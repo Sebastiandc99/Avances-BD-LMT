@@ -145,3 +145,14 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Próximo paso, después de confirmar este commit en main: preparar un fondo esquemático como archivo independiente y ligero, sin mapas online ni imágenes incrustadas; no reutilizar el raster anterior. El fondo se ha dejado fuera de esta recuperación.
 - Después: fecha opcional, avance/rendimiento por vanos y simplificación de estados, con sus pruebas específicas y publicación privada. Esas mejoras no se presentan como terminadas.
 
+
+## 10/11/2026 — sincronización privada: base preparada
+- Se creó un proyecto independiente de Supabase, `Avances BD LMT`, en la organización existente Seba Games. Costo informado por el proveedor: USD 0/mes; no se contrató un plan pago.
+- Proyecto `ynhvceqjhcydsteyzrpt`: migración `lmt_private_sync` aplicada. Eventos con RLS por usuario, versiones e inserción idempotente; bucket `lmt-photos` privado, limitado a JPG/PNG/WebP, sin PDF ni DWG.
+- Comprobado en una transacción revertida: guardar/reintentar sin duplicar, detectar versiones en conflicto, impedir lecturas/escrituras de otra cuenta y rechazar escrituras anónimas. Sin datos de prueba persistidos.
+- Asesor de seguridad de Supabase: cero avisos sobre esta base.
+- Error previo: dos lecturas SQL de KPFighter terminaron en `Connection terminated due to connection timeout`; el diagnóstico informó `currently hibernated`. Se dejó ese proyecto intacto y se preparó una base independiente.
+- Se mantiene el inventario validado: 237 piquetes, 235 vanos y 1.743 BD estimados. No se generan ni cargan recursos gráficos ni documentos originales.
+- La interfaz y cola de sincronización están en preparación local; todavía no se presentan como publicadas.
+
+- Intento Git push en esta sesión: `fatal: could not read Username for 'https://github.com': terminal prompts disabled`. No hay sesión Git autenticada; respaldo alternativo por árbol Git UTF-8 y commits del conector, sin create_blob.
