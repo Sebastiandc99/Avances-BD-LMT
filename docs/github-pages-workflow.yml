@@ -6,6 +6,8 @@ on:
       - 'app/**'
       - 'lib/**'
       - 'pages/**'
+      - 'tests/**'
+      - 'supabase/**'
       - 'public/**'
       - 'package*.json'
       - 'vite.pages.config.ts'
@@ -37,7 +39,7 @@ jobs:
         run: node scripts/check-public-files.mjs
       - run: npm ci
       - name: Verificar modelo y base de datos
-        run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs
+        run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs tests/sync.test.mjs tests/storage.test.mjs
       - name: Comprobar TypeScript
         run: node node_modules/typescript/bin/tsc --noEmit
       - name: Compilar versión para GitHub Pages

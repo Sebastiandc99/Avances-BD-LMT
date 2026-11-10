@@ -1,5 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Dashboard from '../app/dashboard';
+import App from './App';
 import '../app/globals.css';
-createRoot(document.getElementById('root')!).render(<Dashboard user={null} localOnly basePath={import.meta.env.BASE_URL}/>);
+createRoot(document.getElementById('root')!).render(<App/>);

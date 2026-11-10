@@ -9,3 +9,23 @@ export async function photoFile(file:File):Promise<Photo> {
   const bitmap=await createImageBitmap(file); const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));const c=document.createElement('canvas');c.width=Math.round(bitmap.width*scale);c.height=Math.round(bitmap.height*scale);c.getContext('2d')!.drawImage(bitmap,0,0,c.width,c.height);bitmap.close();
   return {id:crypto.randomUUID(),data:c.toDataURL('image/jpeg',.82),name:file.name};
 }
+
+/** Atomically links pre-account records once. Other accounts never inherit them. */
+export async function claimLocalRecords(owner:string){
+ const d=await db();
+ return new Promise<void>((resolve,reject)=>{
+  const tx=d.transaction(['events','photos'],'readwrite');
+  for(const name of ['events','photos']){
+   const store=tx.objectStore(name),request=store.getAll();
+   request.onsuccess=()=>{
+    const rows=request.result;
+    for(const row of rows.filter(r=>r.owner==='local-device')){
+     const key=owner+':'+row.value.id;
+     if(!rows.some(r=>r.key===key))store.put({key,owner,value:name==='events'?{...row.value,sync:row.value.sync==='discarded'?'discarded':'pending'}:{...row.value,uploaded:false}});
+     store.delete(row.key);
+    }
+   };
+  }
+  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}

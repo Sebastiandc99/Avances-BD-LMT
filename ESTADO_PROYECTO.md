@@ -156,3 +156,16 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - La interfaz y cola de sincronización están en preparación local; todavía no se presentan como publicadas.
 
 - Intento Git push en esta sesión: `fatal: could not read Username for 'https://github.com': terminal prompts disabled`. No hay sesión Git autenticada; respaldo alternativo por árbol Git UTF-8 y commits del conector, sin create_blob.
+
+
+## 10/11/2026 — guardado local y sincronización automática
+- Base privada respaldada en GitHub: commit cfb4e8dc9c5c8f15d0d4e229f63beaa1fcab9bd8.
+- Se incorpora ingreso/alta por correo y contraseña, confirmación por enlace del correo dentro de la app y acceso a los mismos datos con la misma cuenta en otro dispositivo.
+- Guardado primero en IndexedDB; cola automática al volver la conexión, al guardar, al volver a la app y cada 45 segundos con la app abierta. Sin promesa de subir con el navegador cerrado.
+- Vinculación transaccional de registros anteriores de Chrome a la cuenta, conservando fotos e historial; separación local y remota entre cuentas. La vista puede abrir sin conexión aun con sesión pendiente de renovar.
+- Reintentos idempotentes, paginación de historial, versiones en conflicto conservadas para elegir y rechazo de registros con fotos faltantes. Se preserva la versión que se estaba editando para detectar cambios concurrentes.
+- 15 pruebas de modelo, SQLite, cola de sincronización y migración local aprobadas; TypeScript, build:pages, verify:pages y control de documentos privados aprobados.
+- Dependencias nuevas fijadas con lock: supabase-js 2.119.0 y fake-indexeddb 6.2.5 (solo pruebas). Clave de frontend publicable; ninguna clave administrativa en el repositorio.
+- Configuración del panel Auth no modificada: el navegador de administración pide iniciar sesión. Se conserva confirmación de correo y se permite pegar el enlace de confirmación en la propia app.
+- La actualización queda guardada para su publicación automática por GitHub Actions. La verificación del despliegue se registra por separado cuando termine.
+- Error de transferencia interna: una lectura combinada excedió el límite y no pudo analizarse como JSON. No se enviaron datos en ese intento. Resuelto con lecturas acotadas y transferencia solo de diferencias del lock.
