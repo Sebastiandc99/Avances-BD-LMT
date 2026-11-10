@@ -51,3 +51,25 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Las referencias anteriores a imágenes se retirarán en una etapa separada antes de compilar, porque los recursos gráficos fueron excluidos de este respaldo por instrucción del usuario.
 - Los cambios funcionales solicitados anteriormente (fecha opcional, rendimiento por vanos y simplificación de estados) permanecen pendientes; esta sesión prioriza recuperar la aplicación existente.
 
+## Recuperación — etapa 3
+- Respaldo de fuente completa confirmado en GitHub: commit `9bd8a1153254ef524bf1338c2d68887608aee14c`, 133 archivos y cero imágenes. Verificado leyendo el árbol de main de forma independiente.
+- Confirmada la presencia remota de `app/page.tsx`, `app/dashboard.tsx`, `lib/model.ts`, `package.json`, `package-lock.json`, `scripts/run-framework.mjs` y el inventario servido por la aplicación.
+- Se retiran dependencias de imágenes excluidas del mapa, los metadatos, el manifiesto y la precarga del Service Worker. La geometría interactiva permanece visible sobre fondo liso; no se cambian coordenadas ni cantidades.
+- Se conserva el inventario de datos validado. No hay mapas online, Base64 dentro de SVG ni cargas de recursos gráficos.
+- Instalación: el lanzador pnpm disponible falló con `EPERM: operation not permitted, realpath 'C:\\Users\\sebas'`. No se repite. Se descargó npm 11.6.2 al directorio temporal del checkout y se ejecuta `npm ci` con el lock original y validación TLS activa.
+- La primera validación de retirada de referencias encontró el atributo CSS `background` como falso positivo y detuvo la escritura. Se acotó a referencias de imagen y variables del fondo; adaptación completada.
+- Instalación terminada: `npm ci`, 686 paquetes, lock original conservado.
+- TypeScript: `tsc --noEmit`, código de salida 0.
+- Compilación: `npm run build` con Vinext/Vite, cinco etapas completadas, código de salida 0. Generados `dist/server/index.js`, configuración Worker y manifiesto de assets del cliente.
+- Pruebas ya verificadas: 7 de modelo/SQLite aprobadas. No se repiten porque la adaptación solo cambia presentación, metadatos y caché. La suite API con servidor no se ejecutó; no se probaron servicios de producción.
+- Lectura independiente de GitHub: los SHA de los 128 archivos de fuente respaldados coinciden con los bytes del checkout recuperado; todos están presentes. Las diferencias respecto de objetos Git originales corresponden a los finales de línea de la copia Windows, sin diferencias de contenido funcional.
+- Confirmado en la copia compilada: el inventario servido y el inventario validado son idénticos como datos; 237 piquetes, 235 vanos y 1.743 BD estimados.
+- Error de transferencia interna: una lectura única del paquete de fuente excedió el límite de salida y devolvió `Warning: truncated output`; el analizador JSON se detuvo antes de enviar datos. Se resolvió leyendo veinte bloques de texto acotados. No se repitió el envío grande ni se usaron imágenes o codificación Base64.
+
+## Estado para retomar sin repetir trabajo
+- Objetivo de esta sesión: fuente recuperada, respaldada y compilada. No reconstruir la aplicación ni repetir el análisis CAD/PDF.
+- Checkout ejecutable: `Avances-BD-LMT/github-recovery`. La copia original `.sites-checkout` se conserva intacta.
+- Mantener el repositorio privado. La publicación existente no se modificó en esta sesión.
+- Próximo paso, después de confirmar este commit en main: preparar un fondo esquemático como archivo independiente y ligero, sin mapas online ni imágenes incrustadas; no reutilizar el raster anterior. El fondo se ha dejado fuera de esta recuperación.
+- Después: fecha opcional, avance/rendimiento por vanos y simplificación de estados, con sus pruebas específicas y publicación privada. Esas mejoras no se presentan como terminadas.
+

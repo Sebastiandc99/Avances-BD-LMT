@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { colors, type Event, type Inventory, type Span } from '../lib/model';
-import { Plus, Minus, Scan, Layers, Navigation } from 'lucide-react';
+import { Plus, Minus, Scan, Navigation } from 'lucide-react';
 export default function TraceMap({data,records,selected,onSelect,line,focus}:{data:Inventory;records:Record<string,Event>;selected:string|null;onSelect:(s:string)=>void;line:string;focus:number}){
  const host=useRef<HTMLDivElement>(null), svg=useRef<SVGSVGElement>(null);
- const [size,setSize]=useState({w:800,h:600}),[view,setView]=useState({x:0,y:0,w:4000,h:4442}),[background,setBackground]=useState(true),[candidates,setCandidates]=useState<Span[]>([]);
+ const [size,setSize]=useState({w:800,h:600}),[view,setView]=useState({x:0,y:0,w:4000,h:4442}),[candidates,setCandidates]=useState<Span[]>([]);
  const pointers=useRef(new Map<number,{x:number;y:number}>()),gesture=useRef<{start:{x:number;y:number};last:{x:number;y:number};distance:number;moved:boolean}>({start:{x:0,y:0},last:{x:0,y:0},distance:0,moved:false});
  const poles=useMemo(()=>Object.fromEntries(data.piquetes.map(p=>[p.id,p])),[data]);
  const spans=data.vanos.filter(s=>line==='all'||s.linea===line);
@@ -19,16 +19,15 @@ export default function TraceMap({data,records,selected,onSelect,line,focus}:{da
  function move(e:React.PointerEvent){if(!pointers.current.has(e.pointerId))return;const p=point(e);pointers.current.set(e.pointerId,p);const ps=[...pointers.current.values()],g=gesture.current;if(Math.hypot(p.x-g.start.x,p.y-g.start.y)>6)g.moved=true;if(ps.length===2){const distance=Math.hypot(ps[0].x-ps[1].x,ps[0].y-ps[1].y),mid={x:(ps[0].x+ps[1].x)/2,y:(ps[0].y+ps[1].y)/2};if(g.distance>0){const factor=g.distance/distance,last={...g.last};setView(v=>{const w=Math.max(70,Math.min(10000,v.w*factor)),f=w/v.w;return{x:v.x+last.x/size.w*v.w-mid.x/size.w*w,y:v.y+last.y/size.h*v.h-mid.y/size.h*v.h*f,w,h:w*size.h/size.w}});}g.last=mid;g.distance=distance;g.moved=true;}else{const dx=p.x-g.last.x,dy=p.y-g.last.y;if(g.moved)setView(v=>({...v,x:v.x-dx*v.w/size.w,y:v.y-dy*v.h/size.h}));g.last=p;}}
  function up(e:React.PointerEvent){const p=point(e),g=gesture.current;pointers.current.delete(e.pointerId);if(pointers.current.size){g.last=[...pointers.current.values()][0];g.distance=0;g.moved=true;return;}if(g.moved)return;const x=view.x+p.x/size.w*view.w,y=view.y+p.y/size.h*view.h;const near=spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,dx=b[0]-a[0],dy=b[1]-a[1];const t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)));return{s,d:Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)*size.w/view.w};}).filter(v=>v.d<26).sort((a,b)=>a.d-b.d);if(near.length===1||(near[0]&&near[0].d<near[1]?.d-7))onSelect(near[0].s.id);else if(near.length)setCandidates(near.slice(0,8).map(v=>v.s));}
  const showLabels=view.w<1400;
- return <div className={'map '+(!background?'plain':'')} ref={host}>
+ return <div className='map plain' ref={host}>
   <svg ref={svg} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="none" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={e=>{pointers.current.delete(e.pointerId);gesture.current.moved=true}} aria-label="Plano interactivo de la LMT. Arrastrá para mover y usá dos dedos para acercar.">
-   {background&&<image href="/assets/traza.webp" width={data.image.width} height={data.image.height}/>}
    {spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,sel=selected===s.id,c=colors[records[s.id]?.status||'pendiente'];return <g key={s.id}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#fff':'#142426'} strokeWidth={sel?12:7} vectorEffect="non-scaling-stroke"/><line data-span={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#69edc0':c} strokeWidth={sel?7:4} vectorEffect="non-scaling-stroke"/></g>})}
    {data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=><g key={p.id}><circle cx={p.pixel[0]} cy={p.pixel[1]} r={view.w/size.w*(showLabels?3:1.7)} fill="#fff" stroke="#172a29" strokeWidth="1" vectorEffect="non-scaling-stroke"/>{showLabels&&<text x={p.pixel[0]+view.w/size.w*9} y={p.pixel[1]-view.w/size.w*8} fontSize={view.w/size.w*12} fontWeight="700" fill="#fff" stroke="#142426" strokeWidth={view.w/size.w*3} paintOrder="stroke">{p.rotulo}</text>}</g>)}
   </svg>
   <div className="map-tag"><span className="live-dot"/> TRAZA LMT <small>237 piquetes · Plano de referencia</small></div>
-  <div className="map-tools"><button aria-label="Acercar mapa" onClick={()=>zoom(.65)}><Plus size={20}/></button><button aria-label="Alejar mapa" onClick={()=>zoom(1.5)}><Minus size={20}/></button><button aria-label="Ver traza completa" onClick={fit}><Scan size={20}/></button><button aria-label="Mostrar u ocultar imagen de fondo" onClick={()=>setBackground(!background)} className={background?'active':''}><Layers size={20}/></button></div>
+  <div className="map-tools"><button aria-label="Acercar mapa" onClick={()=>zoom(.65)}><Plus size={20}/></button><button aria-label="Alejar mapa" onClick={()=>zoom(1.5)}><Minus size={20}/></button><button aria-label="Ver traza completa" onClick={fit}><Scan size={20}/></button></div>
   <div className="map-north"><Navigation size={18}/><b>N</b></div>
-  <div className="map-foot">Imagen aportada · Traza ajustada al DWG <span>Arrastrá · Pellizcá para acercar</span></div>
+  <div className="map-foot">Geometría del DWG · Fondo pendiente <span>Arrastrá · Pellizcá para acercar</span></div>
   {candidates.length>0&&<div className="map-candidates"><b>Elegí el vano</b><small>Hay varios cerca de ese punto.</small>{candidates.map(s=><button key={s.id} onClick={()=>{onSelect(s.id);setCandidates([])}}>{s.desde.replace('L-','P').replace('FP-','FP ')} → {s.hasta.replace('L-','P').replace('FP-','FP ')}<span style={{background:colors[records[s.id]?.status||'pendiente']}}/></button>)}<button onClick={()=>setCandidates([])}>Cerrar</button></div>}
  </div>;
 }

@@ -14,7 +14,7 @@ Aplicación independiente para controlar el montaje de desviadores de vuelo de l
 
 ## Fuentes y límites del cómputo
 
-`public/assets/inventory.json` conserva el inventario original y agrega coordenadas de imagen para los piquetes. El fondo se extrae del raster embebido en **Traza LMT.pdf**, aportado por el usuario, sin mosaicos online ni scraping. Se puede sustituir el fondo conservando o recalibrando el transformado.
+`data/inventory.json` conserva el inventario validado y `public/assets/inventory.json` es su copia servida a la aplicación. Esta recuperación muestra la geometría del DWG sobre fondo liso. El fondo esquemático independiente queda pendiente; no se incluyen imágenes ni mapas online.
 
 `docs/calibration.json` contiene hashes, matriz afín y validaciones. RMS del ajuste entre representaciones del mismo plano: **0,656 m**, máximo **1,256 m**. No equivale a exactitud geográfica comprobada contra terreno. Datum declarado: POSGAR / Gauss-Krüger faja 3; validar marco y puntos de control con topografía.
 
@@ -34,4 +34,5 @@ npx tsc --noEmit
 npm run build
 ```
 
-La configuración de despliegue está en `.openai/hosting.json`. La publicación privada conserva el inicio de sesión. Las migraciones Drizzle se aplican al desplegar. Para desarrollo local ver las herramientas de Sites incluidas en `scripts/`; los bindings declarados son DB y BUCKET. El repositorio independiente de GitHub se conectará cuando esté creado; no se modifica ninguna de las otras apps.
+La configuración de despliegue está en `.openai/hosting.json`. La publicación privada conserva el inicio de sesión. Las migraciones Drizzle se aplican al desplegar. Para desarrollo local ver las herramientas de Sites incluidas en `scripts/`; los bindings declarados son DB y BUCKET. La fuente ejecutable recuperada está guardada en el repositorio privado `Sebastiandc99/Avances-BD-LMT`. Ver `ESTADO_PROYECTO.md` para los commits y las comprobaciones. Esta sesión conserva la funcionalidad previa; fecha opcional, simplificación de estados y rendimiento por vanos siguen pendientes.
+

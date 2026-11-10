@@ -1,5 +1,5 @@
-const CACHE='lmt-v1.0.0';
-const CORE=['/','/assets/inventory.json','/assets/traza.webp','/icon.svg','/manifest.webmanifest'];
+const CACHE='lmt-v1.0.1-recovery';
+const CORE=['/','/assets/inventory.json','/manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('lmt-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
