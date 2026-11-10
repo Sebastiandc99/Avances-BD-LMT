@@ -208,3 +208,16 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - No se cargaron avances ficticios ni se enviaron datos personales para la comprobación visual. El cierre después del guardado local está implementado en la ficha; un error de guardado la mantiene abierta. No se simuló un avance de obra real en producción.
 - Una lectura de prueba de DOM con SVG.viewBox.baseVal devolvió TypeError (propiedad no disponible en esa superficie); se leyó el atributo viewBox y se completó la comparación. No fue un error de la aplicación ni se repitió la operación fallida.
 - Conservados 237 piquetes, 235 vanos y 1.743 BD estimados. Continúan el guardado offline y la sincronización privada existentes. No se añadieron imágenes, mapas online, PDF ni DWG.
+
+
+## 10/11/2026 — corrección de cantidades y rendimiento: lógica verificada
+- Se revisó nuevamente la página de Criterios Técnicos de Señalización del procedimiento privado: 60 % central del vano, separación de 10 m y cantidades orientativas de 7 a 8 por vano promedio. Se mantiene el redondeo/disposición simétrica ya documentado; no se publica el PDF.
+- Se recalcularon las longitudes entre coordenadas de los 237 piquetes extraídos del DWG, los 235 vanos y las cantidades por vano: cero discrepancias con el inventario validado. Resultado: larga 1.613, corta 130, total 1.743 BD estimados; por vano varían de 5 a 8 según su longitud.
+- Nuevo criterio solicitado: un terminado sin cantidad real informada contabiliza los BD calculados de ese vano. Una cantidad real mayor a cero tiene prioridad; en proceso solo suma BD reales informados. Se distingue el origen del conteo. Los registros originales no se reescriben.
+- Rendimiento: solo terminados con fecha de ejecución explícita / días distintos con ejecución registrada; se calculan vanos/día y BD/día. Sin fecha suman avance y BD, pero no rendimiento. No se usa createdAt como fecha de ejecución.
+- Correcciones de fecha se reflejan sin duplicar vanos; reabrir retira el vano de producción terminada. Se separan terminados, en proceso, pendientes de iniciar y faltantes totales (en proceso + pendientes).
+- Pruebas afectadas aprobadas: 17 de modelo y carga por tramos, incluidos 80 históricos sin fecha, mezcla con producción fechada, prioridad de cantidades reales, fechas añadidas/corregidas/borradas, reapertura y total completo 1.743. TypeScript, build:pages, verify:pages y control de documentos privados aprobados.
+- En la carga por tramos, una fecha de finalización vacía no hereda una fecha de actividad anterior de un vano en proceso. Esa fecha anterior se conserva en el historial.
+- La lectura inicial de instrucciones PDF devolvió skill package is not available mientras el entorno iniciaba. Tras quedar disponible se leyó correctamente; no hubo cambios ni pérdida de archivos.
+- Estos criterios reemplazan las notas anteriores que usaban fecha de guardado/días calendario o dejaban en cero los BD de un vano terminado sin cantidad manual.
+- Interfaz y publicación se confirman en la etapa siguiente. Sin imágenes nuevas ni cargas de documentos originales.

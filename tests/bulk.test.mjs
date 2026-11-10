@@ -19,11 +19,11 @@ test('bulk completion keeps measured quantities, photos and notes; completed/con
  const records=latestRecords(old),plan=completionPlan(vanos,[{line:'larga',from:1,to:5}],records,['L-003-004']);
  assert.deepEqual(plan.eligible,['L-001-002','L-004-005']);assert.equal(plan.done.length,1);assert.equal(plan.blocked.length,1);
  const additions=completedEvents(plan.eligible,records,{...options,date:''},makeId,'2026-11-10T11:00:00Z');
- assert.ok(additions.every(validProgress));assert.equal(additions[0].installed,6);assert.equal(additions[0].notes,'Nota previa');assert.deepEqual(additions[0].photos,old[0].photos);assert.equal(additions[0].responsible,'Cuadrilla A');assert.equal(additions[0].date,'2026-11-08');assert.equal(additions[0].version,2);assert.equal(additions[0].baseVersion,1);assert.equal(additions[1].installed,0);
+ assert.ok(additions.every(validProgress));assert.equal(additions[0].installed,6);assert.equal(additions[0].notes,'Nota previa');assert.deepEqual(additions[0].photos,old[0].photos);assert.equal(additions[0].responsible,'Cuadrilla A');assert.equal(additions[0].date,'');assert.equal(additions[0].version,2);assert.equal(additions[0].baseVersion,1);assert.equal(additions[1].installed,0);
  const next=latestRecords([...old,...additions]);assert.equal(completionPlan(vanos,[{line:'larga',from:1,to:5}],next,['L-003-004']).eligible.length,0);
 });
-test('a dated historical load counts completed spans on its real date without inventing installed BD',()=>{
+test('a dated historical load counts completed spans and derives BD without inventing measured entries',()=>{
  const plan=completionPlan(vanos,[{line:'corta',from:1,to:18}],{},[]);
  const events=completedEvents(plan.eligible,{},options,makeId,'2026-11-10T10:00:00Z');
- const summary=metrics(vanos,events,'2026-11-10');assert.equal(summary.done,17);assert.equal(summary.daily['2026-11-08'],17);assert.equal(summary.installed,0);assert.equal(summary.planned,1743);
+ const summary=metrics(vanos,events,'2026-11-10');assert.equal(summary.done,17);assert.equal(summary.daily['2026-11-08'],17);assert.equal(summary.installed,130);assert.ok(events.every(e=>e.installed===0));assert.equal(summary.planned,1743);
 });
