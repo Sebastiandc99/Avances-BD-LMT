@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { colors, type Event, type Inventory, type Span } from '../lib/model';
 import { Plus, Minus, Scan, Navigation } from 'lucide-react';
-export default function TraceMap({data,records,selected,onSelect,line,focus}:{data:Inventory;records:Record<string,Event>;selected:string|null;onSelect:(s:string)=>void;line:string;focus:number}){
+export default function TraceMap({data,records,selected,onSelect,line,focus,basePath='/'}:{data:Inventory;records:Record<string,Event>;selected:string|null;onSelect:(s:string)=>void;line:string;focus:number;basePath?:string}){
  const host=useRef<HTMLDivElement>(null), svg=useRef<SVGSVGElement>(null);
  const [size,setSize]=useState({w:800,h:600}),[view,setView]=useState({x:0,y:0,w:4000,h:4442}),[candidates,setCandidates]=useState<Span[]>([]);
  const pointers=useRef(new Map<number,{x:number;y:number}>()),gesture=useRef<{start:{x:number;y:number};last:{x:number;y:number};distance:number;moved:boolean}>({start:{x:0,y:0},last:{x:0,y:0},distance:0,moved:false});
@@ -21,7 +21,7 @@ export default function TraceMap({data,records,selected,onSelect,line,focus}:{da
  const showLabels=view.w<1400;
  return <div className='map plain' ref={host}>
   <svg ref={svg} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="none" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={e=>{pointers.current.delete(e.pointerId);gesture.current.moved=true}} aria-label="Plano interactivo de la LMT. Arrastrá para mover y usá dos dedos para acercar.">
-   <image href="/assets/fondo-esquematico.svg" width={data.image.width} height={data.image.height} pointerEvents="none"/>
+   <image href={basePath+'assets/fondo-esquematico.svg'} width={data.image.width} height={data.image.height} pointerEvents="none"/>
    {spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,sel=selected===s.id,c=colors[records[s.id]?.status||'pendiente'];return <g key={s.id}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#fff':'#142426'} strokeWidth={sel?12:7} vectorEffect="non-scaling-stroke"/><line data-span={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#2563eb':c} strokeWidth={sel?7:4} vectorEffect="non-scaling-stroke"/></g>})}
    {data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=><g key={p.id}><circle cx={p.pixel[0]} cy={p.pixel[1]} r={view.w/size.w*(showLabels?3:1.7)} fill="#fff" stroke="#172a29" strokeWidth="1" vectorEffect="non-scaling-stroke"/>{showLabels&&<text x={p.pixel[0]+view.w/size.w*9} y={p.pixel[1]-view.w/size.w*8} fontSize={view.w/size.w*12} fontWeight="700" fill="#fff" stroke="#142426" strokeWidth={view.w/size.w*3} paintOrder="stroke">{p.rotulo}</text>}</g>)}
   </svg>

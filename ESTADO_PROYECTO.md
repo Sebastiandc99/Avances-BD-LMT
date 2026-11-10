@@ -1,5 +1,16 @@
 # Avances BD LMT — Estado del proyecto
 
+## Adaptación para GitHub Pages — 09/11/2026
+- Solicitud actual: servir la aplicación desde GitHub Pages del repositorio privado.
+- Repositorio comprobado: `has_pages: false`; Pages aún no está activado.
+- Se añade entrada estática Vite que reutiliza el formulario y el mapa, con rutas bajo `/Avances-BD-LMT/`, guardado local en IndexedDB y respaldo JSON. Los valores por defecto de la versión Sites se conservan.
+- La versión Pages no ejecuta las API de ChatGPT/D1/R2. La sincronización entre equipos se realiza mediante exportar/importar JSON. No se migra ni borra el contenido del despliegue existente.
+- Se prepara build, verificación de artefactos y workflow de Pages. El despliegue se omite si GitHub no tiene Pages configurado para Actions.
+- El entorno local dejó de estar disponible: primer error `setup helper exited with status -1073741502`; posteriormente `No usable execution environment is available`. Node REPL y automatización de Chrome tampoco están disponibles en esta sesión. No repetir esos intentos.
+- No se declara esta adaptación compilada ni publicada hasta obtener resultados de GitHub Actions. Se conservan las diez pruebas y el despliegue anteriores como evidencia de aquella versión.
+- El conector no ofrece administración de Pages ni navegador disponible para activar Settings. Si el plan impide Pages en repositorios privados, no cambiar el repositorio a público sin autorización.
+- Guía y limitaciones: `docs/GITHUB_PAGES.md`.
+
 ## Terminación y publicación — 09/11/2026
 - PUBLICACIÓN CONFIRMADA: `succeeded`, con URL https://avances-bd-lmt.sebastiandc99.chatgpt.site y acceso privado conservado.
 - Fuente de ejecución publicada: `753ea5fd5e0cc367b9d7734626484b05df6b9fb8`, subida mediante Git push al repositorio de Sites. Respaldo funcional en GitHub: `fd89816307f0f8bfb7fee2732d4bc76250158fe6`.
