@@ -275,3 +275,11 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Cambio solo de organización visual; no se cambian fórmulas, cantidades, fechas ni registros, ni el guardado, la sincronización o la memoria de zoom.
 - TypeScript, compilación, verify:pages y diff --check aprobados. No se añadieron pruebas que dupliquen la presentación; el workflow conserva las 28 pruebas funcionales existentes.
 - Fuente preparada para despliegue automático; la publicación se confirma después de terminar Pages.
+
+
+### Separación publicada y verificada
+- Fuente 6339f02aba8d70302c7958525c90b1913a594a13 en main. GitHub Actions 42833140176 terminó success; build 129888183194 y deploy 129888534953 aprobados. Pasaron las 28 pruebas, TypeScript, compilación y verificaciones de publicación.
+- Tres archivos de interfaz/guía comparados por SHA con GitHub: cero diferencias.
+- Comprobación visual en producción tras recargar: Mapa tiene 0 controles/etiquetas de rendimiento, 0 botones de exportación analítica y 1 botón de carga por tramos; mantiene plano, filtros y ficha operativa.
+- Resumen tiene sus indicadores y rendimiento, 0 botones de carga por tramos, 0 fichas laterales de edición y 0 búsquedas de carga. Conserva fecha estimada y días restantes. Ningún registro de obra fue modificado para estas comprobaciones.
+- Aplicación: https://sebastiandc99.github.io/Avances-BD-LMT/. No se generaron imágenes ni se añadieron PDF/DWG. Inventario y cálculos sin cambios: 237 piquetes, 235 vanos y 1.743 BD estimados.
