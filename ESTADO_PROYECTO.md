@@ -45,3 +45,9 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Git directo no tiene autenticación utilizable en este entorno. No repetir estos intentos. Respaldo alternativo: árbol Git con contenido UTF-8, commit y avance de main con comparación del SHA esperado mediante el conector. Sin llamada a `create_blob` ni carga de imágenes.
 - Próximo paso: confirmar los commits y archivos en GitHub; después instalar las dependencias y compilar. El fondo esquemático sigue pendiente hasta completar ese respaldo.
 
+## Recuperación — etapa 2
+- Núcleo guardado en GitHub: commit `c0f342f2dd4f51a9a1ae2ae350243ee15e6ebfb5`, main actualizado correctamente. Incluye 27 archivos de código/datos de la fuente anterior y este registro.
+- Se incorporan ahora componentes, herramientas, configuración y `package-lock.json` originales. No se cambia el comportamiento de la aplicación en estos dos commits de recuperación.
+- Las referencias anteriores a imágenes se retirarán en una etapa separada antes de compilar, porque los recursos gráficos fueron excluidos de este respaldo por instrucción del usuario.
+- Los cambios funcionales solicitados anteriormente (fecha opcional, rendimiento por vanos y simplificación de estados) permanecen pendientes; esta sesión prioriza recuperar la aplicación existente.
+
