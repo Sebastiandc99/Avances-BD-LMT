@@ -71,3 +71,13 @@ El Resumen usa siempre ambas líneas: porcentaje = terminados / 235 × 100. No d
 ## Google Drive: conexión preparada, pendiente de activación
 
 Se identificó la carpeta privada Doc Worley / App avances. Datos y respaldo incorpora **Sincronizar copia con Drive**, con destino fijo y archivo de respaldo por equipo. El botón requiere configurar OAuth web, API key pública de Picker y número de proyecto de Google, además de autorizar la cuenta. Ver `docs/GOOGLE_DRIVE.md`. Sin esa configuración, la interfaz lo informa como pendiente y no simula un guardado exitoso.
+
+
+## Exportar Excel
+Desde Vanos, Resumen o Datos y respaldo, pulsar Exportar Excel. Se descarga un XLSX con cuatro hojas: Resumen global, Rendimiento por fecha, Vanos (235 registros con fecha y cantidades) y Vista aérea.
+
+La hoja Vista aérea contiene una imagen PNG amplia de 4400 × 3400 píxeles con las dos líneas completas, piquetes y estados, usando el fondo esquemático local. No consulta mapas online ni incluye los PDF/DWG originales.
+
+Los resúmenes usan ambas líneas y los mismos registros vigentes que la aplicación. El rendimiento excluye vanos terminados sin fecha de ejecución válida. Incluye días restantes y fecha estimada de finalización. La exportación representa el momento de descarga; para incorporar nuevos datos o nuevas fechas, generar otro Excel desde la app.
+
+La descarga se prepara en el navegador y funciona sin conexión una vez preparada la app y su fondo local. No modifica datos ni reemplaza el respaldo JSON de eventos y fotos.

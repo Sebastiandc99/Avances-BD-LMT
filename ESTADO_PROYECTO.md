@@ -340,3 +340,9 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Advertencia de build: el JS principal ronda 542 kB sin comprimir / 155 kB gzip. Se mantiene incorporado para permitir exportación sin conexión; el build finaliza correctamente.
 - Credenciales propias de Google Drive siguen pendientes; esta función descarga el Excel al dispositivo y no presenta Drive como activado.
 - Lógica lista para conectar en la interfaz y publicar. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados; los PDF/DWG permanecen fuera del repositorio.
+
+
+### Botón de Excel conectado
+- Exportar Excel disponible en Vanos, Resumen y Datos y respaldo. No agrega análisis al Mapa. Conserva la descarga CSV existente.
+- La descarga espera los guardados locales pendientes y toma una única copia de los eventos para que tablas, resumen e imagen correspondan al mismo instante.
+- Función y pruebas guardadas en 0cb5a32000c2c5e5fc96e522624360dd2da46e88. Publicación y descarga desde Pages pendientes de confirmar al finalizar el workflow.
