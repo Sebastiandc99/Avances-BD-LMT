@@ -1,6 +1,14 @@
 # Avances BD LMT — Estado del proyecto
 
 ## Adaptación para GitHub Pages — 09/11/2026
+- Adaptación guardada: `ad3f5adfd3fdcaa020d49bdc0e63dc248b6441ec`; workflow activo: `8ce41ca825962963c222a05f54c9d8f2804d048d`.
+- COMPILACIÓN REMOTA CONFIRMADA: GitHub Actions run `42736883632`, job build `129568163792`, resultado `success`. Pasaron instalación, pruebas de modelo/SQLite, TypeScript, build estático y verificación de rutas/inventario/fondo/manifiesto. Artefacto de Pages subido correctamente.
+- Publicación NO realizada: job deploy `129568461714` terminó `skipped` porque Pages no está habilitado para Actions. Verificación independiente posterior: `private: true`, `has_pages: false`.
+- Resultado de CI: https://github.com/Sebastiandc99/Avances-BD-LMT/actions/runs/42736883632 .
+- Única acción de configuración pendiente: en https://github.com/Sebastiandc99/Avances-BD-LMT/settings/pages elegir GitHub Actions como fuente. Después, volver a ejecutar el job build para comprobar la activación y desplegar.
+- No hay herramienta de administración de Pages expuesta por el conector y el navegador/entorno local no está disponible. La búsqueda de capacidades adicionales solo ofreció el mismo conector y navegadores externos no instalados; no se sustituyó la sesión de Chrome ni se pidieron credenciales.
+- Errores de lecturas auxiliares: `/actions/workflows` fue rechazado como endpoint no admitido; `/check-runs` devolvió 403 `Resource not accessible by integration`. Los resultados se verificaron con `/actions/runs` y la lectura de jobs, que sí funcionaron.
+- La dirección prevista github.io aún no debe presentarse como un enlace publicado. La versión privada de Sites sigue disponible.
 - Solicitud actual: servir la aplicación desde GitHub Pages del repositorio privado.
 - Repositorio comprobado: `has_pages: false`; Pages aún no está activado.
 - Se añade entrada estática Vite que reutiliza el formulario y el mapa, con rutas bajo `/Avances-BD-LMT/`, guardado local en IndexedDB y respaldo JSON. Los valores por defecto de la versión Sites se conservan.
