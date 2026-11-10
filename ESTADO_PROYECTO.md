@@ -397,3 +397,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Botones de modo visibles en móvil y escritorio; contador, Editar seleccionados y Limpiar selección en modo múltiple. Seleccionar no abre fichas ni desplaza la cámara. Los vanos también admiten activación por teclado.
 - Guardar el lote cierra el modal, vuelve al mapa en la misma posición, limpia las marcas y deja el modo múltiple disponible para continuar. Cambiar de modo con una ficha individual sin guardar usa la confirmación existente de cambios sin confirmar.
 - Fuente preparada para Pages; despliegue y controles de producción se verifican al finalizar el workflow.
+
+
+### Selección simple y múltiple publicadas y verificadas
+- Fuente cea00cf9568f5142135c2114777bbc531d16e6ab en main. GitHub Actions 42917010051 completó build y deploy con success: 42 pruebas funcionales, TypeScript, compilación, rutas/inventario y control de documentos privados aprobados.
+- Ocho archivos principales de interfaz, lógica, pruebas, workflow y guía comparados por SHA entre código validado y GitHub: cero diferencias.
+- Verificación en la aplicación pública en viewport móvil de 390 px: botones de selección presentes, dos toques seleccionaron 97–98 y 98–99, Editar seleccionados abrió el modal con ambos y los controles comunes de estado y fecha. Se canceló sin escribir registros de producción.
+- Verificación adicional en escritorio: ambos modos y contador operativo publicados; CSS assets/index-C6VWQmE6.css. App abierta para revisar en https://sebastiandc99.github.io/Avances-BD-LMT/?v=seleccion-multiple-20261110.
+- Guardado completo y cámara conservada ya comprobados con datos aislados en la prueba móvil; ficha individual mostró la fecha y estado comunes después del guardado. No se publicaron registros de prueba.
+- ESTADO actualizado; se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. No se generaron imágenes ni se publicaron PDF/DWG originales.
