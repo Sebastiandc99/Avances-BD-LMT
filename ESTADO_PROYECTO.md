@@ -1,6 +1,11 @@
 # Avances BD LMT — Estado del proyecto
 
 ## Privacidad de documentos y repositorio público — 10/11/2026
+- Control automático aprobado en el run `42804355989`. Pages se activó con GitHub Actions desde Settings.
+- PUBLICACIÓN CONFIRMADA: run manual `42804763819`, resultado `success`, URL https://sebastiandc99.github.io/Avances-BD-LMT/ .
+- La app pública abrió correctamente: 237 piquetes, 235 vanos, 1.743 BD estimados, sin avances ficticios y modo sin conexión listo.
+- En la comprobación visual se detectó que el enlace Inicio apuntaba a la raíz del dominio. Se ajusta para que respete la base del repositorio y conservar el mismo comportamiento en Sites. El workflow comprobará y publicará esta corrección.
+
 - Confirmado: el usuario cambió el repositorio a público (`private: false`). Pages aún no estaba activado al comenzar esta comprobación.
 - Auditoría de los 13 commits alcanzables desde main: ningún PDF, DWG/DXF, archivo comprimido ni raster original en sus árboles. Solo existe la rama main; no hay etiquetas ni releases con adjuntos.
 - Se revisaron 32 versiones de documentación y assets, buscando enlaces a PDF, Drive, Library, adjuntos o archivos originales y contenido PDF/raster incrustado. Sin hallazgos.
