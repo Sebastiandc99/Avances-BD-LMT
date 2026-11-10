@@ -10,8 +10,19 @@ test('237 CAD poles and 235 unique consecutive spans, both complete lines',()=>{
  for(const s of inv.vanos){assert.ok(validSpanId(s.id));const a=byId[s.desde],b=byId[s.hasta];assert.ok(a&&b);assert.ok(a.pixel.every(Number.isFinite));assert.ok(Math.abs(Math.hypot(a.x_este_m-b.x_este_m,a.y_norte_m-b.y_norte_m)-s.longitud_planta_m)<.1);assert.equal(s.posiciones_bd_propuestas_desde_piquete_inicial_m.length,s.bd_propuestos_pendientes_validacion);}
  assert.deepEqual(inv.resumen.map(s=>[s.vanos,s.bd_propuestos_pendientes_validacion]),[[218,1613],[17,130]]);
 });
-test('rejects invalid span identifiers and impossible progress fields',()=>{for(const id of ['L-000-001','L-001-003','L-219-220','FP-018-019','L-1-2','__proto__'])assert.equal(validSpanId(id),false);assert.ok(validProgress(ev()));for(const p of [{installed:-1},{installed:1.2},{status:'bad'},{date:'2026-02-30'},{status:'pendiente',installed:3},{status:'terminado',installed:0},{notes:'x'.repeat(4001)},{photos:['bad']}])assert.equal(validProgress(ev(p)),false);});
+test('rejects invalid span identifiers and impossible progress fields',()=>{for(const id of ['L-000-001','L-001-003','L-219-220','FP-018-019','L-1-2','__proto__'])assert.equal(validSpanId(id),false);assert.ok(validProgress(ev()));for(const p of [{installed:-1},{installed:1.2},{status:'bad'},{date:'2026-02-30'},{status:'pendiente',installed:3},{date:undefined},{notes:'x'.repeat(4001)},{photos:['bad']}])assert.equal(validProgress(ev(p)),false);});
 test('empty project never fabricates installed quantities or ETA',()=>{const m=metrics(inv.vanos,[],'2026-11-08');assert.equal(m.installed,0);assert.equal(m.done,0);assert.equal(m.planned,1743);assert.equal(m.eta,null)});
-test('revision updates, reopening and corrections do not double-count production',()=>{const a=ev(),b=ev({id:'b',installed:8,status:'terminado',version:2,baseVersion:1,date:'2026-11-08'}),c=ev({id:'c',installed:6,status:'observaciones',version:3,baseVersion:2,date:'2026-11-08'});const m=metrics(inv.vanos,[b,a,c],'2026-11-08');assert.equal(m.installed,6);assert.equal(m.done,0);assert.deepEqual(m.daily,{'2026-11-07':3,'2026-11-08':3});assert.equal(m.average,3);});
+test('reopening a completed span reverses production without double-counting BD corrections',()=>{const a=ev(),b=ev({id:'b',installed:8,status:'terminado',version:2,baseVersion:1,date:'2026-11-08'}),c=ev({id:'c',installed:6,status:'observaciones',version:3,baseVersion:2,date:'2026-11-08'});const m=metrics(inv.vanos,[b,a,c],'2026-11-08');assert.equal(m.installed,6);assert.equal(m.done,0);assert.deepEqual(m.daily,{'2026-11-08':0});assert.equal(m.average,0);assert.equal(m.eta,null);});
+
+test('completion can be saved without activity date or measured BD; statistics use the Argentine save date',()=>{
+ assert.equal(emptyProgress().date,'');assert.equal(emptyProgress().installed,0);
+ const e=ev({status:'terminado',installed:0,date:'',createdAt:'2026-11-08T01:00:00Z'});assert.ok(validProgress(e));
+ const m=metrics(inv.vanos,[e],'2026-11-08');assert.equal(m.done,1);assert.equal(m.installed,0);assert.equal(m.planned,1743);assert.equal(m.remaining,234);assert.equal(m.average,.5);assert.deepEqual(m.daily,{'2026-11-07':1});
+});
+
+test('editing measured BD on an already completed span does not add another completed span',()=>{
+ const a=ev({status:'terminado',installed:0}),b=ev({id:'b',status:'terminado',installed:8,version:2,baseVersion:1,date:'2026-11-08'});
+ const m=metrics(inv.vanos,[b,a],'2026-11-08');assert.equal(m.done,1);assert.equal(m.installed,8);assert.deepEqual(m.daily,{'2026-11-07':1});assert.equal(m.average,.5);
+});
 test('local conflict preserves the full local draft until a version is selected',()=>{const a=ev(),b=ev({id:'remote',version:2,baseVersion:1,installed:8}),c=ev({id:'local',version:2,baseVersion:1,installed:5,sync:'conflict'}),d=ev({id:'remote3',version:3,baseVersion:2,installed:10});const es=[a,b,c,d];assert.equal(latestRecords(es)['L-001-002'].installed,5);assert.equal(metrics(inv.vanos,es).installed,5);assert.equal(latestRecords(es.map(e=>e.id==='local'?{...e,sync:'discarded'}:e))['L-001-002'].installed,10);});
 test('CSV quotes cells and neutralizes spreadsheet formulas',()=>{assert.equal(csvCell('=SUM(A1)'),`"'=SUM(A1)"`);assert.equal(csvCell('a"b'),'"a""b"');assert.equal(csvCell(8),'"8"')});

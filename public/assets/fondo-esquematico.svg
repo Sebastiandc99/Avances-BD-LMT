@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="4442" viewBox="0 126 834 926">
+<title>Esquema de referencia de la LMT del Salar del Rincón</title>
+<desc>Ruta Nacional 51, borde aproximado del salar, relieve y sectores de instalaciones. Referencias orientativas; la geometría de piquetes y vanos se dibuja por separado a partir del DWG.</desc>
+<defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="#d5ddce" stroke-width=".6"/></pattern></defs>
+<path fill="#e9e5d6" d="M0 126h834v926H0z"/>
+<path fill="#cfdcd7" d="M0 270L147 240 169 321 205 370 222 420 208 460 237 511 255 548 249 590 284 674 310 749 352 789 401 868 410 951 453 1052H0z"/>
+<path fill="#d3d2be" d="M322 126H834V1052H519L509 969 469 908 453 819 424 753 413 666 379 604 367 521 338 455 333 379 295 299z"/>
+<path d="M397 126L364 235 414 337 402 449 451 549 463 656 500 757 516 860 570 961 598 1052M517 126L481 253 527 366 497 475 557 595 552 725 610 844 626 953 671 1052M644 126L590 236 652 355 613 477 672 585 659 721 718 838 729 965" stroke="#c0c3ae" stroke-width="17" fill="none" stroke-linecap="round"/>
+<path fill="url(#grid)" d="M0 126h834v926H0z"/>
+<path d="M151 126L180 155 235 242 275 301 296 364 348 412 390 482 418 585 429 635 455 683 470 739 486 803 495 853 520 894 541 945 599 968 780 964 834 947" stroke="#fffaf0" stroke-width="10" fill="none" stroke-linejoin="round"/>
+<path d="M151 126L180 155 235 242 275 301 296 364 348 412 390 482 418 585 429 635 455 683 470 739 486 803 495 853 520 894 541 945 599 968 780 964 834 947" stroke="#d0ad64" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<path d="M275 301L176 286 95 303 42 329M486 803L424 821 379 846M599 968L631 1052" stroke="#a5ad9c" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+<g fill="#b8c7bd" stroke="#7e9586" stroke-width="1.5"><path d="M14 314h39v33H14zM12 358h44v29H12zM11 402h49v64H11zM371 827h17v28h-17zM383 866h15v47h-15z"/></g>
+<g font-family="Arial,Helvetica,sans-serif" fill="#66776b"><text x="77" y="680" font-size="24" letter-spacing="3" transform="rotate(-11 77 680)">SALAR DEL RINCÓN</text><text x="595" y="483" font-size="21" letter-spacing="3" transform="rotate(72 595 483)">RELIEVE</text><text x="69" y="405" font-size="12">Instalaciones</text><text x="305" y="887" font-size="12">Instalaciones</text></g>
+<g fill="#fffaf0" stroke="#a68d55" stroke-width="1.5"><rect x="411" y="586" width="39" height="28" rx="5"/><rect x="743" y="940" width="39" height="28" rx="5"/></g>
+<g font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700" fill="#806b43" text-anchor="middle"><text x="430.5" y="605">RN 51</text><text x="762.5" y="959">RN 51</text></g>
+</svg>

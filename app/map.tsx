@@ -21,13 +21,14 @@ export default function TraceMap({data,records,selected,onSelect,line,focus}:{da
  const showLabels=view.w<1400;
  return <div className='map plain' ref={host}>
   <svg ref={svg} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="none" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={e=>{pointers.current.delete(e.pointerId);gesture.current.moved=true}} aria-label="Plano interactivo de la LMT. Arrastrá para mover y usá dos dedos para acercar.">
-   {spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,sel=selected===s.id,c=colors[records[s.id]?.status||'pendiente'];return <g key={s.id}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#fff':'#142426'} strokeWidth={sel?12:7} vectorEffect="non-scaling-stroke"/><line data-span={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#69edc0':c} strokeWidth={sel?7:4} vectorEffect="non-scaling-stroke"/></g>})}
+   <image href="/assets/fondo-esquematico.svg" width={data.image.width} height={data.image.height} pointerEvents="none"/>
+   {spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,sel=selected===s.id,c=colors[records[s.id]?.status||'pendiente'];return <g key={s.id}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#fff':'#142426'} strokeWidth={sel?12:7} vectorEffect="non-scaling-stroke"/><line data-span={s.id} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#2563eb':c} strokeWidth={sel?7:4} vectorEffect="non-scaling-stroke"/></g>})}
    {data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=><g key={p.id}><circle cx={p.pixel[0]} cy={p.pixel[1]} r={view.w/size.w*(showLabels?3:1.7)} fill="#fff" stroke="#172a29" strokeWidth="1" vectorEffect="non-scaling-stroke"/>{showLabels&&<text x={p.pixel[0]+view.w/size.w*9} y={p.pixel[1]-view.w/size.w*8} fontSize={view.w/size.w*12} fontWeight="700" fill="#fff" stroke="#142426" strokeWidth={view.w/size.w*3} paintOrder="stroke">{p.rotulo}</text>}</g>)}
   </svg>
   <div className="map-tag"><span className="live-dot"/> TRAZA LMT <small>237 piquetes · Plano de referencia</small></div>
   <div className="map-tools"><button aria-label="Acercar mapa" onClick={()=>zoom(.65)}><Plus size={20}/></button><button aria-label="Alejar mapa" onClick={()=>zoom(1.5)}><Minus size={20}/></button><button aria-label="Ver traza completa" onClick={fit}><Scan size={20}/></button></div>
   <div className="map-north"><Navigation size={18}/><b>N</b></div>
-  <div className="map-foot">Geometría del DWG · Fondo pendiente <span>Arrastrá · Pellizcá para acercar</span></div>
+  <div className="map-foot">Esquema orientativo · Geometría del DWG <span>Arrastrá · Pellizcá para acercar</span></div>
   {candidates.length>0&&<div className="map-candidates"><b>Elegí el vano</b><small>Hay varios cerca de ese punto.</small>{candidates.map(s=><button key={s.id} onClick={()=>{onSelect(s.id);setCandidates([])}}>{s.desde.replace('L-','P').replace('FP-','FP ')} → {s.hasta.replace('L-','P').replace('FP-','FP ')}<span style={{background:colors[records[s.id]?.status||'pendiente']}}/></button>)}<button onClick={()=>setCandidates([])}>Cerrar</button></div>}
  </div>;
 }

@@ -10,6 +10,8 @@ test('API requires identity, isolates owners, is idempotent, and rejects stale w
  r=await fetch(base+'/api/sync',{method:'POST',headers,body:JSON.stringify({...e,id:crypto.randomUUID()})});assert.equal(r.status,409);
  r=await fetch(base+'/api/sync',{headers});let data=await r.json();assert.equal(data.events.length,1);assert.equal(data.events[0].installed,3);assert.equal(data.events[0].author,'qa@example.test');
  r=await fetch(base+'/api/sync',{headers:{...headers,'oai-authenticated-user-id':'qa-other-owner'}});data=await r.json();assert.equal(data.events.length,0);
- r=await fetch(base+'/api/sync',{method:'POST',headers,body:JSON.stringify({...e,id:crypto.randomUUID(),version:2,baseVersion:1,status:'terminado',installed:0})});assert.equal(r.status,400);
+ r=await fetch(base+'/api/sync',{method:'POST',headers,body:JSON.stringify({...e,id:crypto.randomUUID(),version:2,baseVersion:1,status:'terminado',installed:-1})});assert.equal(r.status,400);
  r=await fetch(base+'/api/sync',{method:'POST',headers:{...headers,Origin:'https://other.test'},body:JSON.stringify(e)});assert.equal(r.status,403);
+ r=await fetch(base+'/api/sync',{method:'POST',headers,body:JSON.stringify({...e,id:crypto.randomUUID(),version:2,baseVersion:1,status:'terminado',installed:0,date:''})});assert.equal(r.status,200,await r.text());
+ r=await fetch(base+'/api/sync',{headers});data=await r.json();assert.equal(data.events.length,2);assert.equal(data.events[1].date,'');assert.equal(data.events[1].installed,0);assert.equal(data.events[1].status,'terminado');
 });

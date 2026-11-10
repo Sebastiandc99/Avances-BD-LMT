@@ -1,5 +1,18 @@
 # Avances BD LMT — Estado del proyecto
 
+## Terminación y publicación — 09/11/2026
+- Funcionalidad terminada: fecha opcional; Pendiente, En proceso y Terminado; avance y rendimiento por vanos; cantidades reales de BD opcionales sin autocompletar estimaciones; selección azul y área táctil de 52 px.
+- Se conservan los registros anteriores, incluidos los de observaciones (se presentan como En proceso). No se altera la geometría ni el inventario: 237 piquetes, 235 vanos y 1.743 BD estimados.
+- Fondo independiente implementado: `public/assets/fondo-esquematico.svg`, 2.715 bytes de texto plano, sin raster ni Base64, con RN 51, salar, relieve y referencias aproximadas. Detalle en `docs/fondo-esquematico.md`. Incluido en la caché offline.
+- Verificado: nueve pruebas de modelo/SQLite aprobadas; TypeScript sin errores; compilación final de cinco etapas completada con salida 0. Respuesta HTTP 200 en la vista previa local.
+- Acceso del sitio confirmado: solo el propietario. Se conserva el mismo proyecto `appgprj_6af0b2362bbc8191a15c1bf47010c244` y su URL.
+- Revisión visual bloqueada por el entorno: `Tab 1 is not part of browser session ...`; después, Computer Use no pudo determinar la URL de Chrome con confianza. Se detuvo la automatización visual, sin reintentar ni cambiar protecciones.
+- El primer intento de build del helper no encontró `npm-prefix.js`/`npm-cli.js` por la disposición del npm temporal. Se corrigió el lanzador local y el build terminó correctamente; no se alteraron las dependencias.
+- Wrangler local informó `Cannot read directory ...: Acceso denegado` al resolver el Worker compilado dentro del perfil Windows. `--no-bundle` no lo resolvió; no seguir repitiendo ese comando. El directorio alternativo `C:\workspace` también devolvió acceso denegado. Las pruebas SQLite sí pasaron; no se cargaron fixtures en producción.
+- Siguiente paso inmediato: respaldar estos cambios, empaquetar la compilación ya comprobada y desplegar la nueva versión privada. Registrar aquí el resultado real del despliegue.
+
+La sección siguiente conserva el historial de recuperación; sus pendientes quedan sustituidos por este estado actual.
+
 Actualizado: 09/11/2026 (Argentina).
 
 ## Objetivo vigente
