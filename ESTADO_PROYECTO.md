@@ -67,6 +67,9 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Error de transferencia interna: una lectura única del paquete de fuente excedió el límite de salida y devolvió `Warning: truncated output`; el analizador JSON se detuvo antes de enviar datos. Se resolvió leyendo veinte bloques de texto acotados. No se repitió el envío grande ni se usaron imágenes o codificación Base64.
 
 ## Estado para retomar sin repetir trabajo
+- Fuente ejecutable final guardada en main: `782f39de1e8cca1ae5546a92e12a3efcfde5408d`.
+- Verificación final independiente: 133 archivos de GitHub comparados por SHA de objeto Git con la copia local compilada; cero diferencias. Cero archivos de imagen en el árbol remoto.
+- Commits de esta recuperación: `c0f342f` (núcleo), `9bd8a11` (componentes y herramientas), `782f39d` (ejecución sin imágenes y compilación verificada). Este último registro documental conserva esas referencias.
 - Objetivo de esta sesión: fuente recuperada, respaldada y compilada. No reconstruir la aplicación ni repetir el análisis CAD/PDF.
 - Checkout ejecutable: `Avances-BD-LMT/github-recovery`. La copia original `.sites-checkout` se conserva intacta.
 - Mantener el repositorio privado. La publicación existente no se modificó en esta sesión.
