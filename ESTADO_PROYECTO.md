@@ -198,3 +198,13 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Seleccionar directamente en el plano no recentra ni cambia el zoom; el redimensionado conserva escala y centro. La vista queda en memoria al cambiar de pestaña; al guardar desde el plano se recupera la posición de desplazamiento de la página.
 - La guía de Pages y el workflow incluyen las nuevas funciones y las cinco pruebas adicionales (20 pruebas en total junto a las anteriores).
 - Despliegue automático pendiente de confirmación; todavía no se presenta esta etapa como publicada.
+
+
+## 10/11/2026 — carga por tramos y vista conservada: publicado
+- Versión publicada: 2fbbf15ef261063b227a111fc93c0a89a14b423f, con lógica en 7acf961f87c635c99645170a46ca2467f991390a. GitHub Actions 42823737910 terminó success; build 129855494873 y deploy 129855739891 aprobados. Pasaron 20 pruebas, TypeScript, compilación, inventario y control de documentos privados.
+- Verificación independiente de GitHub: siete archivos de aplicación/lógica/pruebas comparados por SHA con el checkout; cero diferencias.
+- Verificación visual en https://sebastiandc99.github.io/Avances-BD-LMT/: aparece Cargar vanos completados. Un tramo 1–18 devuelve 17 vanos; al sumar 1–18 de la corta devuelve 34. Los tramos superpuestos se deduplican.
+- Se verificó el viewBox exacto antes y después de seleccionar el vano 98–99, cerrar su ficha y alternar Vanos → Mapa: idéntico, sin pérdida de zoom ni posición del plano. Las pruebas matemáticas cubren el redimensionado de la ficha móvil.
+- No se cargaron avances ficticios ni se enviaron datos personales para la comprobación visual. El cierre después del guardado local está implementado en la ficha; un error de guardado la mantiene abierta. No se simuló un avance de obra real en producción.
+- Una lectura de prueba de DOM con SVG.viewBox.baseVal devolvió TypeError (propiedad no disponible en esa superficie); se leyó el atributo viewBox y se completó la comparación. No fue un error de la aplicación ni se repitió la operación fallida.
+- Conservados 237 piquetes, 235 vanos y 1.743 BD estimados. Continúan el guardado offline y la sincronización privada existentes. No se añadieron imágenes, mapas online, PDF ni DWG.
