@@ -346,3 +346,11 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Exportar Excel disponible en Vanos, Resumen y Datos y respaldo. No agrega análisis al Mapa. Conserva la descarga CSV existente.
 - La descarga espera los guardados locales pendientes y toma una única copia de los eventos para que tablas, resumen e imagen correspondan al mismo instante.
 - Función y pruebas guardadas en 0cb5a32000c2c5e5fc96e522624360dd2da46e88. Publicación y descarga desde Pages pendientes de confirmar al finalizar el workflow.
+
+
+### Exportación publicada y detalle de trazas superpuestas
+- Fuente 573f8398e744b7843fe9fabd2212b1adc6fba3b7 en main. Actions 42875824336 success: build y deploy aprobados. Nueve archivos de interfaz/lógica/dependencias/documentación comparados por SHA: cero diferencias.
+- Se comprobó la exportación con el servidor de prueba detenido: XLSX válido con cuatro hojas e imagen, a partir de los recursos previamente almacenados. Prueba aislada, sin conexión ni cambios en registros de producción.
+- La revisión del plano identificó superposición de la línea corta con el sector largo P208–P219. Se agrega recuadro amplio que muestra esos sectores por separado y conserva la vista general completa, para que los estados de una línea no oculten los de la otra.
+- Descarga real del XLSX con el detalle e inspección visual del recuadro aprobadas; etiquetas legibles y geometría del DWG conservada en cada recuadro. Pruebas afectadas, TypeScript, compilación y verificación Pages aprobados después del ajuste.
+- Pendiente confirmar el despliegue de esta mejora final y el botón en producción.

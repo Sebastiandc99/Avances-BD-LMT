@@ -121,7 +121,21 @@ export async function aerialImage(inventory:Inventory,events:Event[],basePath:st
   if(Math.abs(box.x-x)>w+10||Math.abs(box.y+18-y)>30){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(box.x+w/2,box.y+12);ctx.lineWidth=1;ctx.strokeStyle='#405c51';ctx.stroke();}
   ctx.strokeStyle='#18352f';ctx.lineWidth=5;ctx.strokeText(p.rotulo,box.x,box.y+18);ctx.fillStyle='white';ctx.fillText(p.rotulo,box.x,box.y+18);
  }
- ctx.restore();ctx.fillStyle='#fffefa';ctx.fillRect(0,0,canvas.width,120);ctx.fillRect(0,canvas.height-120,canvas.width,120);
+ ctx.restore();
+ // The CAD paths overlap near the branch. Separate insets keep both states visible.
+ ctx.fillStyle='#fffefa';ctx.fillRect(2960,210,1350,1450);ctx.strokeStyle='#91a297';ctx.lineWidth=2;ctx.strokeRect(2960,210,1350,1450);
+ ctx.fillStyle='#203a36';ctx.font='bold 30px Arial';ctx.fillText('Detalle de las dos líneas',3000,265);ctx.font='23px Arial';ctx.fillText('Sectores superpuestos en la vista general',3000,307);
+ for(const [line,start,end,left,title] of [['larga',208,219,3010,'Larga · P208 a P219'],['corta',1,18,3680,'Corta · FP1 a FP18']] as const){
+  const subset=ps.filter(p=>p.linea===line&&Number(p.id.split('-')[1])>=start&&Number(p.id.split('-')[1])<=end);
+  const bx=subset.map(p=>p.pixel[0]),by=subset.map(p=>p.pixel[1]),x0=Math.min(...bx),y0=Math.min(...by),dx=Math.max(...bx)-x0,dy=Math.max(...by)-y0;
+  const k=Math.min(360/Math.max(1,dx),1170/Math.max(1,dy));
+  const project=(p:[number,number])=>[left+160+(p[0]-x0)*k,405+(p[1]-y0)*k];
+  ctx.fillStyle='#203a36';ctx.font='bold 25px Arial';ctx.fillText(title,left+20,365);
+  for(const s of inventory.vanos.filter(s=>s.linea===line&&subset.some(p=>p.id===s.desde)&&subset.some(p=>p.id===s.hasta))){const a=project(poles[s.desde].pixel),b=project(poles[s.hasta].pixel);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='#18352f';ctx.lineWidth=14;ctx.stroke();ctx.strokeStyle=colors[records[s.id]?.status||'pendiente'];ctx.lineWidth=10;ctx.stroke();}
+  ctx.font='bold 24px Arial';
+  for(const p of subset){const [x,y]=project(p.pixel);ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='#18352f';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#203a36';ctx.fillText(p.rotulo,x+15,y+8);}
+ }
+ ctx.fillStyle='#fffefa';ctx.fillRect(0,0,canvas.width,120);ctx.fillRect(0,canvas.height-120,canvas.width,120);
  ctx.fillStyle='#203a36';ctx.font='bold 38px Arial';ctx.fillText('Avances BD LMT — Ambas líneas',55,52);ctx.font='25px Arial';ctx.fillText(`${today.split('-').reverse().join('/')} · ${ps.length} piquetes · ${inventory.vanos.length} vanos · Esquema orientativo del DWG`,55,94);
  let x=55;ctx.font='26px Arial';for(const status of ['pendiente','ejecucion','terminado'] as const){ctx.fillStyle=colors[status];ctx.fillRect(x,canvas.height-77,36,18);ctx.fillStyle='#203a36';ctx.fillText(statuses[status],x+48,canvas.height-60);x+=330;}
  ctx.font='24px Arial';ctx.fillText('Geometría de referencia. Mismo fondo local que la app.',55,canvas.height-20);

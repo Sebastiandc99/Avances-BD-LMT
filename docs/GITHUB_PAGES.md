@@ -81,3 +81,5 @@ La hoja Vista aérea contiene una imagen PNG amplia de 4400 × 3400 píxeles con
 Los resúmenes usan ambas líneas y los mismos registros vigentes que la aplicación. El rendimiento excluye vanos terminados sin fecha de ejecución válida. Incluye días restantes y fecha estimada de finalización. La exportación representa el momento de descarga; para incorporar nuevos datos o nuevas fechas, generar otro Excel desde la app.
 
 La descarga se prepara en el navegador y funciona sin conexión una vez preparada la app y su fondo local. No modifica datos ni reemplaza el respaldo JSON de eventos y fotos.
+
+La vista general incorpora un recuadro separado para Larga P208–P219 y la línea corta completa, para distinguir sus estados donde las trazas se superponen.
