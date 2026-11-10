@@ -363,3 +363,11 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - XLSX descargado de producción validado: cuatro hojas Resumen, Rendimiento, Vanos y Vista aérea; 235 filas de vanos; XML y relaciones válidos; PNG incrustado válido de 4400 × 3400; archivo aproximadamente 1,13 MB en la vista vacía de verificación.
 - Importador de hojas reconoce la cuarta hoja como imagen incrustada de 2600 × 2009 píxeles de presentación (fuente 4400 × 3400), sin vínculo externo. Plano general y recuadro separado de Larga P208–P219 / Corta FP1–FP18 revisados visualmente.
 - Las fórmulas y tablas ya verificadas coinciden con la aplicación; no se añadieron PDF/DWG, datos reales ni imágenes de avances al repositorio público. Mantener 237 piquetes, 235 vanos y 1.743 BD estimados. Google Drive conserva el pendiente de credenciales registrado anteriormente.
+
+
+## 10/11/2026 — botón Exportar Excel visible en celular
+- Causa concreta del reporte: la regla CSS .export-top{display:none} dentro de @media(max-width:600px) ocultaba el botón en Vanos y Resumen. La función de exportación estaba publicada, pero el botón principal no se mostraba en teléfonos.
+- Se reemplaza por display:inline-flex y width:100% dentro del mismo ancho móvil. El botón queda visible y a ancho completo sin modificar la exportación, los datos ni los cálculos.
+- Comprobación con viewport de 390 px en una vista aislada: Exportar Excel visible en Vanos (347 × 42 px, posición dentro del ancho disponible) y en Resumen. No se alteraron registros de producción.
+- Compilación Pages y verificación de recursos/rutas/inventario aprobadas. Pendiente confirmar el despliegue de la corrección.
+- Sin imágenes nuevas ni documentos originales publicados. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
