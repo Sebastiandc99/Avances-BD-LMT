@@ -1,5 +1,12 @@
 # Avances BD LMT
 
+**Aplicación web:** https://sebastiandc99.github.io/Avances-BD-LMT/
+
+En GitHub Pages los registros y fotos quedan en cada navegador; exportar/importar JSON permite respaldarlos o transferirlos. No hay sincronización automática de nube en esa versión.
+
+Los PDF y DWG originales no se publican. El repositorio conserva la app y sus datos derivados; el workflow comprueba que no se incorporen documentos originales o archivos comprimidos antes de publicar. Ver `scripts/check-public-files.mjs`.
+
+
 Aplicación independiente para controlar el montaje de desviadores de vuelo de la LMT del Salar del Rincón. La geometría proviene del DWG suministrado: **237 piquetes, 235 vanos**, 218 en la línea larga y 17 en la corta FP. No incluye avances ficticios.
 
 ## Uso

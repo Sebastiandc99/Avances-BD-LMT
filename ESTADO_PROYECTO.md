@@ -1,6 +1,12 @@
 # Avances BD LMT — Estado del proyecto
 
 ## Privacidad de documentos y repositorio público — 10/11/2026
+- RESULTADO FINAL: https://sebastiandc99.github.io/Avances-BD-LMT/ publicada y abierta correctamente. Workflow `42805336484`, resultado `success`, fuente `523a38741d729aa9da976e2ca5d706e2944fb3f8`.
+- El guard de privacidad, pruebas de modelo/SQLite, TypeScript, compilación, verificación de inventario/assets y despliegue finalizaron correctamente.
+- Verificación visual pública completada: mapa, listado de 235 vanos, ficha con fecha y cantidad opcionales, tres estados, 237 piquetes y 1.743 BD estimados; cero registros ficticios. No se guardaron datos de prueba. Inicio ya conserva la ruta de la aplicación.
+- Los PDF originales no están disponibles como archivos ni enlaces de descarga en el repositorio público o en el artefacto de Pages. El historial auditado tampoco los contenía. La geometría y los conteos derivados que usa la app sí forman parte de la versión pública, como requiere su funcionamiento.
+- Quedan cumplidos los pendientes anteriores de activación de Pages y publicación. Esta sección reemplaza el estado histórico de bloqueo de acceso.
+
 - Control automático aprobado en el run `42804355989`. Pages se activó con GitHub Actions desde Settings.
 - PUBLICACIÓN CONFIRMADA: run manual `42804763819`, resultado `success`, URL https://sebastiandc99.github.io/Avances-BD-LMT/ .
 - La app pública abrió correctamente: 237 piquetes, 235 vanos, 1.743 BD estimados, sin avances ficticios y modo sin conexión listo.
