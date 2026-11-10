@@ -256,3 +256,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Se usa la razón entera equivalente ceil(faltantes × días registrados / vanos fechados), que elimina el día adicional por redondeo numérico.
 - Regresión aprobada: 15 días desde 10/11/2026 → 25/11/2026. Pasaron 16 pruebas del modelo, TypeScript, compilación y verificación de Pages. El workflow completo suma ahora 28 pruebas.
 - El cambio conserva el criterio de usar solo producción con fecha y no modifica registros de obra.
+
+
+## 10/11/2026 — fecha estimada y días restantes: publicados
+- Fecha/días incorporados en f3cf76ec7f17f3dbe3afc89864ef42ed56456564; ajuste final del redondeo b4949c3e08dd4117a983f577af704d5be79e730d, presente en main.
+- GitHub Actions 42831638307: success; build 129882906175 y deploy 129883252168 aprobados. Pasaron 28 pruebas del modelo/base/cola/almacenamiento/mapa/tramos, TypeScript, compilación, inventario y control de documentos privados.
+- Cinco archivos de esta ampliación comparados por SHA con GitHub: cero diferencias.
+- Verificación visual en producción: Resumen muestra Días para finalizar y Fecha estimada de finalización; sin datos fechados muestra — días y Sin estimación, con explicación para cargar fechas. No se generaron registros de obra ficticios para la comprobación.
+- La proyección usa solo el rendimiento de vanos terminados con fecha. Días = ceil(faltantes × días registrados / vanos fechados); fecha = hoy en Argentina + días. Supone mantener el ritmo con una jornada por día. Con todos los vanos terminados indica 0 días y Finalizado.
+- Se conservan los cambios anteriores de BD automáticos por vano y estados separados. No se borran ni reescriben cargas previas; el usuario debe recargar la página para actualizar indicadores y proyección.
