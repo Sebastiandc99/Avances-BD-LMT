@@ -324,3 +324,19 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Los vanos sin fecha cargada muestran Sin fecha. No se asignan fechas automáticas ni se modifican registros de obra.
 - TypeScript, compilación para Pages y verificación de recursos/rutas/inventario aprobados. Sin cambios de modelo, fórmulas, sincronización ni documentos privados. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
 - Cambio listo para publicar; despliegue y columna en producción se confirman por separado.
+
+
+### Fecha en Vanos publicada
+- Fuente e0a8d88d74009f426f64e3c0b897f51ffd5bec66 en main, Actions 42872944861 success. Columna Fecha de ejecución y texto Sin fecha comprobados en la tabla publicada. El archivo de interfaz guardado coincide con el validado localmente.
+
+## 10/11/2026 — exportación Excel y vista aérea: lógica verificada
+- XLSX con cuatro hojas: Resumen global de ambas líneas, Rendimiento por fecha, Vanos (235 registros, fechas numéricas, cantidades, origen, responsable y observaciones) y Vista aérea.
+- Usa los registros vigentes y las métricas existentes; excluye terminados sin fecha del rendimiento, conserva avance global sobre 235, BD colocados, días restantes y fecha estimada de finalización. Fórmulas con valores cacheados, filtros y encabezados congelados en tablas.
+- Vista aérea: PNG de 4400 × 3400 píxeles generado en el navegador con el fondo local, los 237 piquetes y los 235 vanos según su estado; imagen amplia incrustada en la cuarta hoja. Sin mapas online, SVG con Base64 ni imágenes nuevas publicadas en el repositorio. La nueva solicitud autoriza esta imagen dentro del Excel.
+- Plantilla de formato creada con Artifact Tool y guardada como XML en JSON; sin datos de obra ni imágenes. ZIP mediante fflate ya disponible en el lock, declarado como dependencia directa. Sin descargas de bibliotecas durante la exportación.
+- Tres pruebas nuevas aprobadas: fechas/revisiones vigentes, resumen global/rendimiento y estructura XLSX con fórmulas, escape de texto, filtros e imagen. TypeScript, compilación Pages y verificación de rutas/inventario aprobados.
+- Descarga real en una vista de prueba aislada: cuatro hojas y PNG válido de 4400 × 3400, aproximadamente 1 MB. Importación, recálculo y revisión de fórmulas con Artifact Tool: coincide con la app (1 terminado, 1 en proceso, 12 BD, 1 vano/día, 8 BD/día y 234 jornadas restantes en el ejemplo). Revisión visual de las tablas y plano completada. No se alteraron registros de producción.
+- Errores corregidos: TS5097 al importar tipos/cálculos compartidos por extensión .ts, resuelto habilitando allowImportingTsExtensions con noEmit; prueba de porcentaje falló por precisión binaria al dividir por 100, corregido usando directamente terminados/total. La automatización fill de fecha no emitía el cambio nativo; la verificación usó el control de fecha por teclado y confirmó guardado y exportación.
+- Advertencia de build: el JS principal ronda 542 kB sin comprimir / 155 kB gzip. Se mantiene incorporado para permitir exportación sin conexión; el build finaliza correctamente.
+- Credenciales propias de Google Drive siguen pendientes; esta función descarga el Excel al dispositivo y no presenta Drive como activado.
+- Lógica lista para conectar en la interfaz y publicar. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados; los PDF/DWG permanecen fuera del repositorio.
