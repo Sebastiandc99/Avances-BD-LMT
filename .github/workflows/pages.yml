@@ -1,0 +1,75 @@
+name: Publicar Avances BD LMT en Pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'lib/**'
+      - 'pages/**'
+      - 'public/**'
+      - 'package*.json'
+      - 'vite.pages.config.ts'
+      - 'postcss.config.mjs'
+      - 'scripts/verify-pages.mjs'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+concurrency:
+  group: avances-lmt-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Verificar modelo y base de datos
+        run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs
+      - name: Comprobar TypeScript
+        run: node node_modules/typescript/bin/tsc --noEmit
+      - name: Compilar versión para GitHub Pages
+        run: npm run build:pages
+      - name: Verificar rutas e inventario
+        run: npm run verify:pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-dist
+      - name: Comprobar activación de Pages
+        id: pages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const settings = 'https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/settings/pages';
+            try {
+              const {data} = await github.rest.repos.getPages(context.repo);
+              const enabled = data.build_type === 'workflow';
+              core.setOutput('enabled', String(enabled));
+              if (!enabled) await core.summary.addHeading('Compilación terminada').addRaw('Elegir GitHub Actions como fuente en ' + settings).write();
+            } catch (error) {
+              if (![403,404].includes(error.status)) throw error;
+              core.setOutput('enabled','false');
+              await core.summary.addHeading('Aplicación compilada; falta activar Pages').addRaw('El repositorio conserva su privacidad. Activar GitHub Actions en ' + settings + ' y volver a ejecutar este workflow. GitHub puede exigir Pro para Pages en repositorios privados.').write();
+            }
+  deploy:
+    if: needs.build.outputs.pages_enabled == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
