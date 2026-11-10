@@ -1,6 +1,13 @@
 # Avances BD LMT — Estado del proyecto
 
 ## Terminación y publicación — 09/11/2026
+- PUBLICACIÓN CONFIRMADA: `succeeded`, con URL https://avances-bd-lmt.sebastiandc99.chatgpt.site y acceso privado conservado.
+- Fuente de ejecución publicada: `753ea5fd5e0cc367b9d7734626484b05df6b9fb8`, subida mediante Git push al repositorio de Sites. Respaldo funcional en GitHub: `fd89816307f0f8bfb7fee2732d4bc76250158fe6`.
+- Versión: `appgprj_6af0b2362bbc8191a15c1bf47010c244~appgver_9d11e1c0e0288191b8fe0664de2f7f59`. Despliegue: `appgdep_6af271d80d188191a76523d5d85dab4b`. Confirmación: 09/11/2026 22:22 (Argentina).
+- Prueba API local completada: acceso requerido, aislamiento por usuario, idempotencia, rechazo de versiones atrasadas/origen externo y guardado Terminado sin fecha ni BD. Resultado total: 10 pruebas aprobadas, TypeScript y compilación correctos.
+- Para ejecutar la API compilada en este entorno se usó Miniflare directo con lista explícita de módulos. El primer intento devolvió `ERR_MODULE_DYNAMIC_SPEC`; se corrigió solo el lanzador de pruebas. No se cambió código de la aplicación para sortear las limitaciones locales.
+- La credencial temporal de Sites expiró antes del empaquetado (`Renew the source credential for the same Site before retrying`); se renovó una vez y el empaquetado, Git push y despliegue terminaron correctamente.
+- El siguiente paso de empaquetar y desplegar que figura más abajo ya está cumplido. La revisión visual sigue sin poder confirmarse por el bloqueo del navegador del entorno; no afecta la evidencia de pruebas, compilación y despliegue.
 - Funcionalidad terminada: fecha opcional; Pendiente, En proceso y Terminado; avance y rendimiento por vanos; cantidades reales de BD opcionales sin autocompletar estimaciones; selección azul y área táctil de 52 px.
 - Se conservan los registros anteriores, incluidos los de observaciones (se presentan como En proceso). No se altera la geometría ni el inventario: 237 piquetes, 235 vanos y 1.743 BD estimados.
 - Fondo independiente implementado: `public/assets/fondo-esquematico.svg`, 2.715 bytes de texto plano, sin raster ni Base64, con RN 51, salar, relieve y referencias aproximadas. Detalle en `docs/fondo-esquematico.md`. Incluido en la caché offline.
