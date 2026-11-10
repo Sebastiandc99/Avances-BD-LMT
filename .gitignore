@@ -45,3 +45,11 @@ yarn-error.log*
 .DS_Store
 
 /pages-dist/
+
+# Documentos originales privados: no incorporar al repositorio público
+*.[pP][dD][fF]
+*.[dD][wW][gG]
+*.[dD][xX][fF]
+*.[zZ][iI][pP]
+*.[7][zZ]
+*.[rR][aA][rR]

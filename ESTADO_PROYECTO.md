@@ -1,5 +1,15 @@
 # Avances BD LMT — Estado del proyecto
 
+## Privacidad de documentos y repositorio público — 10/11/2026
+- Confirmado: el usuario cambió el repositorio a público (`private: false`). Pages aún no estaba activado al comenzar esta comprobación.
+- Auditoría de los 13 commits alcanzables desde main: ningún PDF, DWG/DXF, archivo comprimido ni raster original en sus árboles. Solo existe la rama main; no hay etiquetas ni releases con adjuntos.
+- Se revisaron 32 versiones de documentación y assets, buscando enlaces a PDF, Drive, Library, adjuntos o archivos originales y contenido PDF/raster incrustado. Sin hallazgos.
+- Los archivos originales aportados por el usuario no se subieron a este repositorio. La app conserva la geometría y los conteos derivados necesarios para su funcionamiento; eso no equivale a publicar los documentos completos.
+- Se añaden exclusiones de PDF, DWG/DXF y comprimidos a .gitignore y un control previo al build de Pages. El workflow descarga el historial completo y detiene la publicación si aparecen esos formatos o un PDF incrustado.
+- No fue necesario borrar ni reescribir el historial porque no contenía esos archivos. Los documentos originales privados no se eliminan de las fuentes del usuario.
+- Las comprobaciones de app ya aprobadas se conservan. Se verificará el nuevo control de privacidad mediante GitHub Actions.
+
+
 ## Cambio a público solicitado — 10/11/2026
 - El usuario autorizó expresamente cambiar `Sebastiandc99/Avances-BD-LMT` a público y publicar GitHub Pages. Esa instrucción sustituye la anterior exigencia de mantenerlo privado.
 - Se abrió Settings y se completaron los diálogos preparatorios de Change visibility → Change to public. GitHub exigió reautenticación en Confirm access antes de aplicar el cambio.

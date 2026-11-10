@@ -11,6 +11,7 @@ on:
       - 'vite.pages.config.ts'
       - 'postcss.config.mjs'
       - 'scripts/verify-pages.mjs'
+      - 'scripts/check-public-files.mjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 concurrency:
@@ -26,10 +27,14 @@ jobs:
       pages_enabled: ${{ steps.pages.outputs.enabled }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+      - name: Comprobar documentos privados
+        run: node scripts/check-public-files.mjs
       - run: npm ci
       - name: Verificar modelo y base de datos
         run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs
