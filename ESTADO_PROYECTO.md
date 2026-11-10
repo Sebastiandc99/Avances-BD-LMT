@@ -283,3 +283,16 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Comprobación visual en producción tras recargar: Mapa tiene 0 controles/etiquetas de rendimiento, 0 botones de exportación analítica y 1 botón de carga por tramos; mantiene plano, filtros y ficha operativa.
 - Resumen tiene sus indicadores y rendimiento, 0 botones de carga por tramos, 0 fichas laterales de edición y 0 búsquedas de carga. Conserva fecha estimada y días restantes. Ningún registro de obra fue modificado para estas comprobaciones.
 - Aplicación: https://sebastiandc99.github.io/Avances-BD-LMT/. No se generaron imágenes ni se añadieron PDF/DWG. Inventario y cálculos sin cambios: 237 piquetes, 235 vanos y 1.743 BD estimados.
+
+
+## 10/11/2026 — búsqueda de piquetes, fechas editables y Drive: lógica verificada
+- Búsqueda exacta por número y prefijo (192, P98, FP 3), con resolución de números compartidos entre líneas. La cámara centra el punto del DWG con zoom táctil adecuado; no cambia al listado.
+- Se agrega modo Actualizar fechas por tramos: solo vanos ya terminados, nuevas revisiones sin duplicar avance, manteniendo cantidades, responsable, notas y fotos. Las fichas existentes muestran Guardar cambios.
+- Resumen usa siempre las dos líneas juntas: porcentaje sobre 235 vanos; sin porcentajes separados ni filtros que cambien ese denominador.
+- Drive: carpeta Doc Worley / App avances identificada y verificada privada. No se leyó el contenido ni se modificaron los PDF/DWG originales.
+- Integración de respaldo por equipo preparada con destino fijo, OAuth limitado drive.file y autorización de la carpeta por Google Picker. No se almacenan tokens de Google en el repositorio; configuración pública local y tokens solo en memoria, separados por usuario de la app.
+- La función de Drive crea/actualiza únicamente el JSON de respaldo del equipo en la carpeta fija y verifica el contenido leyendo lo escrito. No cambia permisos ni guarda en otra carpeta/raíz si falla. No mezcla automáticamente respaldos de otros equipos.
+- Bloqueo real de activación: no se dispone del cliente OAuth, API key pública de Picker ni número de proyecto propios. La consola cloud.google.com devolvió Site Unavailable / Unable to access this site en el navegador. La conexión de Drive del chat no proporciona esas credenciales a la app. No se presenta Drive como activado.
+- Diez pruebas afectadas aprobadas (tramos, búsqueda/cámara y protocolo Drive), con respuestas aisladas: no hubo escrituras ficticias en Drive. TypeScript, build:pages, verify:pages y control de documentos privados aprobados.
+- Error de TypeScript resuelto: Response.json devolvía unknown y había conflicto de tipos de append con Cloudflare. Se tiparon los resultados JSON y se usó appendChild para cargar los SDK oficiales de Google.
+- Mantener 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes nuevas, SVG codificados ni carga de PDF/DWG.

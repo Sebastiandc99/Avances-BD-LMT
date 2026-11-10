@@ -27,3 +27,13 @@ test('a dated historical load counts completed spans and derives BD without inve
  const events=completedEvents(plan.eligible,{},options,makeId,'2026-11-10T10:00:00Z');
  const summary=metrics(vanos,events,'2026-11-10');assert.equal(summary.done,17);assert.equal(summary.daily['2026-11-08'],17);assert.equal(summary.installed,130);assert.ok(events.every(e=>e.installed===0));assert.equal(summary.planned,1743);
 });
+
+test('dates mode revises already completed spans without counting them twice or changing field data',()=>{
+ const ids=vanos.slice(0,3).map(s=>s.id),old=completedEvents(ids,{},options,makeId,'2026-11-08T10:00:00Z');
+ old[0]={...old[0],installed:8,notes:'Conservar',responsible:'A',photos:[makeId()]};old[2]={...old[2],status:'ejecucion',installed:2};
+ const current=latestRecords(old),plan=completionPlan(vanos,[{line:'larga',from:1,to:5}],current,[],'dates');
+ assert.deepEqual(plan.eligible,ids.slice(0,2));assert.equal(plan.notFinished.length,2);
+ const revisions=completedEvents(plan.eligible,current,{date:'2026-11-06',responsible:'No debe pisar',author:'Prueba',mode:'dates'},makeId,'2026-11-10T10:00:00Z');
+ const m=metrics(vanos,[...old,...revisions],'2026-11-10');assert.equal(m.done,2);assert.deepEqual(m.daily,{'2026-11-06':2});
+ assert.equal(revisions[0].version,2);assert.equal(revisions[0].baseVersion,1);assert.equal(revisions[0].installed,8);assert.equal(revisions[0].notes,'Conservar');assert.equal(revisions[0].responsible,'A');assert.deepEqual(revisions[0].photos,old[0].photos);
+});
