@@ -1,5 +1,14 @@
 # Avances BD LMT — Estado del proyecto
 
+## Cambio a público solicitado — 10/11/2026
+- El usuario autorizó expresamente cambiar `Sebastiandc99/Avances-BD-LMT` a público y publicar GitHub Pages. Esa instrucción sustituye la anterior exigencia de mantenerlo privado.
+- Se abrió Settings y se completaron los diálogos preparatorios de Change visibility → Change to public. GitHub exigió reautenticación en Confirm access antes de aplicar el cambio.
+- Se solicitó la contraseña mediante el formulario seguro de autenticación, sin leer ni registrar credenciales. La solicitud devolvió `declined`; no se repitió ni se intentó otra vía de autenticación.
+- Resultado comprobado nuevamente con el conector: `private: true`, `has_pages: false`. El repositorio todavía no cambió de visibilidad y Pages no se publicó.
+- La pestaña de Confirm access se conserva para continuar. Falta completar esa reautenticación; después, verificar visibilidad pública, activar Pages para GitHub Actions y desplegar el artefacto ya compilado. No repetir análisis, imágenes ni las pruebas ya aprobadas.
+- El nuevo entorno de ejecución está disponible, pero `gh auth status` confirma que su CLI no está autenticado. No buscar credenciales en archivos ni sustituir la sesión del usuario.
+
+
 ## Adaptación para GitHub Pages — 09/11/2026
 - Adaptación guardada: `ad3f5adfd3fdcaa020d49bdc0e63dc248b6441ec`; workflow activo: `8ce41ca825962963c222a05f54c9d8f2804d048d`.
 - COMPILACIÓN REMOTA CONFIRMADA: GitHub Actions run `42736883632`, job build `129568163792`, resultado `success`. Pasaron instalación, pruebas de modelo/SQLite, TypeScript, build estático y verificación de rutas/inventario/fondo/manifiesto. Artefacto de Pages subido correctamente.
