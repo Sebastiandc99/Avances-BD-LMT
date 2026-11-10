@@ -354,3 +354,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - La revisión del plano identificó superposición de la línea corta con el sector largo P208–P219. Se agrega recuadro amplio que muestra esos sectores por separado y conserva la vista general completa, para que los estados de una línea no oculten los de la otra.
 - Descarga real del XLSX con el detalle e inspección visual del recuadro aprobadas; etiquetas legibles y geometría del DWG conservada en cada recuadro. Pruebas afectadas, TypeScript, compilación y verificación Pages aprobados después del ajuste.
 - Pendiente confirmar el despliegue de esta mejora final y el botón en producción.
+
+
+### Excel completo publicado y descarga verificada en producción
+- Fuente final 725c366c7ab0e79387aa19c0e0a8466494729d98 en main. GitHub Actions 42876494263 success, build y deploy aprobados: 38 pruebas funcionales, TypeScript, compilación y verificación Pages.
+- Código final de exportación leído de GitHub: coincide con el validado. App publicada cargó assets/index-Do7Fh7yE.js, correspondiente al build final.
+- Comprobación en https://sebastiandc99.github.io/Avances-BD-LMT/: Vanos muestra Fecha de ejecución y Exportar Excel. Descarga real completada con aviso de éxito, sin alterar registros de producción.
+- XLSX descargado de producción validado: cuatro hojas Resumen, Rendimiento, Vanos y Vista aérea; 235 filas de vanos; XML y relaciones válidos; PNG incrustado válido de 4400 × 3400; archivo aproximadamente 1,13 MB en la vista vacía de verificación.
+- Importador de hojas reconoce la cuarta hoja como imagen incrustada de 2600 × 2009 píxeles de presentación (fuente 4400 × 3400), sin vínculo externo. Plano general y recuadro separado de Larga P208–P219 / Corta FP1–FP18 revisados visualmente.
+- Las fórmulas y tablas ya verificadas coinciden con la aplicación; no se añadieron PDF/DWG, datos reales ni imágenes de avances al repositorio público. Mantener 237 piquetes, 235 vanos y 1.743 BD estimados. Google Drive conserva el pendiente de credenciales registrado anteriormente.
