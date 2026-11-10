@@ -72,3 +72,9 @@ test('finish projection rounds remaining spans up to whole days and uses only th
  const undated=metrics(spans,events.map(e=>({...e,date:''})),'2026-11-10');assert.equal(undated.estimatedDays,null);assert.equal(undated.eta,null);
  const finished=metrics(spans,spans.map((s,i)=>ev({id:'done-'+i,spanId:s.id,status:'terminado',date:'',installed:0})),'2026-11-10');assert.equal(finished.estimatedDays,0);assert.equal(finished.remaining,0);
 });
+
+
+test('finish-day rounding avoids adding a day from floating-point division',()=>{
+ const spans=inv.vanos.slice(0,28),events=spans.slice(0,7).map((s,i)=>ev({id:'round-'+i,spanId:s.id,status:'terminado',date:`2026-11-0${i<5?i+1:1}`,installed:0}));
+ const m=metrics(spans,events,'2026-11-10');assert.equal(m.average,1.4);assert.equal(m.remaining,21);assert.equal(m.estimatedDays,15);assert.equal(m.eta,'2026-11-25');
+});

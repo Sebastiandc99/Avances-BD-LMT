@@ -249,3 +249,10 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Prueba específica aprobada: 5 vanos faltantes a 1,5 vanos/día dan 4 días; desde 10/11/2026 se estima 14/11/2026. Sin fechas, proyección ausente; todo terminado, 0 días.
 - Pasaron las 15 pruebas afectadas del modelo, TypeScript, compilación y verificación de Pages. El workflow completo suma 27 pruebas.
 - Fuente guardada para despliegue automático; publicación de esta ampliación pendiente de confirmar.
+
+
+### Corrección del redondeo de días
+- Comprobación adicional encontró un error numérico concreto: con 7 vanos fechados en 5 días y 21 faltantes, ceil(21 / 1,4) daba 16 por representación de coma flotante; el resultado correcto es 15.
+- Se usa la razón entera equivalente ceil(faltantes × días registrados / vanos fechados), que elimina el día adicional por redondeo numérico.
+- Regresión aprobada: 15 días desde 10/11/2026 → 25/11/2026. Pasaron 16 pruebas del modelo, TypeScript, compilación y verificación de Pages. El workflow completo suma ahora 28 pruebas.
+- El cambio conserva el criterio de usar solo producción con fecha y no modifica registros de obra.
