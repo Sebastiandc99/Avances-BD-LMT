@@ -306,3 +306,14 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Datos y respaldo incorpora el botón Sincronizar copia con Drive y configuración del cliente Google. Destino fijo: Doc Worley / App avances. El botón permanece pendiente/deshabilitado sin las credenciales públicas propias, sin fingir una sincronización.
 - Se documentó la activación concreta en docs/GOOGLE_DRIVE.md. La copia por equipo no mezcla automáticamente respaldos de otros equipos ni sustituye la sincronización de eventos existente.
 - El workflow incorpora siete pruebas nuevas (35 en total). La publicación se verifica por separado cuando termine Pages.
+
+
+### Publicación confirmada y comprobación en la aplicación
+- Fuente aec837be4dfa118e05382c1e28f9400102474edf guardada en main. GitHub Actions 42862278578 terminó success, con build y deploy aprobados: pruebas del modelo/base de datos, TypeScript, compilación Pages, rutas, inventario y control de documentos privados.
+- Ocho archivos principales de lógica e interfaz comparados por SHA entre el código local y GitHub: cero diferencias.
+- App publicada verificada en https://sebastiandc99.github.io/Avances-BD-LMT/: buscar 192 conserva Mapa, resalta el piquete y centra la cámara en sus coordenadas (808.6033, 354.37945), con ancho de vista 117.57 unidades. Resultado seleccionable Enfocar presente.
+- Modal Actualizar fechas verificado: fecha obligatoria y selección solo de vanos terminados. Los casos de fechas corregidas sin duplicar producción, conservando cantidades, fotos y responsable, se verificaron con pruebas aisladas; no se alteraron registros reales para probar.
+- Con el filtro Línea corta activo en Mapa, Resumen continúa mostrando Ambas líneas / Proyecto completo, porcentaje sobre 235 vanos y total de 1.743 BD calculados. Sin porcentajes individuales por línea.
+- Datos y respaldo muestra el destino fijo Doc Worley / App avances y el estado Pendiente de activar; el botón está deshabilitado al faltar la configuración pública propia de Google. No se escribió ni se comprobó un respaldo real en Drive: OAuth web, API key de Picker y número de proyecto siguen pendientes. Pasos concretos en docs/GOOGLE_DRIVE.md.
+- Incidencia de automatización de la comprobación: setChecked sobre el filtro devolvió no_matches con rol checkbox; el control es un botón con estado aria-pressed. Se seleccionó mediante su botón y se verificó el cambio correctamente. No requirió cambios en la aplicación.
+- No se generaron imágenes, no se usó create_blob y no se publicaron PDF/DWG. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
