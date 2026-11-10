@@ -390,3 +390,10 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Prueba real en viewport móvil de 390 px con datos aislados: dos toques seleccionaron 97–98 y 98–99, el modal guardó Terminado con 09/11/2026 en ambos, cerró y limpió marcas. Colores verdes y fecha en ficha individual comprobados. viewBox idéntico antes y después: 1920.2310063686823 2536.40440048089 110.87324726263515 144.61727903821975. Selección simple conservada.
 - Incidencias de automatización de QA: selector svg[viewBox] coincidía con 23 SVG (iconos incluidos); se acotó al plano por su etiqueta. La tecla ArrowUp del control de fecha aumentó el mes a diciembre; la validación HTML bloqueó el guardado por fecha futura. Se corrigió con ArrowDown y se comprobó 09/11/2026 antes de guardar. Una lectura de atributo de fecha devolvió selector deadline exceeded; la fecha se verificó por el estado visible y la ficha guardada. No se cambiaron registros de producción.
 - Sin imágenes nuevas, create_blob ni publicación de PDF/DWG. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. Fuente lista para conectar y publicar; Google Drive continúa con las credenciales propias pendientes.
+
+
+### Interfaz de selección lista para desplegar
+- Lógica y pruebas guardadas en 96c287f84a77ad5eb2b748149f048d6718e959f7.
+- Botones de modo visibles en móvil y escritorio; contador, Editar seleccionados y Limpiar selección en modo múltiple. Seleccionar no abre fichas ni desplaza la cámara. Los vanos también admiten activación por teclado.
+- Guardar el lote cierra el modal, vuelve al mapa en la misma posición, limpia las marcas y deja el modo múltiple disponible para continuar. Cambiar de modo con una ficha individual sin guardar usa la confirmación existente de cambios sin confirmar.
+- Fuente preparada para Pages; despliegue y controles de producción se verifican al finalizar el workflow.

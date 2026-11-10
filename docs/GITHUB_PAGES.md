@@ -83,3 +83,14 @@ Los resúmenes usan ambas líneas y los mismos registros vigentes que la aplicac
 La descarga se prepara en el navegador y funciona sin conexión una vez preparada la app y su fondo local. No modifica datos ni reemplaza el respaldo JSON de eventos y fotos.
 
 La vista general incorpora un recuadro separado para Larga P208–P219 y la línea corta completa, para distinguir sus estados donde las trazas se superponen.
+
+
+## Selección de vanos en el mapa
+Arriba del plano hay dos botones: Selección simple y Selección múltiple.
+
+- Simple: tocar un vano abre su ficha individual.
+- Múltiple: tocar varios vanos los marca en azul; tocar uno ya marcado lo quita. Se pueden elegir vanos no contiguos y de ambas líneas. El contador avisa si el filtro oculta alguno de los seleccionados.
+- Pulsar Editar seleccionados, revisar los vanos de la lista y elegir el estado y la fecha común. Para una carga histórica sin fecha, marcar Sin fecha de ejecución explícitamente.
+- Guardar aplica los datos a todos en una sola transacción local, cierra la ventana, limpia las marcas y mantiene el zoom y la posición del mapa. Los eventos quedan pendientes de sincronizar cuando corresponda.
+
+Cada vano conserva sus notas, fotos, responsable y cantidad real. Al pasar a Pendiente, su cantidad colocada queda en cero. Si existe un conflicto o algún vano cambió desde que se abrió la ventana, se bloquea todo el lote y se conserva la selección para revisarla.
