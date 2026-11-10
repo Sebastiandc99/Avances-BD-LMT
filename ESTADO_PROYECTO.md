@@ -180,3 +180,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Base final comprobada: cero usuarios y eventos de prueba persistidos; bucket de fotos public=false. Asesor de seguridad sin avisos. Los PDF/DWG originales siguen fuera del repositorio y del sitio.
 - Comprobación diff --check: Git interpretó CRLF heredados como espacios al final; con core.whitespace=cr-at-eol la comprobación pasó sin cambiar los finales de línea de origen.
 - Conservados 237 piquetes, 235 vanos y 1.743 desviadores estimados. No se generaron, codificaron ni subieron imágenes en esta etapa.
+
+
+## 10/11/2026 — carga por tramos y conservación de la vista: lógica verificada
+- Se preparó la selección por línea y rangos entre piquetes (1 a 18 = 17 vanos). Los rangos superpuestos se deduplican; los vanos ya terminados o con conflictos se omiten.
+- La carga conserva BD reales, fotos, notas y datos previos; fecha y responsable se pueden completar sin inventar cantidades. Los eventos usan la cola local y la sincronización existente.
+- Cinco pruebas nuevas aprobadas: cobertura exacta de 235 vanos y validación de límites, preservación de datos y repetición sin duplicar, producción histórica con fecha, recuperación de zoom/centro al abrir/cerrar la ficha y conservación de escala al cambiar el ancho.
+- TypeScript, compilación Pages, rutas/inventario y control de documentos privados aprobados sobre la actualización completa local.
+- Error de vista previa local: Vite preview devolvió ERR_SYSTEM_ERROR, uv_interface_addresses returned Unknown system error 1. Se sirvió el artefacto estático con Python; el navegador remoto devolvió net::ERR_CONNECTION_REFUSED al puerto local. No se insistió: la comprobación visual se realiza sobre Pages después del despliegue.
+- No se modifican la base privada ni sus permisos. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. Sin generación/codificación/carga de imágenes ni documentos originales.
