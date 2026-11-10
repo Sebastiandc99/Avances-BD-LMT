@@ -317,3 +317,10 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Datos y respaldo muestra el destino fijo Doc Worley / App avances y el estado Pendiente de activar; el botón está deshabilitado al faltar la configuración pública propia de Google. No se escribió ni se comprobó un respaldo real en Drive: OAuth web, API key de Picker y número de proyecto siguen pendientes. Pasos concretos en docs/GOOGLE_DRIVE.md.
 - Incidencia de automatización de la comprobación: setChecked sobre el filtro devolvió no_matches con rol checkbox; el control es un botón con estado aria-pressed. Se seleccionó mediante su botón y se verificó el cambio correctamente. No requirió cambios en la aplicación.
 - No se generaron imágenes, no se usó create_blob y no se publicaron PDF/DWG. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
+
+
+## 10/11/2026 — fecha visible en la tabla de Vanos
+- Se agrega la columna Fecha de ejecución junto al estado de cada vano, en formato día/mes/año. Usa la fecha del último registro vigente, por lo que las correcciones guardadas se reflejan en el listado.
+- Los vanos sin fecha cargada muestran Sin fecha. No se asignan fechas automáticas ni se modifican registros de obra.
+- TypeScript, compilación para Pages y verificación de recursos/rutas/inventario aprobados. Sin cambios de modelo, fórmulas, sincronización ni documentos privados. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
+- Cambio listo para publicar; despliegue y columna en producción se confirman por separado.
