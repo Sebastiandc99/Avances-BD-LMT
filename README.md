@@ -12,7 +12,7 @@ Aplicación independiente para controlar el montaje de desviadores de vuelo de l
 ## Uso
 
 - Acercar y arrastrar el plano; seleccionar un vano con un toque. Si hay varios dentro del área táctil de 52 px, elegir el vano en la lista.
-- Registrar Pendiente, En proceso o Terminado. Fecha y cantidad real de BD opcionales; responsable, notas y hasta ocho fotos. Terminar un vano no inventa cantidades instaladas.
+- Registrar Pendiente, En proceso o Terminado. Fecha y cantidad real de BD opcionales; responsable, notas y hasta ocho fotos. Terminar un vano contabiliza su cantidad calculada de BD, identificada como calculada. Una cantidad real informada mayor a cero tiene prioridad.
 - Confirmar guarda una revisión en IndexedDB. Las revisiones anteriores conservan autoría y fecha. La cancelación no cambia los registros.
 - Con sesión iniciada, los cambios se sincronizan con la base D1 y las fotos privadas con R2. Se usa la identidad de ChatGPT del sitio; los registros se separan por usuario. Esta versión es privada y su alcance es el mismo titular en varios dispositivos; no incluye gestión de cuadrillas multiusuario.
 - Un conflicto entre dispositivos requiere elegir la versión a conservar. No se sobrescribe silenciosamente otro registro.
@@ -25,9 +25,11 @@ Aplicación independiente para controlar el montaje de desviadores de vuelo de l
 
 `docs/calibration.json` contiene hashes, matriz afín y validaciones. RMS del ajuste entre representaciones del mismo plano: **0,656 m**, máximo **1,256 m**. No equivale a exactitud geográfica comprobada contra terreno. Datum declarado: POSGAR / Gauss-Krüger faja 3; validar marco y puntos de control con topografía.
 
-El apartado 6.1.2 del procedimiento L0002-4111-Q-WIT-00047_0 establece un espaciado de 10 m en el 60 % central. Se propone `floor(0.60 × longitud_planta / 10) + 1`, centrado simétricamente, con **1.613 + 130 = 1.743 BD**. Redondeo, extremos y desarrollo del OPGW con flecha requieren validación. El usuario siempre confirma la cantidad real instalada.
+La sección Criterios Técnicos de Señalización del procedimiento L0002-4111-Q-WIT-00047_0 establece un espaciado de 10 m en el 60 % central. Se propone `floor(0.60 × longitud_planta / 10) + 1`, centrado simétricamente, con **1.613 + 130 = 1.743 BD**. Redondeo, extremos y desarrollo del OPGW con flecha requieren validación. La app distingue los BD calculados por estado de las cantidades reales informadas. No modifica las cantidades originales guardadas al recalcular los indicadores.
 
-El avance, la producción diaria y el rendimiento se miden por vanos terminados. Reabrir un vano resta uno; corregir la cantidad de BD no suma vanos. El promedio usa días calendario desde el primer vano terminado. Si no se indica fecha de actividad, la estadística usa el día del guardado en Argentina. La ETA divide los vanos pendientes por ese promedio; es orientativa. Las cantidades de BD se muestran como indicador secundario.
+El avance incluye todos los vanos terminados, tengan o no fecha. Se muestran terminados, en proceso, pendientes de iniciar y el total que falta terminar (pendientes + en proceso). Los BD colocados suman la cantidad calculada de cada terminado sin cantidad real; si hay una cantidad real mayor a cero, se usa esa cantidad, también para avances parciales en proceso.
+
+El rendimiento utiliza solo los vanos actualmente terminados con fecha de ejecución explícita, divididos por días distintos con ejecución registrada. No usa la fecha de carga ni días sin registros. Se muestran vanos/día y BD/día. Una carga histórica sin fecha suma al avance y los BD, pero queda excluida del rendimiento. Corregir la fecha mueve la producción al día indicado; reabrir un vano lo excluye de la producción terminada. Las jornadas restantes son orientativas.
 
 ## Desarrollo
 

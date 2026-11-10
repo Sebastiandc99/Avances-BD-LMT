@@ -29,6 +29,17 @@ Los PDF/DWG originales no están incluidos ni son recursos de la app. El inventa
 
 Pulsar **Cargar vanos completados**. Elegir la línea, el piquete inicial y el final; por ejemplo 1 a 18 corresponde a los 17 vanos entre esos piquetes. **Agregar otro tramo** permite cargar sectores separados o ambas líneas a la vez. Revisar el conteo y confirmar. Los vanos ya terminados y los que requieren resolver un conflicto se omiten; no se duplican rangos superpuestos.
 
-La fecha de finalización y el responsable son opcionales. Si no se indican, se conservan los valores existentes. Un registro sin fecha usa el día de carga para el resumen diario, por lo que conviene indicar la fecha real si se conoce. Se conservan BD reales, notas y fotos; las cantidades previstas no se convierten en cantidades instaladas.
+La fecha de finalización y el responsable son opcionales. Sin fecha de finalización, los nuevos terminados quedan sin fecha y fuera del rendimiento; no se usa la fecha de carga ni la fecha de una actividad previa en proceso. El responsable existente, las cantidades reales, notas y fotos se conservan. Cada terminado sin cantidad real informada suma automáticamente los BD calculados de su vano.
 
 Al confirmar una ficha individual, el guardado local cierra la ficha y vuelve al plano. Tocar un vano en el mapa conserva el acercamiento y el desplazamiento; abrir/cerrar la ficha en el celular mantiene la escala y el centro. La vista también se conserva al alternar entre Mapa y las demás pestañas. Cambiar de línea o pulsar Ver traza completa ajusta la vista deliberadamente.
+
+
+## Cómputo y rendimiento corregidos (10/11/2026)
+
+El total calculado sigue siendo **1.743 BD**: 1.613 en la larga y 130 en la corta. Se recalcula cada vano con `floor((0,60 × longitud_en_planta + 0,0001) / 10) + 1`, la misma disposición simétrica con separación de 10 m en el 60 % central ya contrastada con el DWG y el procedimiento. Los extremos y el desarrollo real del OPGW siguen sujetos a validación en campo.
+
+Al marcar un vano terminado, su cantidad calculada se contabiliza automáticamente cuando no hay una cantidad real mayor a cero. Si se informa una cantidad real, tiene prioridad; en un vano en proceso solo se suma la cantidad real informada. Listado, historial, resumen y CSV distinguen cantidades calculadas de las informadas. Los indicadores nuevos también se aplican a los registros existentes, sin reescribirlos ni necesitar volver a cargarlos.
+
+El rendimiento es **vanos terminados con fecha / días distintos con ejecución registrada**, y también muestra BD/día para esos mismos vanos. Los terminados sin fecha cuentan en el avance y los BD, pero nunca en el rendimiento. El día del guardado es solo trazabilidad, no una fecha de ejecución. Agregar, corregir o quitar una fecha actualiza el cálculo; los vanos reabiertos se excluyen de la producción terminada.
+
+El resumen separa terminados, en proceso y pendientes de iniciar. Faltan terminar = en proceso + pendientes. El inventario permanece en 237 piquetes y 235 vanos.

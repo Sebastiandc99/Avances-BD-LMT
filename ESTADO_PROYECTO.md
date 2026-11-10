@@ -221,3 +221,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - La lectura inicial de instrucciones PDF devolvió skill package is not available mientras el entorno iniciaba. Tras quedar disponible se leyó correctamente; no hubo cambios ni pérdida de archivos.
 - Estos criterios reemplazan las notas anteriores que usaban fecha de guardado/días calendario o dejaban en cero los BD de un vano terminado sin cantidad manual.
 - Interfaz y publicación se confirman en la etapa siguiente. Sin imágenes nuevas ni cargas de documentos originales.
+
+
+### Interfaz de cantidades y estados lista para publicar
+- Lógica respaldada en fd601269fadba4dd86250266d78ae04726a54e8f.
+- Seis indicadores visibles también en móvil: avance, terminados, en proceso, pendientes, BD colocados y rendimiento con fecha. Faltantes incluye pendientes + en proceso, sin confundir esos estados.
+- Cantidades calculadas/informadas coherentes en tarjetas, listado de vanos, fichas, historial, conflictos y CSV. Cada vano muestra su cómputo; la carga por tramos anticipa los BD calculados para los vanos nuevos.
+- Advertencia visible de terminados sin fecha excluidos del rendimiento; resumen de vanos/día y BD/día, días registrados y jornadas estimadas restantes.
+- Guías actualizadas al criterio nuevo. Las cantidades y fechas guardadas previamente se conservan; los indicadores se corrigen al abrir la nueva versión.
+- Pendiente confirmar el workflow y el despliegue de Pages antes de dar la publicación por terminada.
