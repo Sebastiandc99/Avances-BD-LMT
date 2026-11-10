@@ -371,3 +371,11 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Comprobación con viewport de 390 px en una vista aislada: Exportar Excel visible en Vanos (347 × 42 px, posición dentro del ancho disponible) y en Resumen. No se alteraron registros de producción.
 - Compilación Pages y verificación de recursos/rutas/inventario aprobadas. Pendiente confirmar el despliegue de la corrección.
 - Sin imágenes nuevas ni documentos originales publicados. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
+
+
+### Corrección móvil publicada y verificada
+- Fuente 2f5700ec56745abadd08d396fbc4018ee8db690c en main. Actions 42884427923 finalizó success con build y deploy aprobados. Hoja de estilos final leída de GitHub: coincide con la compilada.
+- Verificado en la aplicación pública dentro de un viewport de 390 px: Exportar Excel aparece en Vanos debajo de Cargar o actualizar tramos, y en Resumen encima de los indicadores. CSS publicada assets/index-CHV7exMd.css.
+- Primera comprobación con la dirección sin parámetro todavía recibió estilos anteriores; la consulta del botón dentro del iframe devolvió Runtime.evaluate timed out a los 3000 ms. Se comprobó una vez con la URL versionada y la observación visible confirmó el botón en las dos secciones.
+- Enlace comprobado para abrir la actualización sin borrar datos del navegador: https://sebastiandc99.github.io/Avances-BD-LMT/?v=excel-movil-20261110. Misma aplicación y mismo origen de almacenamiento.
+- Cambio limitado a visibilidad móvil. Función Excel, datos, fórmulas y documentos privados sin cambios.
