@@ -230,3 +230,13 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Advertencia visible de terminados sin fecha excluidos del rendimiento; resumen de vanos/día y BD/día, días registrados y jornadas estimadas restantes.
 - Guías actualizadas al criterio nuevo. Las cantidades y fechas guardadas previamente se conservan; los indicadores se corrigen al abrir la nueva versión.
 - Pendiente confirmar el workflow y el despliegue de Pages antes de dar la publicación por terminada.
+
+
+## 10/11/2026 — cantidades y rendimiento corregidos: publicación confirmada
+- Fuente publicada bf300405dc872de3a92ca5e36151d7bb6f59f95f, lógica fd601269fadba4dd86250266d78ae04726a54e8f. GitHub Actions 42830361480 terminó success; build 129878471728 y deploy 129878832491 aprobados.
+- Las 26 pruebas del workflow, TypeScript, compilación, inventario y control de documentos privados pasaron. Los nueve archivos modificados de aplicación/lógica/pruebas/guías coinciden por SHA con GitHub.
+- Verificación visual tras recargar https://sebastiandc99.github.io/Avances-BD-LMT/: seis indicadores, estados separados, faltantes totales, 1.743 BD calculados y explicación del origen de cantidades. Resumen por línea confirma 1.613 y 130.
+- Resumen de producción muestra vanos/día, BD/día, días con ejecución y terminados sin fecha excluidos; el estado sin fechas no inventa un rendimiento.
+- La regresión de 80 históricos sin fecha se verificó con datos aislados de prueba; no se cargaron avances ficticios en producción ni se leyeron/modificaron registros personales del navegador del usuario. Los indicadores nuevos se aplican automáticamente a los datos existentes al recargar.
+- El navegador de verificación informó Kernel state was reset after inactivity antes de ejecutar la primera lectura; se reinicializó y se completó la comprobación, sin cambios de datos.
+- Los PDF/DWG originales continúan fuera del sitio/repositorio. No se generaron ni subieron imágenes. Se mantienen 237 piquetes, 235 vanos y 1.743 desviadores estimados.
