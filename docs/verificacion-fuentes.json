@@ -1,0 +1,26 @@
+{
+  "fecha": "2026-11-09",
+  "lector": "@mlightcad/libredwg-web 0.8.7",
+  "advertencia_lector": 68,
+  "piquetes": 237,
+  "vanos": 235,
+  "por_linea": {
+    "larga": {
+      "vanos": 218,
+      "longitud_m": 24860.51771835526,
+      "bd_estimados": 1613
+    },
+    "corta": {
+      "vanos": 17,
+      "longitud_m": 1984.5659999996424,
+      "bd_estimados": 130
+    }
+  },
+  "pdf_pares_verificados": 235,
+  "alineacion_rms_m": 0.6563356651047043,
+  "alineacion_max_m": 1.2556261541128912,
+  "fuente_cad_sha256": "ef80e9b3d71a5d3f613364347a18288a23900c21ef3d79e20c67086cc3bcc97c",
+  "fuente_pdf_sha256": "8d668aabea9d584bed83125b821123d2e2317063204bc53c701983869dd95f34",
+  "bd_criterio": "floor((0.60*longitud_horizontal_m + 0.0001)/10)+1, distribución simétrica cada 10 m dentro del 60 % central. Estimación; extremos y desarrollo del OPGW sin definir.",
+  "alineacion_limite": "Coincidencia entre DWG y PDF; no equivale a validación topográfica contra el terreno."
+}
