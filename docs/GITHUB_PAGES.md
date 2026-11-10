@@ -48,3 +48,13 @@ El resumen separa terminados, en proceso y pendientes de iniciar. Faltan termina
 ### Fecha estimada y días restantes
 
 El Resumen muestra **Días para finalizar** y **Fecha estimada de finalización**, según la línea seleccionada o ambas líneas. Días = redondeo hacia arriba de (vanos sin terminar / promedio de vanos por día con ejecución fechada). La fecha suma esos días a la fecha actual de Argentina. Se supone una jornada por día y continuidad del promedio; no se inventa proyección sin datos fechados. Si todos los vanos están terminados, se muestran 0 días y Finalizado.
+
+
+## Apartados de la aplicación
+
+- **Mapa:** plano, filtros de búsqueda/línea y controles para seleccionar vanos, editar fichas y cargar tramos completados. No muestra indicadores, rendimiento ni proyecciones.
+- **Vanos:** listado para buscar y editar registros.
+- **Resumen:** indicadores de avance, terminados/en proceso/pendientes, BD colocados/calculados, producción por fecha, rendimiento, días restantes, fecha estimada y exportación CSV. El filtro de línea se aplica también a los indicadores. No incluye formularios ni instrucciones de carga del mapa.
+- **Historial:** revisiones de los registros, sin tarjetas de indicadores ni formulario lateral de carga.
+
+El cambio solo organiza la interfaz; conserva cantidades, fechas, guardado local, sincronización y la vista del mapa.

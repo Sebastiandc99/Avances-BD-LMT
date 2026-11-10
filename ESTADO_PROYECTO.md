@@ -265,3 +265,13 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Verificación visual en producción: Resumen muestra Días para finalizar y Fecha estimada de finalización; sin datos fechados muestra — días y Sin estimación, con explicación para cargar fechas. No se generaron registros de obra ficticios para la comprobación.
 - La proyección usa solo el rendimiento de vanos terminados con fecha. Días = ceil(faltantes × días registrados / vanos fechados); fecha = hoy en Argentina + días. Supone mantener el ritmo con una jornada por día. Con todos los vanos terminados indica 0 días y Finalizado.
 - Se conservan los cambios anteriores de BD automáticos por vano y estados separados. No se borran ni reescriben cargas previas; el usuario debe recargar la página para actualizar indicadores y proyección.
+
+
+## 10/11/2026 — separación de Mapa y Resumen
+- Mapa queda dedicado al plano, búsqueda/filtros y carga de datos individual o por tramos. Se retiran sus tarjetas de indicadores, rendimiento, proyección y exportación analítica.
+- Resumen concentra indicadores, cantidades de BD, estados de vanos, producción fechada, rendimiento, días restantes, fecha estimada y exportación CSV. El filtro de línea se aplica de forma coherente a sus indicadores.
+- Se retira del Resumen y del Historial la ficha/instrucción lateral para cargar en el mapa. Esos apartados usan el ancho completo y muestran títulos propios.
+- Vanos conserva su listado y ficha operativa; Historial conserva las revisiones. Los controles de sincronización y respaldo siguen disponibles.
+- Cambio solo de organización visual; no se cambian fórmulas, cantidades, fechas ni registros, ni el guardado, la sincronización o la memoria de zoom.
+- TypeScript, compilación, verify:pages y diff --check aprobados. No se añadieron pruebas que dupliquen la presentación; el workflow conserva las 28 pruebas funcionales existentes.
+- Fuente preparada para despliegue automático; la publicación se confirma después de terminar Pages.
