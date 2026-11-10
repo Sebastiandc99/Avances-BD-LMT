@@ -6,7 +6,9 @@ export function searchPoles(poles:Pole[],query:string,line='all'){
  const match=/^(FP|CORTA|LARGA|L|PIQUETE|PIQ|PQT|P)?0*(\d{1,3})$/.exec(text);
  if(!match)return [];
  const explicit=['FP','CORTA'].includes(match[1])?'corta':['L','LARGA','P'].includes(match[1])?'larga':null;
- return poles.filter(p=>Number(p.id.split('-').at(-1))===Number(match[2])&&(explicit?p.linea===explicit:line==='all'||p.linea===line));
+ const matches=poles.filter(p=>Number(p.id.split('-').at(-1))===Number(match[2]));
+ if(explicit)return matches.filter(p=>p.linea===explicit);
+ const scoped=matches.filter(p=>line==='all'||p.linea===line);return scoped.length?scoped:matches;
 }
 export function viewAtPole(poles:Pole[],spans:Span[],id:string,size:MapSize):MapView|null{
  const pole=poles.find(p=>p.id===id);if(!pole)return null;

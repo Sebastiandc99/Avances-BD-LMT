@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { searchPoles, viewAtPole } from '../lib/pole-search.ts';
 const {piquetes,vanos}=JSON.parse(fs.readFileSync('public/assets/inventory.json','utf8'));
 test('pole search resolves exact numbers and line prefixes without matching 19 to 190',()=>{
- assert.deepEqual(searchPoles(piquetes,'192').map(p=>p.id),['L-192']);assert.equal(searchPoles(piquetes,'19').length,1);
+ assert.deepEqual(searchPoles(piquetes,'192').map(p=>p.id),['L-192']);assert.equal(searchPoles(piquetes,'19').length,1);assert.equal(searchPoles(piquetes,'192','corta')[0].id,'L-192');
  assert.equal(searchPoles(piquetes,'1').length,2);assert.deepEqual(searchPoles(piquetes,'FP 003').map(p=>p.id),['FP-003']);
  assert.deepEqual(searchPoles(piquetes,'P98','corta').map(p=>p.id),['L-098']);assert.equal(searchPoles(piquetes,'piquete 17','corta')[0].id,'FP-017');
  for(const q of ['','0','220','FP 19','19-20','hola'])assert.equal(searchPoles(piquetes,q).length,0);

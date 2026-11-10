@@ -296,3 +296,13 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Diez pruebas afectadas aprobadas (tramos, búsqueda/cámara y protocolo Drive), con respuestas aisladas: no hubo escrituras ficticias en Drive. TypeScript, build:pages, verify:pages y control de documentos privados aprobados.
 - Error de TypeScript resuelto: Response.json devolvía unknown y había conflicto de tipos de append con Cloudflare. Se tiparon los resultados JSON y se usó appendChild para cargar los SDK oficiales de Google.
 - Mantener 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes nuevas, SVG codificados ni carga de PDF/DWG.
+
+
+### Interfaz lista para publicar
+- Lógica/pruebas respaldadas en c85bde2367d2f90261962e875d7b714b38cecea6.
+- La lupa del Mapa mantiene la vista de mapa; enfoca y resalta piquetes exactos, permite elegir la línea en resultados ambiguos y busca en la otra línea si el número no existe en el filtro actual.
+- Cargar o actualizar tramos incluye Actualizar fechas; una ficha existente muestra Guardar cambios. No se duplican vanos terminados al corregir fechas.
+- Resumen siempre usa el proyecto completo de 235 vanos, sin porcentajes por línea.
+- Datos y respaldo incorpora el botón Sincronizar copia con Drive y configuración del cliente Google. Destino fijo: Doc Worley / App avances. El botón permanece pendiente/deshabilitado sin las credenciales públicas propias, sin fingir una sincronización.
+- Se documentó la activación concreta en docs/GOOGLE_DRIVE.md. La copia por equipo no mezcla automáticamente respaldos de otros equipos ni sustituye la sincronización de eventos existente.
+- El workflow incorpora siete pruebas nuevas (35 en total). La publicación se verifica por separado cuando termine Pages.

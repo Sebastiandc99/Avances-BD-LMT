@@ -47,14 +47,27 @@ El resumen separa terminados, en proceso y pendientes de iniciar. Faltan termina
 
 ### Fecha estimada y días restantes
 
-El Resumen muestra **Días para finalizar** y **Fecha estimada de finalización**, según la línea seleccionada o ambas líneas. Días = redondeo hacia arriba de (vanos sin terminar / promedio de vanos por día con ejecución fechada). La fecha suma esos días a la fecha actual de Argentina. Se supone una jornada por día y continuidad del promedio; no se inventa proyección sin datos fechados. Si todos los vanos están terminados, se muestran 0 días y Finalizado.
+El Resumen muestra **Días para finalizar** y **Fecha estimada de finalización**, para el proyecto completo (línea larga + corta). Días = redondeo hacia arriba de (vanos sin terminar / promedio de vanos por día con ejecución fechada). La fecha suma esos días a la fecha actual de Argentina. Se supone una jornada por día y continuidad del promedio; no se inventa proyección sin datos fechados. Si todos los vanos están terminados, se muestran 0 días y Finalizado.
 
 
 ## Apartados de la aplicación
 
 - **Mapa:** plano, filtros de búsqueda/línea y controles para seleccionar vanos, editar fichas y cargar tramos completados. No muestra indicadores, rendimiento ni proyecciones.
 - **Vanos:** listado para buscar y editar registros.
-- **Resumen:** indicadores de avance, terminados/en proceso/pendientes, BD colocados/calculados, producción por fecha, rendimiento, días restantes, fecha estimada y exportación CSV. El filtro de línea se aplica también a los indicadores. No incluye formularios ni instrucciones de carga del mapa.
+- **Resumen:** indicadores de avance, terminados/en proceso/pendientes, BD colocados/calculados, producción por fecha, rendimiento, días restantes, fecha estimada y exportación CSV. Siempre muestra el proyecto completo, sin porcentajes separados por línea. No incluye formularios ni instrucciones de carga del mapa.
 - **Historial:** revisiones de los registros, sin tarjetas de indicadores ni formulario lateral de carga.
 
 El cambio solo organiza la interfaz; conserva cantidades, fechas, guardado local, sincronización y la vista del mapa.
+
+
+## Búsqueda y edición de avances completados
+
+En Mapa, la lupa busca piquetes exactos (por ejemplo `192`, `P98`, `FP 3`). Si hay una sola coincidencia se centra y acerca el plano. Si un número existe en ambas líneas, se elige cuál enfocar. La búsqueda del mapa no lleva al listado. Un piquete encontrado se resalta y permite tocar los vanos cercanos.
+
+Una ficha existente permite cambiar la fecha y pulsar **Guardar cambios**. En **Cargar o actualizar tramos → Actualizar fechas** se eligen los tramos y una fecha nueva; solo se actualizan vanos ya terminados, sin sumar vanos duplicados y conservando cantidades, fotos, notas y responsable. El rendimiento y la proyección usan la fecha corregida.
+
+El Resumen usa siempre ambas líneas: porcentaje = terminados / 235 × 100. No divide el avance en porcentajes independientes de la línea larga y corta.
+
+## Google Drive: conexión preparada, pendiente de activación
+
+Se identificó la carpeta privada Doc Worley / App avances. Datos y respaldo incorpora **Sincronizar copia con Drive**, con destino fijo y archivo de respaldo por equipo. El botón requiere configurar OAuth web, API key pública de Picker y número de proyecto de Google, además de autorizar la cuenta. Ver `docs/GOOGLE_DRIVE.md`. Sin esa configuración, la interfaz lo informa como pendiente y no simula un guardado exitoso.
