@@ -43,3 +43,8 @@ Al marcar un vano terminado, su cantidad calculada se contabiliza automáticamen
 El rendimiento es **vanos terminados con fecha / días distintos con ejecución registrada**, y también muestra BD/día para esos mismos vanos. Los terminados sin fecha cuentan en el avance y los BD, pero nunca en el rendimiento. El día del guardado es solo trazabilidad, no una fecha de ejecución. Agregar, corregir o quitar una fecha actualiza el cálculo; los vanos reabiertos se excluyen de la producción terminada.
 
 El resumen separa terminados, en proceso y pendientes de iniciar. Faltan terminar = en proceso + pendientes. El inventario permanece en 237 piquetes y 235 vanos.
+
+
+### Fecha estimada y días restantes
+
+El Resumen muestra **Días para finalizar** y **Fecha estimada de finalización**, según la línea seleccionada o ambas líneas. Días = redondeo hacia arriba de (vanos sin terminar / promedio de vanos por día con ejecución fechada). La fecha suma esos días a la fecha actual de Argentina. Se supone una jornada por día y continuidad del promedio; no se inventa proyección sin datos fechados. Si todos los vanos están terminados, se muestran 0 días y Finalizado.

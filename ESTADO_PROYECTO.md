@@ -240,3 +240,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - La regresión de 80 históricos sin fecha se verificó con datos aislados de prueba; no se cargaron avances ficticios en producción ni se leyeron/modificaron registros personales del navegador del usuario. Los indicadores nuevos se aplican automáticamente a los datos existentes al recargar.
 - El navegador de verificación informó Kernel state was reset after inactivity antes de ejecutar la primera lectura; se reinicializó y se completó la comprobación, sin cambios de datos.
 - Los PDF/DWG originales continúan fuera del sitio/repositorio. No se generaron ni subieron imágenes. Se mantienen 237 piquetes, 235 vanos y 1.743 desviadores estimados.
+
+
+## 10/11/2026 — fecha de finalización estimada en el resumen
+- Se agrega al Resumen la fecha estimada de finalización y los días restantes, para ambas líneas o la seleccionada.
+- Días = ceil(vanos sin terminar / promedio de vanos por día con ejecución fechada); fecha = fecha actual en Argentina + esos días. Se aclara la hipótesis de una jornada por día.
+- Sin producción fechada no se inventan días ni fecha. Si todos los vanos están terminados: 0 días y Finalizado, sin presentar la fecha de carga como fecha real de finalización.
+- Prueba específica aprobada: 5 vanos faltantes a 1,5 vanos/día dan 4 días; desde 10/11/2026 se estima 14/11/2026. Sin fechas, proyección ausente; todo terminado, 0 días.
+- Pasaron las 15 pruebas afectadas del modelo, TypeScript, compilación y verificación de Pages. El workflow completo suma 27 pruebas.
+- Fuente guardada para despliegue automático; publicación de esta ampliación pendiente de confirmar.

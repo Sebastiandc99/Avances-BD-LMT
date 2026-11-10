@@ -45,7 +45,7 @@ export function metrics(spans:Span[],events:Event[],today=localDate()) {
  }
  const days=Object.keys(daily).length,datedDone=Object.values(daily).reduce((a,b)=>a+b,0),datedInstalled=Object.values(dailyBD).reduce((a,b)=>a+b,0);
  const undatedDone=done-datedDone,average=days?datedDone/days:0,averageBD=days?datedInstalled/days:0;
- const estimatedDays=average>0?Math.ceil(remaining/average):null;
+ const estimatedDays=spans.length>0&&remaining===0?0:average>0?Math.ceil(remaining/average):null;
  const eta=estimatedDays!==null?localDate(new Date(Date.parse(today+'T12:00:00-03:00')+estimatedDays*86400000)):null;
  return {total:spans.length,done,inProgress,pending,installed,calculatedInstalled,reportedInstalled,planned,pct:spans.length?done/spans.length*100:0,remaining,average,averageBD,eta,estimatedDays,daily,dailyBD,days,datedDone,undatedDone,datedInstalled};
 }

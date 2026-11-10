@@ -64,3 +64,11 @@ test('all 235 completed spans sum exactly 1743 BD, even with no manually entered
  assert.equal(m.done,235);assert.equal(m.pending,0);assert.equal(m.inProgress,0);assert.equal(m.remaining,0);assert.equal(m.pct,100);assert.equal(m.installed,1743);assert.equal(m.calculatedInstalled,1743);assert.equal(m.average,0);
  assert.equal(metrics(inv.vanos.filter(s=>s.linea==='larga'),events,'2026-11-10').installed,1613);assert.equal(metrics(inv.vanos.filter(s=>s.linea==='corta'),events,'2026-11-10').installed,130);
 });
+
+
+test('finish projection rounds remaining spans up to whole days and uses only the dated rate',()=>{
+ const spans=inv.vanos.slice(0,8),events=spans.slice(0,3).map((s,i)=>ev({id:'forecast-'+i,spanId:s.id,status:'terminado',date:i<2?'2026-11-08':'2026-11-09',installed:0}));
+ const m=metrics(spans,events,'2026-11-10');assert.equal(m.average,1.5);assert.equal(m.remaining,5);assert.equal(m.estimatedDays,4);assert.equal(m.eta,'2026-11-14');
+ const undated=metrics(spans,events.map(e=>({...e,date:''})),'2026-11-10');assert.equal(undated.estimatedDays,null);assert.equal(undated.eta,null);
+ const finished=metrics(spans,spans.map((s,i)=>ev({id:'done-'+i,spanId:s.id,status:'terminado',date:'',installed:0})),'2026-11-10');assert.equal(finished.estimatedDays,0);assert.equal(finished.remaining,0);
+});
