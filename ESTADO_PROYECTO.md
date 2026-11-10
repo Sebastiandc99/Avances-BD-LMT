@@ -189,3 +189,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - TypeScript, compilación Pages, rutas/inventario y control de documentos privados aprobados sobre la actualización completa local.
 - Error de vista previa local: Vite preview devolvió ERR_SYSTEM_ERROR, uv_interface_addresses returned Unknown system error 1. Se sirvió el artefacto estático con Python; el navegador remoto devolvió net::ERR_CONNECTION_REFUSED al puerto local. No se insistió: la comprobación visual se realiza sobre Pages después del despliegue.
 - No se modifican la base privada ni sus permisos. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. Sin generación/codificación/carga de imágenes ni documentos originales.
+
+
+### Interfaz lista para publicación
+- Lógica y pruebas respaldadas en commit 7acf961f87c635c99645170a46ca2467f991390a.
+- Nuevo diálogo Cargar vanos completados: varios tramos, línea larga/corta, piquetes de inicio/fin, fecha y responsable opcionales, vista previa del total y guardado conjunto transaccional.
+- Una ficha individual se cierra después de confirmar el guardado local y vuelve al plano. Si el guardado falla, la ficha queda abierta para reintentar.
+- Seleccionar directamente en el plano no recentra ni cambia el zoom; el redimensionado conserva escala y centro. La vista queda en memoria al cambiar de pestaña; al guardar desde el plano se recupera la posición de desplazamiento de la página.
+- La guía de Pages y el workflow incluyen las nuevas funciones y las cinco pruebas adicionales (20 pruebas en total junto a las anteriores).
+- Despliegue automático pendiente de confirmación; todavía no se presenta esta etapa como publicada.

@@ -24,3 +24,11 @@ El guardado se confirma primero en IndexedDB, aun sin conexión. Con la app abie
 Los eventos y las fotos usan el proyecto Supabase independiente `ynhvceqjhcydsteyzrpt`: acceso por cuenta con RLS, bucket privado y clave de frontend publicable. No hay claves administrativas en el cliente. El repositorio contiene únicamente la configuración pública y el esquema reproducible `supabase/lmt-sync.sql`; no contiene los avances ni las fotos de cada cuenta.
 
 Los PDF/DWG originales no están incluidos ni son recursos de la app. El inventario derivado sigue público y mantiene 237 piquetes, 235 vanos y 1.743 BD estimados. Exportar JSON sigue disponible como respaldo adicional.
+
+## Cargar avances anteriores por tramos
+
+Pulsar **Cargar vanos completados**. Elegir la línea, el piquete inicial y el final; por ejemplo 1 a 18 corresponde a los 17 vanos entre esos piquetes. **Agregar otro tramo** permite cargar sectores separados o ambas líneas a la vez. Revisar el conteo y confirmar. Los vanos ya terminados y los que requieren resolver un conflicto se omiten; no se duplican rangos superpuestos.
+
+La fecha de finalización y el responsable son opcionales. Si no se indican, se conservan los valores existentes. Un registro sin fecha usa el día de carga para el resumen diario, por lo que conviene indicar la fecha real si se conoce. Se conservan BD reales, notas y fotos; las cantidades previstas no se convierten en cantidades instaladas.
+
+Al confirmar una ficha individual, el guardado local cierra la ficha y vuelve al plano. Tocar un vano en el mapa conserva el acercamiento y el desplazamiento; abrir/cerrar la ficha en el celular mantiene la escala y el centro. La vista también se conserva al alternar entre Mapa y las demás pestañas. Cambiar de línea o pulsar Ver traza completa ajusta la vista deliberadamente.
