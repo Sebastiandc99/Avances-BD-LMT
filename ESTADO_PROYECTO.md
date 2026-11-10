@@ -169,3 +169,14 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Configuración del panel Auth no modificada: el navegador de administración pide iniciar sesión. Se conserva confirmación de correo y se permite pegar el enlace de confirmación en la propia app.
 - La actualización queda guardada para su publicación automática por GitHub Actions. La verificación del despliegue se registra por separado cuando termine.
 - Error de transferencia interna: una lectura combinada excedió el límite y no pudo analizarse como JSON. No se enviaron datos en ese intento. Resuelto con lecturas acotadas y transferencia solo de diferencias del lock.
+
+
+## 10/11/2026 — sincronización publicada y verificada
+- Aplicación: https://sebastiandc99.github.io/Avances-BD-LMT/
+- Código de sincronización: commit 0fe1878d3d660ade7ad2737cf73b369a58fbac55, presente en main. Verificada la lectura independiente del componente de acceso y los archivos enviados. El lock remoto contiene los mismos datos de dependencias; solo difiere el orden de entradas respecto del archivo local.
+- GitHub Actions 42808728152: resultado success. Build 129804425140 y deploy 129805154254 completados; 15 pruebas, TypeScript, compilación, inventario y control de documentos privados aprobados.
+- Verificación visual de producción: botón Activar nube; panel Nube privada con Ingresar/Crear cuenta, correo y contraseña, confirmación por enlace, respaldos JSON/CSV y aviso de sincronización al recuperar conexión con la app abierta. Se confirmó el indicador Listo para trabajar sin conexión.
+- La cuenta personal debe activarla el usuario desde la app. No se creó una cuenta en su nombre ni se pidió su contraseña. No se probó una sesión personal real en dos dispositivos; las pruebas de cola y la transacción de la base verifican reintentos, conflictos y aislamiento.
+- Base final comprobada: cero usuarios y eventos de prueba persistidos; bucket de fotos public=false. Asesor de seguridad sin avisos. Los PDF/DWG originales siguen fuera del repositorio y del sitio.
+- Comprobación diff --check: Git interpretó CRLF heredados como espacios al final; con core.whitespace=cr-at-eol la comprobación pasó sin cambiar los finales de línea de origen.
+- Conservados 237 piquetes, 235 vanos y 1.743 desviadores estimados. No se generaron, codificaron ni subieron imágenes en esta etapa.
