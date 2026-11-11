@@ -424,3 +424,13 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Accesibilidad: descripción textual del gráfico y leyenda visible, sin depender únicamente del color. La vista Mapa y sus modos de selección permanecen dedicados a la carga.
 - Validación final local aprobada: seis pruebas afectadas, TypeScript, build:pages, verify:pages y control de documentos privados. Se conserva la carga offline y no se modifican los registros guardados.
 - Publicación pendiente de confirmar en Pages.
+
+
+### Torta de avance publicada y verificada
+- Fuente 38bf3eefd6bb631b7f76394074d99ec4689a8cb6, con lógica y Excel en fef070913c381e962b8844ee268ba4aefd37944c. GitHub Actions 42992773351 terminó correctamente: build 130429411676 y deploy 130429702408 success; pruebas funcionales, TypeScript, compilación y controles de publicación aprobados.
+- Doce archivos modificados comparados por SHA entre el código validado y el árbol de GitHub: cero diferencias. El código está realmente guardado y compilado.
+- Verificación visual en https://sebastiandc99.github.io/Avances-BD-LMT/?v=torta-avance-20261111: torta y leyenda de tres estados presentes en Resumen, con cantidades y porcentajes globales. La vista móvil de 390 px también fue revisada.
+- Descarga real desde la aplicación pública completada: XLSX con gráfico circular nativo, referencias a las celdas de Resumen, cachés coherentes y mapa PNG conservado. ZIP y todos los XML/relaciones válidos. La prueba pública sin datos locales mostró 0/0/235; no representa ni modifica los registros que el usuario conserva en su navegador. La mezcla 3/1/231 y la actualización de fórmulas se verificaron por separado con datos aislados.
+- Se evitaron porcentajes interiores superpuestos en los sectores pequeños del Excel; quedan sus tres colores y leyenda, más cantidades y porcentaje global en la tabla superior. La torta de la app muestra explícitamente los porcentajes de los tres estados.
+- Captura de comprobación: el primer guardado respondió ENOENT porque no existía /workspace/shared; se creó el directorio y se guardaron los mismos bytes sin volver a capturar. No fue un fallo de la app.
+- No se añadieron documentos originales ni recursos de imagen al repositorio. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. ESTADO actualizado; previsualización temporal detenida.
