@@ -434,3 +434,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Se evitaron porcentajes interiores superpuestos en los sectores pequeños del Excel; quedan sus tres colores y leyenda, más cantidades y porcentaje global en la tabla superior. La torta de la app muestra explícitamente los porcentajes de los tres estados.
 - Captura de comprobación: el primer guardado respondió ENOENT porque no existía /workspace/shared; se creó el directorio y se guardaron los mismos bytes sin volver a capturar. No fue un fallo de la app.
 - No se añadieron documentos originales ni recursos de imagen al repositorio. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. ESTADO actualizado; previsualización temporal detenida.
+
+
+## 11/11/2026 — consulta de vanos montados por día: lógica verificada
+- Se agrega un cálculo diario sobre la última revisión vigente de cada vano: estado Terminado y fecha de ejecución explícita igual al día elegido. No usa createdAt ni asigna fechas a cargas históricas sin fecha.
+- El total diario reúne ambas líneas e incluye vanos y BD colocados, respetando las cantidades reales prioritarias o el cálculo por vano terminado. Cambiar una fecha mueve el vano de día; reabrirlo lo retira sin duplicaciones.
+- Dos regresiones nuevas verifican ambos circuitos, exclusión de otros estados/sin fecha, cantidades reales y calculadas, coincidencia con la producción diaria del modelo, correcciones, reapertura y descarte de revisiones. Las 18 pruebas afectadas (modelo + consulta diaria) pasaron.
+- TypeScript, compilación para Pages, verify:pages y control de documentos privados aprobados. El workflow incorpora la prueba diaria y conserva las anteriores.
+- Permanecen 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes nuevas ni publicación de PDF/DWG.
+- Lógica lista para guardar; interfaz y publicación se confirman por separado.
