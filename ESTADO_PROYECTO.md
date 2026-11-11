@@ -452,3 +452,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - No se escribieron avances ficticios en producción ni se modificaron datos para verificar. El filtro solo consulta registros. El Excel completo y el Resumen conservan su alcance global.
 - Incidencias acotadas de verificación: el tab de prueba anterior ya no existía (Tab not found); se creó uno nuevo. Una asignación a un nombre aún no declarado devolvió dailyQA is not defined después de crear la pestaña; se vinculó su ID observado. El rellenado automático del campo date cambió el valor DOM sin activar el cambio de React; se usaron controles de teclado nativos y se comprobó la actualización correcta. Sin fallos de compilación ni de la aplicación.
 - Interfaz lista para despliegue; pendiente confirmar Pages.
+
+
+### Consulta diaria publicada y verificada
+- Fuente d52f9f6e0633fe2c05a07eed45dfd1c0e7777643 en main, con lógica 9c468c8ddbff5d36bb792470864b0e4795bb7877. GitHub Actions 43008212847 terminó con build 130480945157 y deploy 130481195543 success. Los logs confirman 47 pruebas aprobadas y cero fallos, además de TypeScript, compilación, rutas/inventario y privacidad.
+- Nueve archivos de esta ampliación comparados por SHA con el árbol publicado: cero diferencias.
+- Comprobación en la aplicación pública: Vanos muestra Montados el día y Ver todas las fechas; una fecha seleccionada restringe la tabla a terminados y muestra el total diario de vanos/BD. La prueba pública, sin datos locales de obra en ese navegador, muestra el estado vacío correcto. La prueba móvil con datos aislados confirmó los resultados 2 vanos/14 BD y 1 vano/8 BD, así como búsqueda, filtro de línea y retorno a los 235 resultados.
+- URL verificada: https://sebastiandc99.github.io/Avances-BD-LMT/?v=vanos-por-dia-20261111. No se modificaron registros de producción para comprobar el filtro.
+- El primer git diff --check contra la base local antigua marcó los CR de finales de línea ya existentes como trailing whitespace; la comprobación con core.whitespace=cr-at-eol pasó sin cambiar finales de línea ni archivos ajenos a la solicitud.
+- Se mantiene el alcance global del Resumen y del Excel existente, el guardado offline y la selección del mapa. Inventario conservado: 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes ni documentos originales nuevos. Previsualización temporal detenida.
