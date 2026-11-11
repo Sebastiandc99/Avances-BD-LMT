@@ -100,3 +100,11 @@ Cada vano conserva sus notas, fotos, responsable y cantidad real. Al pasar a Pen
 En Resumen, la torta muestra terminados (verde), en proceso (amarillo) y pendientes (gris), con cantidades y porcentajes sobre los 235 vanos de ambas líneas. Incluye los terminados históricos sin fecha; el rendimiento conserva su criterio de usar solo fechas válidas.
 
 El Excel descargado incorpora la misma torta como gráfico editable en la hoja Resumen, debajo de los indicadores y vinculado a sus tres celdas de estados. Los valores y colores coinciden con la app. La tabla mantiene los conteos y el porcentaje global; se evitan rótulos sobre sectores muy pequeños que se superpongan. Para incorporar cambios de la app, descargar un nuevo Excel.
+
+
+## Consultar vanos montados por día
+En Vanos, elegir una fecha en **Montados el día**. La tabla muestra únicamente los vanos actualmente terminados cuya fecha de ejecución coincide con ese día; no usa la fecha en que se guardó el registro. Las cargas históricas sin fecha quedan fuera de esta consulta.
+
+El recuadro **Total del día (ambas líneas)** indica los vanos montados y los BD colocados, con el mismo criterio automático/real del Resumen. La búsqueda y el filtro de línea pueden reducir las filas visibles; el encabezado muestra cuántas se ven del total diario. Mientras hay una fecha elegida, el estado queda en Terminado. **Ver todas las fechas** recupera el listado y su filtro de estado anterior.
+
+Las correcciones de fecha, cantidades o estado se reflejan según la última revisión vigente de cada vano. No se crean registros nuevos al consultar ni se cambia el Resumen global, el mapa o el Excel completo existente.

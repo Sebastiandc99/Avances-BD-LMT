@@ -443,3 +443,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - TypeScript, compilación para Pages, verify:pages y control de documentos privados aprobados. El workflow incorpora la prueba diaria y conserva las anteriores.
 - Permanecen 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes nuevas ni publicación de PDF/DWG.
 - Lógica lista para guardar; interfaz y publicación se confirman por separado.
+
+
+### Selector diario en Vanos listo para publicar
+- Lógica y pruebas guardadas en 9c468c8ddbff5d36bb792470864b0e4795bb7877.
+- Vanos incorpora Montados el día, total de vanos/BD de ambas líneas y Ver todas las fechas. El encabezado distingue filas visibles del total del día; la búsqueda y línea siguen operativas. El selector de estado refleja Terminado durante la consulta y recupera el estado previo al quitar la fecha.
+- Prueba visual móvil de 390 px sobre datos aislados existentes: 09/11 → vanos 97–98 y 98–99, total 2 vanos/14 BD; 10/11 → 1 vano/8 BD. Filtrar la corta devuelve 0 de 2; buscar 97 devuelve 1 de 2 conservando el total diario. Quitar fecha y búsqueda devuelve 235 resultados. Mapa no muestra el selector diario.
+- No se escribieron avances ficticios en producción ni se modificaron datos para verificar. El filtro solo consulta registros. El Excel completo y el Resumen conservan su alcance global.
+- Incidencias acotadas de verificación: el tab de prueba anterior ya no existía (Tab not found); se creó uno nuevo. Una asignación a un nombre aún no declarado devolvió dailyQA is not defined después de crear la pestaña; se vinculó su ID observado. El rellenado automático del campo date cambió el valor DOM sin activar el cambio de React; se usaron controles de teclado nativos y se comprobó la actualización correcta. Sin fallos de compilación ni de la aplicación.
+- Interfaz lista para despliegue; pendiente confirmar Pages.
