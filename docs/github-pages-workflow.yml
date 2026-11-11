@@ -39,7 +39,7 @@ jobs:
         run: node scripts/check-public-files.mjs
       - run: npm ci
       - name: Verificar modelo y base de datos
-        run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs tests/sync.test.mjs tests/storage.test.mjs tests/bulk.test.mjs tests/map-view.test.mjs tests/pole-search.test.mjs tests/drive-backup.test.mjs tests/excel.test.mjs tests/map-selection.test.mjs tests/progress-pie.test.mjs tests/daily-completion.test.mjs
+        run: node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs tests/sync.test.mjs tests/storage.test.mjs tests/bulk.test.mjs tests/map-view.test.mjs tests/pole-search.test.mjs tests/drive-backup.test.mjs tests/excel.test.mjs tests/map-selection.test.mjs tests/progress-pie.test.mjs tests/daily-completion.test.mjs tests/backup-status.test.mjs
       - name: Comprobar TypeScript
         run: node node_modules/typescript/bin/tsc --noEmit
       - name: Compilar versión para GitHub Pages
