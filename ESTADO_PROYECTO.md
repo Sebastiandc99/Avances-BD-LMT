@@ -417,3 +417,10 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Pasaron seis pruebas afectadas de Excel/torta, TypeScript, compilación para Pages, verificación de rutas/inventario y control de documentos privados. Se conservan 237 piquetes, 235 vanos y 1.743 BD estimados.
 - Errores técnicos acotados: lectura inicial de instrucciones respondió skill package is not available antes de iniciar el entorno; tras iniciarlo se leyó correctamente. La primera ejecución fuera del directorio temporal devolvió ERR_MODULE_NOT_FOUND @oai/artifact-tool; corregido el directorio, se ejecutó sin reinstalar dependencias. La espera de descarga desde el iframe agotó 30.000 ms; la descarga desde la pestaña directa funcionó en menos de dos segundos. No se repitió indefinidamente ninguna operación.
 - Fuente preparada; falta confirmar guardado en GitHub y despliegue automático antes de presentar la actualización como publicada.
+
+
+### Torta en la interfaz lista para desplegar
+- Resumen incorpora la torta global con leyenda de los tres estados, cantidades y porcentajes sobre el total de ambas líneas. Diseño verificado a 390 px, sin desbordamiento; el gráfico y las cifras coinciden con los indicadores.
+- Accesibilidad: descripción textual del gráfico y leyenda visible, sin depender únicamente del color. La vista Mapa y sus modos de selección permanecen dedicados a la carga.
+- Validación final local aprobada: seis pruebas afectadas, TypeScript, build:pages, verify:pages y control de documentos privados. Se conserva la carga offline y no se modifican los registros guardados.
+- Publicación pendiente de confirmar en Pages.

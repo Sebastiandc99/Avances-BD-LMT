@@ -94,3 +94,9 @@ Arriba del plano hay dos botones: Selección simple y Selección múltiple.
 - Guardar aplica los datos a todos en una sola transacción local, cierra la ventana, limpia las marcas y mantiene el zoom y la posición del mapa. Los eventos quedan pendientes de sincronizar cuando corresponda.
 
 Cada vano conserva sus notas, fotos, responsable y cantidad real. Al pasar a Pendiente, su cantidad colocada queda en cero. Si existe un conflicto o algún vano cambió desde que se abrió la ventana, se bloquea todo el lote y se conserva la selección para revisarla.
+
+
+## Gráfico de avance
+En Resumen, la torta muestra terminados (verde), en proceso (amarillo) y pendientes (gris), con cantidades y porcentajes sobre los 235 vanos de ambas líneas. Incluye los terminados históricos sin fecha; el rendimiento conserva su criterio de usar solo fechas válidas.
+
+El Excel descargado incorpora la misma torta como gráfico editable en la hoja Resumen, debajo de los indicadores y vinculado a sus tres celdas de estados. Los valores y colores coinciden con la app. La tabla mantiene los conteos y el porcentaje global; se evitan rótulos sobre sectores muy pequeños que se superpongan. Para incorporar cambios de la app, descargar un nuevo Excel.
