@@ -108,3 +108,9 @@ En Vanos, elegir una fecha en **Montados el día**. La tabla muestra únicamente
 El recuadro **Total del día (ambas líneas)** indica los vanos montados y los BD colocados, con el mismo criterio automático/real del Resumen. La búsqueda y el filtro de línea pueden reducir las filas visibles; el encabezado muestra cuántas se ven del total diario. Mientras hay una fecha elegida, el estado queda en Terminado. **Ver todas las fechas** recupera el listado y su filtro de estado anterior.
 
 Las correcciones de fecha, cantidades o estado se reflejan según la última revisión vigente de cada vano. No se crean registros nuevos al consultar ni se cambia el Resumen global, el mapa o el Excel completo existente.
+
+
+## Presentación del Excel
+La exportación usa Arial de 11 puntos, títulos más grandes y bordes visibles. Resumen agrupa sus indicadores en bloques de color: alcance, avance, desviadores, rendimiento y proyección. Destaca el avance total, los BD colocados, los promedios y la fecha prevista, manteniendo las mismas fórmulas y referencias de la torta.
+
+Vanos distingue las columnas de identificación, estado/fecha, cantidades y observaciones mediante sus encabezados. Las filas alternan fondo y el estado usa colores que reaccionan a su texto. Se conservan los encabezados y los identificadores visibles al desplazarse. Rendimiento comparte la tipografía y las filas alternadas. Para obtener la presentación nueva se debe descargar otro Excel desde la app.

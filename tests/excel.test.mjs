@@ -52,3 +52,14 @@ test('torta nativa del Excel enlaza Resumen y conserva valores y colores del ava
   assert.ok(files['xl/media/traza.png']);
  }
 });
+test('la descarga conserva alturas legibles y alternancia hasta el último vano sin confundir ht con customHeight',()=>{
+ const files=unzipSync(productionXlsx(inventory,[event('L-001-002',{responsible:'Cuadrilla de montaje '.repeat(5),notes:'Revisión del montaje\n'.repeat(5)})],{png,width:4400,height:3400},'2026-11-11'));
+ const sheet=n=>strFromU8(files[`xl/worksheets/sheet${n}.xml`]);
+ const row=(s,r)=>s.match(new RegExp(`<x:row r="${r}"[^>]*>[\\s\\S]*?</x:row>`))[0];
+ const height=(s,r)=>Number(row(s,r).match(/\bht="([\d.]+)"/)[1]);
+ const style=(s,address)=>s.match(new RegExp(`<x:c r="${address}" s="(\\d+)"`))[1];
+ assert.ok(height(sheet(1),1)>=30);assert.ok(height(sheet(1),5)>=34);assert.ok(height(sheet(1),12)>=28);
+ assert.ok(height(sheet(3),5)>=40);assert.ok(height(sheet(3),6)>height(sheet(3),7));assert.ok(height(sheet(3),240)>=28);
+ assert.notEqual(style(sheet(3),'A6'),style(sheet(3),'A7'));assert.equal(style(sheet(3),'A6'),style(sheet(3),'A240'));
+ assert.match(sheet(3),/conditionalFormatting sqref="E6:E240"/);assert.match(sheet(3),/ySplit="5"/);
+});

@@ -82,9 +82,14 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
   const path=`xl/worksheets/sheet${i+1}.xml`,source=template.files[path as keyof typeof template.files];
   const styles:Record<string,string>={};
   for(const c of source.matchAll(/<x:c\b[^>]*r="([A-Z]+\d+)"[^>]*s="(\d+)"/g))styles[c[1]]=c[2];
+  const heights:Record<number,number>={};
+  for(const row of source.matchAll(/<x:row\b[^>]*\br="(\d+)"[^>]*\bht="([\d.]+)"/g))heights[Number(row[1])]=Number(row[2]);
   const rows=sheet.rows.map((cells,j)=>{
-   const r=j+1;const h=i===2&&r>5?Math.min(240,Math.max(23,Math.ceil(String(cells[11]||'').length/65)*14)):r===5?34:23;
-   return `<x:row r="${r}" ht="${h}" customHeight="1">${cells.map((c,k)=>{const col=column(k),address=col+r,style=styles[address]||styles[col+(r>5?'6':r)]||styles['A6']||'0';return cellXML(address,c,style);}).join('')}</x:row>`;
+   const r=j+1,pattern=r>5&&[1,2].includes(i)?(r%2?7:6):r;
+   const baseHeight=heights[r]||heights[pattern]||28;
+   const lines=(value:Cell,width:number)=>String(value??'').split(/\r?\n/).reduce((n,line)=>n+Math.max(1,Math.ceil(line.length/width)),0);
+   const h=i===2&&r>5?Math.min(409.5,Math.max(baseHeight,Math.max(lines(cells[8],27),lines(cells[10],28),lines(cells[11],55))*16+8)):baseHeight;
+   return `<x:row r="${r}" ht="${h}" customHeight="1">${cells.map((c,k)=>{const col=column(k),address=col+r,style=styles[address]||styles[col+pattern]||styles[col+'6']||styles['A6']||'0';return cellXML(address,c,style);}).join('')}</x:row>`;
   }).join('');
   let sheetXML=source.replace(/<x:sheetData>[\s\S]*?<\/x:sheetData>/,`<x:sheetData>${rows}</x:sheetData>`);
   if(i===1||i===2)sheetXML=sheetXML.replace('</x:sheetData>',`</x:sheetData><x:autoFilter ref="A5:${i===2?'L':'C'}${sheet.rows.length}"/>`);
