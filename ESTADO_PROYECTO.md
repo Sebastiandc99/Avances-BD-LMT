@@ -501,3 +501,10 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Ningún dato de obra fue importado, borrado o restaurado durante esta etapa. No se cambiaron el nombre/versión de IndexedDB ni el mecanismo de lectura/guardado. Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados.
 - Incidencia de lectura: una primera ruta relativa del adjunto no existía desde el directorio del repositorio; se utilizó la ruta absoluta provista y se leyó correctamente. No hubo fallos al abrir el Excel.
 - Fuente lista para guardar. Recuperación real pendiente del navegador original o de un respaldo anterior que contenga los datos. La activación personal requiere que el usuario cree/ingrese a su cuenta; no se afirma que ya esté activa.
+
+
+### Aviso de guardado listo para desplegar
+- Lógica y regresiones guardadas en 0f55cd3759b989e69d925ef35019972d0b5d14a5.
+- Aviso permanente en todas las secciones y botón Activar sincronización. La cabecera sin cuenta dice Solo en este equipo, incluso con cambios pendientes; el panel explica el alta única y la diferencia con estar conectado a Chrome/Google.
+- El aviso cambia según el estado real de la sesión, red, cola, errores, conflictos y última comprobación. No se añadieron credenciales, una cuenta automática compartida ni permisos públicos sobre los avances.
+- No había una herramienta de navegador habilitada para esta etapa; se omite la revisión visual y no se lanza una previsualización alternativa. Las comprobaciones locales de lógica, tipos y compilación sí quedaron aprobadas. Publicación pendiente de confirmar en Pages.

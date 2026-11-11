@@ -114,3 +114,13 @@ Las correcciones de fecha, cantidades o estado se reflejan según la última rev
 La exportación usa Arial de 11 puntos, títulos más grandes y bordes visibles. Resumen agrupa sus indicadores en bloques de color: alcance, avance, desviadores, rendimiento y proyección. Destaca el avance total, los BD colocados, los promedios y la fecha prevista, manteniendo las mismas fórmulas y referencias de la torta.
 
 Vanos distingue las columnas de identificación, estado/fecha, cantidades y observaciones mediante sus encabezados. Las filas alternan fondo y el estado usa colores que reaccionan a su texto. Se conservan los encabezados y los identificadores visibles al desplazarse. Rendimiento comparte la tipografía y las filas alternadas. Para obtener la presentación nueva se debe descargar otro Excel desde la app.
+
+
+## Comprobar la sincronización automática
+El aviso Estado de guardado y sincronización permanece visible en todas las secciones. Tener Internet o guardar en el navegador no se presenta como una copia confirmada en la nube.
+
+- **Sincronización automática desactivada:** todavía no se ingresó a una cuenta de esta app. Activar sincronización abre Datos y respaldo; crear cuenta, confirmar el correo e ingresar. La sesión de Chrome/Google no activa esta cuenta.
+- **Pendientes / sin conexión / error / revisión:** los cambios necesitan completar la sincronización o resolver el problema indicado. Con la app abierta, se intenta después de guardar, al recuperar conexión, al volver a la app y cada 45 segundos.
+- **Sincronización comprobada:** hubo una comprobación exitosa y no quedan registros pendientes ni conflictos. Un nuevo guardado pendiente retira esta confirmación hasta terminar la siguiente sincronización.
+
+Cerrar Chrome no mantiene ejecutándose el sincronizador. En una ventana normal, los datos locales confirmados deben continuar al reabrir el mismo navegador/perfil y sitio; no confundir esto con una copia en la nube. En incógnito/invitado o un navegador temporal no se debe depender del almacenamiento local al cerrar la sesión. Google Drive sigue siendo un respaldo separado que necesita su configuración y una escritura verificada; no se presenta como automático ni activado sin confirmación.
