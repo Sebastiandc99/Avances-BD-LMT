@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 20694)
-Total output lines: 542
-
 # Avances BD LMT — Estado del proyecto
 
 ## Privacidad de documentos y repositorio público — 10/11/2026
@@ -291,7 +288,27 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 ## 10/11/2026 — búsqueda de piquetes, fechas editables y Drive: lógica verificada
 - Búsqueda exacta por número y prefijo (192, P98, FP 3), con resolución de números compartidos entre líneas. La cámara centra el punto del DWG con zoom táctil adecuado; no cambia al listado.
 - Se agrega modo Actualizar fechas por tramos: solo vanos ya terminados, nuevas revisiones sin duplicar avance, manteniendo cantidades, responsable, notas y fotos. Las fichas existentes muestran Guardar cambios.
-- Resumen usa siempre las dos líneas juntas: porcentaje sobre 235 vanos; sin…694 tokens truncated…cación confirmada y comprobación en la aplicación
+- Resumen usa siempre las dos líneas juntas: porcentaje sobre 235 vanos; sin porcentajes separados ni filtros que cambien ese denominador.
+- Drive: carpeta Doc Worley / App avances identificada y verificada privada. No se leyó el contenido ni se modificaron los PDF/DWG originales.
+- Integración de respaldo por equipo preparada con destino fijo, OAuth limitado drive.file y autorización de la carpeta por Google Picker. No se almacenan tokens de Google en el repositorio; configuración pública local y tokens solo en memoria, separados por usuario de la app.
+- La función de Drive crea/actualiza únicamente el JSON de respaldo del equipo en la carpeta fija y verifica el contenido leyendo lo escrito. No cambia permisos ni guarda en otra carpeta/raíz si falla. No mezcla automáticamente respaldos de otros equipos.
+- Bloqueo real de activación: no se dispone del cliente OAuth, API key pública de Picker ni número de proyecto propios. La consola cloud.google.com devolvió Site Unavailable / Unable to access this site en el navegador. La conexión de Drive del chat no proporciona esas credenciales a la app. No se presenta Drive como activado.
+- Diez pruebas afectadas aprobadas (tramos, búsqueda/cámara y protocolo Drive), con respuestas aisladas: no hubo escrituras ficticias en Drive. TypeScript, build:pages, verify:pages y control de documentos privados aprobados.
+- Error de TypeScript resuelto: Response.json devolvía unknown y había conflicto de tipos de append con Cloudflare. Se tiparon los resultados JSON y se usó appendChild para cargar los SDK oficiales de Google.
+- Mantener 237 piquetes, 235 vanos y 1.743 BD estimados. Sin imágenes nuevas, SVG codificados ni carga de PDF/DWG.
+
+
+### Interfaz lista para publicar
+- Lógica/pruebas respaldadas en c85bde2367d2f90261962e875d7b714b38cecea6.
+- La lupa del Mapa mantiene la vista de mapa; enfoca y resalta piquetes exactos, permite elegir la línea en resultados ambiguos y busca en la otra línea si el número no existe en el filtro actual.
+- Cargar o actualizar tramos incluye Actualizar fechas; una ficha existente muestra Guardar cambios. No se duplican vanos terminados al corregir fechas.
+- Resumen siempre usa el proyecto completo de 235 vanos, sin porcentajes por línea.
+- Datos y respaldo incorpora el botón Sincronizar copia con Drive y configuración del cliente Google. Destino fijo: Doc Worley / App avances. El botón permanece pendiente/deshabilitado sin las credenciales públicas propias, sin fingir una sincronización.
+- Se documentó la activación concreta en docs/GOOGLE_DRIVE.md. La copia por equipo no mezcla automáticamente respaldos de otros equipos ni sustituye la sincronización de eventos existente.
+- El workflow incorpora siete pruebas nuevas (35 en total). La publicación se verifica por separado cuando termine Pages.
+
+
+### Publicación confirmada y comprobación en la aplicación
 - Fuente aec837be4dfa118e05382c1e28f9400102474edf guardada en main. GitHub Actions 42862278578 terminó success, con build y deploy aprobados: pruebas del modelo/base de datos, TypeScript, compilación Pages, rutas, inventario y control de documentos privados.
 - Ocho archivos principales de lógica e interfaz comparados por SHA entre el código local y GitHub: cero diferencias.
 - App publicada verificada en https://sebastiandc99.github.io/Avances-BD-LMT/: buscar 192 conserva Mapa, resalta el piquete y centra la cámara en sus coordenadas (808.6033, 354.37945), con ancho de vista 117.57 unidades. Resultado seleccionable Enfocar presente.
@@ -523,3 +540,9 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Primer chequeo de tipos informó exportación inexistente Github de lucide-react y Response.json de tipo unknown. Se corrigieron usando el icono existente Cloud y tipos explícitos; chequeo posterior aprobado. Avisos no bloqueantes del compilador: chunk mayor a 500 kB y variable npm http-proxy obsoleta.
 - La app recibirá un panel de activación con token granular restringido al repositorio de datos. El usuario debe generar y conectar esa autorización desde su dispositivo; no se afirma un guardado automático real hasta comprobarlo. No se crea una credencial compartida ni se registra un token en GitHub.
 - Se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. No se modificó la base IndexedDB, sus claves, ni el acceso existente de Supabase. Publicación de la nueva conexión pendiente de verificar en Pages.
+
+### Panel y autoguardado listos para publicación
+- Incorporado Datos y respaldo → Respaldo automático en GitHub, con destino privado fijo, instrucciones de permiso granular y consentimiento visible al conectar. Recordar la credencial es optativo y está desmarcado por defecto; sin esa opción solo permanece en memoria.
+- El proceso se monta en el panel principal, no únicamente al abrir configuración: sigue los cambios, red y retorno a la app, con reintentos limitados y pausa por autorización o privacidad. La confirmación se retira ante cambios nuevos, errores o desconexión; vuelve solo después de guardar o leer una copia idéntica.
+- Agregada recuperación manual sin reemplazar UUID locales ni fotografías existentes. No cambia los estados de sincronización de Supabase ni presenta el respaldo GitHub como copia de las fotos.
+- Controles y build locales aprobados. Código y pruebas del servicio ya guardados en commit 71426fe1e258f627e48e67cb6a394428169ba1d1; panel y workflow se guardan en un segundo commit. Activación con la credencial del usuario y primer envío real aún pendientes.
