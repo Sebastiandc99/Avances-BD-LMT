@@ -39,3 +39,16 @@ test('XLSX contiene cuatro hojas, fórmulas, formatos, filtros e imagen embebida
  for(const [p,b] of Object.entries(files))if(p.endsWith('.rels'))assert.ok(!strFromU8(b).includes('TargetMode="External"'));
  assert.throws(()=>productionXlsx(inventory,[],{png:new Uint8Array(),width:0,height:0}));
 });
+test('torta nativa del Excel enlaza Resumen y conserva valores y colores del avance global',()=>{
+ for(const [events,expected] of [[[],[0,0,235]],[[event('L-001-002'),event('FP-001-002',{status:'ejecucion'})],[1,1,233]]]){
+  const files=unzipSync(productionXlsx(inventory,events,{png,width:4400,height:3400},'2026-11-11'));
+  const chartNames=Object.keys(files).filter(p=>/\/charts\/chart\d+\.xml$/.test(p));assert.equal(chartNames.length,1);
+  const chart=strFromU8(files[chartNames[0]]);assert.ok(chart.includes('<c:pieChart>'));
+  assert.ok(chart.includes("'Resumen'!$A$8:$A$10"));assert.ok(chart.includes("'Resumen'!$B$8:$B$10"));
+  const values=chart.match(/<c:numCache>[\s\S]*?<\/c:numCache>/)[0];
+  assert.deepEqual([...values.matchAll(/<c:pt idx="\d+"><c:v>(\d+)<\/c:v>/g)].map(m=>Number(m[1])),expected);
+  for(const rgb of ['36A66E','EAB645','8B9299'])assert.ok(chart.includes(`val="${rgb}"`));
+  assert.ok(!chart.includes('<c:showPercent val="1"/>'));assert.ok(strFromU8(files['xl/worksheets/sheet1.xml']).includes('<x:drawing'));
+  assert.ok(files['xl/media/traza.png']);
+ }
+});

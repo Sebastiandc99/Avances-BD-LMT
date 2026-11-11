@@ -1,5 +1,6 @@
 import { zipSync, strToU8 } from 'fflate';
 import template from './excel-template.json' with { type: 'json' };
+import { progressSlices } from './progress-pie.ts';
 import { colors, diverterBasis, installedDiverters, latestRecords, localDate, metrics, plannedDiverters, statuses, type Event, type Inventory, type Span } from './model.ts';
 
 type Value=string|number|null;
@@ -68,6 +69,15 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
  const files:Record<string,Uint8Array>={};
  for(const [path,content] of Object.entries(template.files))files[path]=strToU8(content);
  const sheets=productionSheets(inventory,events,today);
+ const slices=progressSlices(metrics(inventory.vanos,events,today));
+ const chartParts=Object.entries(template.files).filter(([path])=>/\/charts\/chart\d+\.xml$/.test(path));
+ if(chartParts.length!==1)throw new Error('No se encontró el gráfico del resumen de Excel.');
+ for(const [path,source] of chartParts){
+  const cache='<c:numCache><c:formatCode>#,##0</c:formatCode><c:ptCount val="3"/>'+slices.map((s,i)=>`<c:pt idx="${i}"><c:v>${s.value}</c:v></c:pt>`).join('')+'</c:numCache>';
+  const categories='<c:strCache><c:ptCount val="3"/>'+sheets[0].rows.slice(7,10).map((r,i)=>`<c:pt idx="${i}"><c:v>${xml(String(r[0]))}</c:v></c:pt>`).join('')+'</c:strCache>';
+  const points=slices.map((s,i)=>`<c:dPt><c:idx val="${i}"/><c:spPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:solidFill><a:srgbClr val="${s.color.slice(1).toUpperCase()}"/></a:solidFill><a:ln w="12700"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:dPt>`).join('');
+  files[path]=strToU8(source.replace(/<c:numCache>[\s\S]*?<\/c:numCache>/,cache).replace(/<c:strCache>[\s\S]*?<\/c:strCache>/,categories).replace('<c:cat>',points+'<c:cat>'));
+ }
  for(const [i,sheet] of sheets.entries()){
   const path=`xl/worksheets/sheet${i+1}.xml`,source=template.files[path as keyof typeof template.files];
   const styles:Record<string,string>={};

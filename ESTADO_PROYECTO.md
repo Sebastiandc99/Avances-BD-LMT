@@ -406,3 +406,14 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Verificación adicional en escritorio: ambos modos y contador operativo publicados; CSS assets/index-C6VWQmE6.css. App abierta para revisar en https://sebastiandc99.github.io/Avances-BD-LMT/?v=seleccion-multiple-20261110.
 - Guardado completo y cámara conservada ya comprobados con datos aislados en la prueba móvil; ficha individual mostró la fecha y estado comunes después del guardado. No se publicaron registros de prueba.
 - ESTADO actualizado; se mantienen 237 piquetes, 235 vanos y 1.743 BD estimados. No se generaron imágenes ni se publicaron PDF/DWG originales.
+
+
+## 11/11/2026 — torta de avance: cálculo y Excel verificados
+- Distribución global sobre 235 vanos de ambas líneas: terminados, en proceso (incluye observaciones) y pendientes. Los históricos sin fecha cuentan en el avance; no se cambia el rendimiento ni sus fechas.
+- Modelo compartido para la torta de la app y el XLSX, con colores verde, amarillo y gris. No se generan imágenes para este gráfico ni se usa create_blob.
+- Excel: gráfico circular nativo y editable debajo de los indicadores de Resumen, enlazado a A8:A10 y B8:B10. Se conservan las cuatro hojas, fórmulas, fechas y la imagen de vista aérea existente. La tabla conserva cantidades y porcentaje; se omiten etiquetas internas que se solapan en sectores pequeños.
+- Plantilla actualizada mediante herramienta de planillas, manteniendo su formato y XML textual. La herramienta exportó cachés del gráfico vacías (ptCount=0); se completan con las tres categorías y cantidades reales al descargar, verificadas dentro del XLSX.
+- Descarga real en vista de prueba independiente: 3 terminados, 1 en proceso y 231 pendientes coinciden entre app, celdas y gráfico. Los 18 XML/relaciones son válidos y la imagen del mapa permanece presente. Importación/recalculo del XLSX confirma los mismos conteos y un gráfico nativo; una mezcla descartable de 120/40/75 verifica sus tres colores. No se cargaron datos ficticios en producción.
+- Pasaron seis pruebas afectadas de Excel/torta, TypeScript, compilación para Pages, verificación de rutas/inventario y control de documentos privados. Se conservan 237 piquetes, 235 vanos y 1.743 BD estimados.
+- Errores técnicos acotados: lectura inicial de instrucciones respondió skill package is not available antes de iniciar el entorno; tras iniciarlo se leyó correctamente. La primera ejecución fuera del directorio temporal devolvió ERR_MODULE_NOT_FOUND @oai/artifact-tool; corregido el directorio, se ejecutó sin reinstalar dependencias. La espera de descarga desde el iframe agotó 30.000 ms; la descarga desde la pestaña directa funcionó en menos de dos segundos. No se repitió indefinidamente ninguna operación.
+- Fuente preparada; falta confirmar guardado en GitHub y despliegue automático antes de presentar la actualización como publicada.
