@@ -2,6 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {backupStatus} from '../lib/backup-status.ts';
 const signed={signedIn:true,online:true,syncing:false,pending:0,conflicts:0,lastVerified:'14:30',error:''};
+test('conexión automática distingue arranque, falta de red y proveedor deshabilitado sin mostrar verde',()=>{
+ assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,lastVerified:''}).kind,'connecting');
+ assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,online:false}).kind,'offline');
+ assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,error:'anonymous_provider_disabled'}).kind,'error');
+ assert.match(backupStatus({...signed,deviceOnly:true}).detail,/Vinculá tu correo/);
+});
 test('sin cuenta nunca presenta una copia en la nube aunque haya conexión o una hora anterior',()=>{
  const result=backupStatus({...signed,signedIn:false,pending:80});
  assert.equal(result.kind,'local');assert.equal(result.tone,'warning');assert.match(result.detail,/solo en este navegador/);
