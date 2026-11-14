@@ -8,7 +8,7 @@ export function automaticSession<S>(auth:AutomaticAuth<S>,hadAccess:()=>boolean)
   running=(async()=>{
    const current=await auth.getSession();if(current.error)throw Error(current.error.message);
    if(current.data.session)return current.data.session;
-   if(hadAccess())throw Error('Este navegador tenía una copia en Supabase, pero falta su sesión. Recuperá el acceso con tu correo; no se creó otra cuenta ni se borraron registros.');
+   if(hadAccess())throw Error('Este navegador tenía una copia en Supabase, pero falta su sesión. Tocá Usar código de otro equipo y vinculalo desde un dispositivo con acceso; no se creó otra cuenta ni se borraron registros.');
    const created=await auth.signInAnonymously();
    if(created.error){
     if(created.error.code==='anonymous_provider_disabled')throw Error('El guardado automático está preparado, pero falta habilitar los accesos anónimos en la configuración de Supabase. Los registros siguen en este equipo.');

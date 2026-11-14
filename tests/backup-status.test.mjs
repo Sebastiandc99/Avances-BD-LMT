@@ -6,7 +6,7 @@ test('conexión automática distingue arranque, falta de red y proveedor deshabi
  assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,lastVerified:''}).kind,'connecting');
  assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,online:false}).kind,'offline');
  assert.equal(backupStatus({...signed,signedIn:false,autoConnect:true,error:'anonymous_provider_disabled'}).kind,'error');
- assert.match(backupStatus({...signed,deviceOnly:true}).detail,/Vinculá tu correo/);
+ assert.match(backupStatus({...signed,deviceOnly:true}).detail,/código/);
 });
 test('sin cuenta nunca presenta una copia en la nube aunque haya conexión o una hora anterior',()=>{
  const result=backupStatus({...signed,signedIn:false,pending:80});
@@ -29,7 +29,7 @@ test('un guardado posterior o perder conexión retira la confirmación hasta com
 
 test('la sesión nueva de otro dispositivo muestra cómo recuperar los avances en vez de confirmar una copia vacía',()=>{
  const empty=backupStatus({...signed,deviceOnly:true,savedRecords:0});
- assert.equal(empty.kind,'empty-device');assert.equal(empty.tone,'warning');assert.match(empty.detail,/desde ese celular/);
+ assert.equal(empty.kind,'empty-device');assert.equal(empty.tone,'warning');assert.match(empty.detail,/código de vinculación/);
  assert.equal(backupStatus({...signed,deviceOnly:true,savedRecords:179}).kind,'verified');
  assert.equal(backupStatus({...signed,deviceOnly:false,savedRecords:0}).kind,'verified');
 });

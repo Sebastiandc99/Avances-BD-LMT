@@ -29,3 +29,27 @@ export async function claimLocalRecords(owner:string){
   tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
  });
 }
+
+/** Copies device records into the linked workspace atomically, preserving both originals and existing target rows. */
+export async function copyDeviceRecords(sourceOwner:string,targetOwner:string,remoteEvents:Event[]=[],remotePhotos:Photo[]=[]){
+ if(sourceOwner===targetOwner)return;
+ const d=await db();
+ return new Promise<void>((resolve,reject)=>{
+  const tx=d.transaction(['events','photos'],'readwrite');
+  for(const name of ['events','photos']){
+   const store=tx.objectStore(name),request=store.getAll();
+   request.onsuccess=()=>{
+    const rows=request.result;
+    const existing=new Set(rows.filter(row=>row.owner===targetOwner).map(row=>row.value.id));
+    const additions=new Map<string,Event|Photo>((name==='events'?remoteEvents:remotePhotos).map(value=>[value.id,value]));
+    for(const row of rows.filter(row=>row.owner===sourceOwner))additions.set(row.value.id,row.value);
+    for(const [id,value] of additions){
+     if(existing.has(id))continue;
+     const next=name==='events'?{...value,sync:(value as Event).sync==='discarded'?'discarded':'pending'}:{...value,uploaded:false};
+     store.put({key:targetOwner+':'+id,owner:targetOwner,value:next});
+    }
+   };
+  }
+  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}

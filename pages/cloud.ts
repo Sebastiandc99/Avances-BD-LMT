@@ -23,7 +23,7 @@ export function cloudAdapter(owner:string):SyncAdapter{
   },
   async appendEvent(event){
    const {sync:_,...payload}=event;
-   const {data,error}=await supabase.rpc('lmt_append_event',{p_event:payload});
+   const {data,error}=await supabase.rpc('lmt_append_workspace_event',{p_event:payload,p_owner:owner});
    if(error)throw Error('El avance sigue guardado en el equipo: '+error.message);
    if(data!=='saved'&&data!=='conflict')throw Error('Respuesta inesperada al guardar en la nube.');
    return data;
