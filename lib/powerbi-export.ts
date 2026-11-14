@@ -1,6 +1,7 @@
 import { zipSync, strToU8 } from 'fflate';
 import { diverterBasis, installedDiverters, latestRecords, localDate, metrics, plannedDiverters, statuses, type Event, type Inventory } from './model.ts';
 import type { SyncAdapter } from './sync-engine.ts';
+import { powerBiNativeRoles, type PowerBiVisualType } from './powerbi-native.ts';
 
 type Cell = string | number | null;
 type Row = Record<string, Cell>;
@@ -8,15 +9,23 @@ type Column = { name:string; dataType:'string'|'int64'|'double'|'dateTime' };
 const schema = 'https://developer.microsoft.com/json-schemas/fabric/';
 const reportFolder = 'Avances.Report';
 const modelFolder = 'Avances.SemanticModel';
+export const powerBiDesignRevision = 'Verde_Feb2025_R2';
 export const powerBiTarget = '2.140.1454.0 (febrero de 2025)';
 
 export function powerBiData(inventory:Inventory, events:Event[], today=localDate()) {
  const records = latestRecords(events);
+ const linePositions={larga:0,corta:0};
+ const lineCounts={larga:inventory.vanos.filter(s=>s.linea==='larga').length,corta:inventory.vanos.filter(s=>s.linea==='corta').length};
  const vanos:Row[] = inventory.vanos.map(span => {
+  const line=span.linea==='corta'?'corta':'larga';
+  const index=linePositions[line]++,first=Math.floor(index/6)*6+1,last=Math.min(first+5,lineCounts[line]);
+  const pad=(n:number)=>String(n).padStart(3,'0');
   const record = records[span.id];
   const status = record?.status || 'pendiente';
   const finished = status === 'terminado';
   return {
+   FilaVano:(span.linea==='corta'?'FP ':'L ')+pad(first)+'–'+pad(last),PosicionVano:index%6+1,
+   EtiquetaVano:span.id.replace(/^FP-0*(\d+)-0*(\d+)$/,'FP $1 – $2').replace(/^L-0*(\d+)-0*(\d+)$/,'$1 – $2'),
    Vano:span.id, Linea:span.linea === 'corta' ? 'Corta' : 'Larga',
    Estado:statuses[status], Fecha:record?.date || null,
    FechaFinalizacion:finished ? record.date || null : null,
@@ -65,14 +74,15 @@ function projection(table:string, name:string, measure=false) {
  };
 }
 
-const palette = {ink:'#18324D',muted:'#526579',blue:'#2474DD',green:'#22946B',amber:'#C98B12',gray:'#7C8998',paper:'#F1F5F9',white:'#FFFFFF'};
+const palette = {ink:'#203E3B',muted:'#667E7A',blue:'#087F78',green:'#087F78',amber:'#C59428',gray:'#8A9C99',paper:'#F2F5F3',white:'#FFFFFF'};
 const literal = (value:string|number|boolean) => ({expr:{Literal:{Value:typeof value === 'string' ? "'" + value.replaceAll("'","''") + "'" : typeof value === 'number' ? value + 'D' : String(value)}}});
 const solid = (color:string) => ({solid:{color:literal(color)}});
 const properties = (value:Record<string,unknown>) => [{properties:value}];
 const padding = (size:number) => properties({top:literal(size),bottom:literal(size),left:literal(size),right:literal(size)});
 
-function visual(name:string, type:string, title:string, x:number, y:number, width:number, height:number,
+function visual(name:string, type:PowerBiVisualType, title:string, x:number, y:number, width:number, height:number,
  roles:Record<string,ReturnType<typeof projection>[]>) {
+ if(!Object.hasOwn(powerBiNativeRoles,type))throw Error('Visual de Power BI no nativo: '+type);
  const objects:Record<string,unknown> = {};
  const visualContainerObjects:Record<string,unknown> = {
   title:properties({show:literal(!!title),text:literal(title),fontColor:solid(palette.ink),fontSize:literal(13),fontFamily:literal('Segoe UI Semibold')}),
@@ -83,7 +93,7 @@ function visual(name:string, type:string, title:string, x:number, y:number, widt
  };
  return {
   $schema:schema + 'item/report/definition/visualContainer/2.1.0/schema.json',
-  name, position:{x,y,z:1000,width,height,tabOrder:y*10+x},
+  name, filters:[] as unknown[], position:{x,y,z:1000,width,height,tabOrder:y*10+x},
   visual:{
    visualType:type,
    syncGroup:undefined as {groupName:string;fieldChanges:boolean;filterChanges:boolean}|undefined,
@@ -102,8 +112,8 @@ function textbox(name:string, text:string, x:number, y:number, width:number, hei
  return v;
 }
 
-function button(name:string, label:string, x:number, action:string, destination='', selected=false) {
- const v=visual(name,'actionButton','',x,20,name==='limpiar'?200:140,48,{});
+function button(name:string, label:string, x:number, y:number, action:string, destination='', selected=false, width=132) {
+ const v=visual(name,'actionButton','',x,y,width,44,{});
  const state = (value:Record<string,unknown>, id='default') => ({properties:value,selector:{id}});
  v.visual.objects={
   text:[...properties({show:literal(true)}),state({text:literal(label),fontSize:literal(12),fontColor:solid(selected?palette.white:palette.ink),horizontalAlignment:literal('center')})],
@@ -135,7 +145,7 @@ function card(name:string, measure:ReturnType<typeof projection>, x:number, y:nu
 }
 
 function slicer(name:string, title:string, field:ReturnType<typeof projection>, x:number, width:number, range=false) {
- const v=visual(name,'slicer','',x,88,width,104,{Values:[field]});
+ const v=visual(name,'slicer','',x,238,width,104,{Values:[field]});
  v.visual.objects={
   data:properties({mode:literal(range?'Between':'Dropdown')}),
   header:properties({show:literal(true),text:literal(title),textSize:literal(12),fontColor:solid(palette.ink)}),
@@ -180,14 +190,14 @@ function legacyContainer(v:ReturnType<typeof visual>) {
   drillFilterOtherVisuals:true
  };
  const {tabOrder,...position}=v.position;
- return {...position,tabOrder,config:JSON.stringify({name:v.name,layouts:[{id:0,position:v.position}],singleVisual}),filters:'[]'};
+ return {...position,tabOrder,config:JSON.stringify({name:v.name,layouts:[{id:0,position:v.position}],singleVisual}),filters:JSON.stringify(v.filters)};
 }
 
 /** Creates a private, portable snapshot. Credentials and photo contents are excluded. */
-export function powerBiProject(inventory:Inventory, events:Event[], today=localDate(), extractedAt=new Date().toISOString()) {
+export function powerBiProject(inventory:Inventory, events:Event[], today=localDate(), extractedAt=new Date().toISOString(), includePhoto=false) {
  const data = powerBiData(inventory,events,today);
- const textColumns = ['Vano','Linea','Estado','OrigenConteo','Responsable','Observaciones'];
- const integerColumns = ['BDPrevistos','BDColocados','BDReales','Terminado','EnProceso','Pendiente','TerminadoConFecha'];
+ const textColumns = ['Vano','Linea','Estado','OrigenConteo','Responsable','Observaciones','FilaVano','EtiquetaVano'];
+ const integerColumns = ['BDPrevistos','BDColocados','BDReales','Terminado','EnProceso','Pendiente','TerminadoConFecha','PosicionVano'];
  const columns:Column[] = [
   ...textColumns.map(name => ({name,dataType:'string' as const})),
   ...integerColumns.map(name => ({name,dataType:'int64' as const})),
@@ -211,6 +221,9 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   measure('Dias registrados','CALCULATE(DISTINCTCOUNT(Vanos[FechaFinalizacion]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
   measure('Promedio vanos dia','DIVIDE([Vanos fechados], [Dias registrados])','0.00'),
   measure('BD fechados','CALCULATE(SUM(Vanos[BDColocados]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
+  measure('Estado del vano','IF(HASONEVALUE(Vanos[Vano]), SELECTEDVALUE(Vanos[Estado]), BLANK())', ''),
+  measure('Ficha del vano','IF(HASONEVALUE(Vanos[Vano]), SELECTEDVALUE(Vanos[EtiquetaVano]) & UNICHAR(10) & SELECTEDVALUE(Vanos[Estado]), BLANK())', ''),
+  measure('Vanos acumulados','VAR Corte = MAX(Vanos[FechaFinalizacion]) RETURN IF(ISBLANK(Corte), BLANK(), CALCULATE([Vanos fechados], FILTER(ALLSELECTED(Vanos[FechaFinalizacion]), NOT ISBLANK(Vanos[FechaFinalizacion]) && Vanos[FechaFinalizacion] <= Corte)))'),
   measure('Promedio BD dia','DIVIDE([BD fechados], [Dias registrados])','0.00'),
   measure('Dias restantes','VAR Restantes = [Vanos totales] - [Vanos terminados] RETURN IF(Restantes = 0, 0, IF([Promedio vanos dia] > 0, ROUNDUP(DIVIDE(Restantes, [Promedio vanos dia]), 0), BLANK()))'),
   measure('Finalizacion estimada','IF(ISBLANK([Dias restantes]), BLANK(), DATE(' + today.replaceAll('-',',') + ') + [Dias restantes])','dd/MM/yyyy')
@@ -252,62 +265,103 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  const col = (name:string) => projection('Vanos',name);
  const val = (name:string) => projection('Vanos',name,true);
  const readableDate = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Salta',dateStyle:'short',timeStyle:'short'}).format(new Date(extractedAt));
- const pages=[{name:'Resumen',label:'Resumen'},{name:'Produccion',label:'Producción'},{name:'Vanos',label:'Vanos'}];
+ const pages=[{name:'Resumen',label:'Resumen'},{name:'Produccion',label:'Producción'},{name:'Vanos',label:'Por vano'},{name:'Detalle',label:'Detalle'}];
+ const panel=(name:string,x:number,y:number,w:number,h:number,color=palette.white)=>{
+  const v=textbox(name,'',x,y,w,h);
+  v.position.z=0;
+  v.visual.visualContainerObjects.background=properties({show:literal(true),color:solid(color),transparency:literal(0)});
+  return v;
+ };
+ const stateColors=[['Terminado',palette.green],['En proceso',palette.amber],['Observaciones',palette.amber],['Pendiente',palette.gray]];
+ const statePoints=stateColors.map(([state,color])=>({properties:{fill:solid(color)},selector:{data:[{scopeId:{Comparison:{ComparisonKind:0,Left:{Column:{Expression:{SourceRef:{Entity:'Vanos'}},Property:'Estado'}},Right:{Literal:{Value:"'"+state+"'"}}}}}]}}));
+ const seriesPoints=(items:[string,string][])=>items.map(([name,color])=>({properties:{fill:solid(color)},selector:{metadata:'Vanos.'+name}}));
+ const tableStyle={
+  grid:properties({gridVertical:literal(false),gridHorizontal:literal(true),rowPadding:literal(9)}),
+  columnHeaders:properties({fontSize:literal(11),fontColor:solid(palette.white),backColor:solid(palette.green),wordWrap:literal(true)}),
+  values:properties({fontSize:literal(11),fontColorPrimary:solid(palette.ink),fontColorSecondary:solid(palette.ink),backColorPrimary:solid(palette.white),backColorSecondary:solid('#EFF6F3')})
+ };
+ const nativeLine=(name:string,title:string,x:number,y:number,w:number,h:number,measureName:string)=>{
+  const v=visual(name,'lineChart',title,x,y,w,h,{Category:[col('FechaFinalizacion')],Y:[val(measureName)]});
+  v.visual.query.sortDefinition={sort:[{field:col('FechaFinalizacion').field,direction:'Ascending'}],isDefaultSort:false};
+  v.visual.objects={dataPoint:properties({defaultColor:solid(palette.green)}),labels:properties({show:literal(true),fontSize:literal(10)}),categoryAxis:properties({showAxisTitle:literal(false)}),valueAxis:properties({showAxisTitle:literal(false),start:literal(0)})};
+  return v;
+ };
+ if(includePhoto)report.resourcePackages[0].resourcePackage.items.push({name:'obra-lmt.jpg',path:'obra-lmt.jpg',type:100});
  for(const page of pages) {
   report.sections.push({
-   name:page.name,displayName:page.label,displayOption:1,width:1280,height:800,
+   name:page.name,displayName:page.label,displayOption:1,width:1440,height:1000,
    config:JSON.stringify({objects:{background:properties({color:solid(palette.paper),transparency:literal(0)})}}),
    filters:'[]',visualContainers:[]
   });
-  addVisual(page.name,textbox('titulo','Avances BD LMT  /  '+page.label,24,20,550,40,26,palette.ink));
-  pages.forEach((target,i)=>addVisual(page.name,button('abrir'+target.name,target.label,600+i*150,'PageNavigation',target.name,target.name===page.name)));
-  addVisual(page.name,button('limpiar','Limpiar filtros',1056,'ClearAllSlicers'));
-  addVisual(page.name,slicer('linea','Línea',col('Linea'),24,240));
-  addVisual(page.name,slicer('estado','Estado',col('Estado'),280,240));
-  addVisual(page.name,slicer('responsable','Responsable',col('Responsable'),536,240));
-  const date=slicer(page.name==='Produccion'?'fechaProduccion':'fechaActividad',page.name==='Produccion'?'Fecha de finalización':'Fecha de actividad',col(page.name==='Produccion'?'FechaFinalizacion':'Fecha'),792,464,true);
-  addVisual(page.name,date);
-  addVisual(page.name,textbox('ayuda','Primera apertura: Inicio → Actualizar. Botones en Desktop: Ctrl + clic. Copia de Supabase: '+readableDate+'.',24,752,1232,32,14));
+  addVisual(page.name,panel('decorSidebar',16,16,156,968));
+  addVisual(page.name,panel('decorHeader',196,16,1220,204));
+  addVisual(page.name,textbox('marca','AVANCES',32,40,126,24,12,palette.muted));
+  addVisual(page.name,textbox('marcaLmt','LMT',32,70,126,44,30,palette.green));
+  addVisual(page.name,textbox('menuLabel','INFORME DE OBRA',32,146,126,40,10,palette.muted));
+  pages.forEach((target,i)=>addVisual(page.name,button('abrir'+target.name,target.label,28,202+i*58,'PageNavigation',target.name,target.name===page.name,132)));
+  addVisual(page.name,button('limpiar','Limpiar filtros',28,902,'ClearAllSlicers','',false,132));
+  addVisual(page.name,textbox('titulo','Control de vanos',220,46,560,54,32,palette.ink));
+  addVisual(page.name,textbox('subtitulo','LMT larga y corta · Salar del Rincón',220,108,560,30,16,palette.muted));
+  addVisual(page.name,textbox('corte','DATOS AL '+readableDate,220,156,550,24,11,palette.green));
+  if(includePhoto){
+   const image=visual('fotoObra','image','',804,16,612,204,{});
+   image.visual.objects={general:properties({imageUrl:{expr:{ResourcePackageItem:{PackageName:'RegisteredResources',PackageType:1,ItemName:'obra-lmt.jpg'}}}}),imageScaling:properties({imageScalingType:literal('Fill')})};
+   image.visual.visualContainerObjects.padding=padding(0);
+   image.visual.visualContainerObjects.visualHeader=properties({show:literal(false)});
+   addVisual(page.name,image);
+  }
+  addVisual(page.name,slicer('linea','Línea',col('Linea'),196,190));
+  addVisual(page.name,slicer('estado','Estado',col('Estado'),402,190));
+  addVisual(page.name,slicer('responsable','Responsable',col('Responsable'),608,260));
+  addVisual(page.name,slicer(page.name==='Produccion'?'fechaProduccion':'fechaActividad',page.name==='Produccion'?'Fecha de finalización':'Fecha de actividad',col(page.name==='Produccion'?'FechaFinalizacion':'Fecha'),884,532,true));
+  addVisual(page.name,textbox('ayuda','Primera apertura: Inicio → Actualizar. Navegación: Ctrl + clic. Copia al '+readableDate+' · '+powerBiDesignRevision,196,964,1220,24,11));
  }
- const summary=[
-  ['Avance de la seleccion',palette.blue],['Vanos terminados',palette.green],
-  ['Vanos en proceso',palette.amber],['Vanos pendientes',palette.gray],['BD colocados',palette.blue]
- ];
- summary.forEach(([name,color],i)=>addVisual('Resumen',card('indicador'+i,val(name),24+i*250,216,232,color)));
- const stateChart=visual('estados','donutChart','Vanos por estado · seleccioná un segmento',24,360,400,328,{Category:[col('Estado')],Y:[val('Vanos totales')]});
- stateChart.visual.objects={
-  legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(11)}),
-  labels:properties({show:literal(true),fontSize:literal(12)})
- };
- addVisual('Resumen',stateChart);
- const byLine=visual('porLinea','stackedColumnChart','Avance por línea',448,360,808,328,{Category:[col('Linea')],Y:[val('Vanos terminados'),val('Vanos en proceso'),val('Vanos pendientes')]});
- byLine.visual.objects={legend:properties({show:literal(true),position:literal('Bottom')}),labels:properties({show:literal(true),fontSize:literal(12)})};
+ const donut=visual('estados','donutChart','Estado de los vanos',196,364,300,300,{Category:[col('Estado')],Y:[val('Vanos totales')]});
+ donut.visual.objects={dataPoint:statePoints,legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(10)}),labels:properties({show:literal(false)})};
+ addVisual('Resumen',donut);
+ const center=card('avanceCentro',val('Avance de la seleccion'),292,470,108,palette.green);
+ center.position.height=72;center.visual.objects.labels=properties({fontSize:literal(24),color:solid(palette.green),labelDisplayUnits:literal(1)});
+ center.visual.objects.categoryLabels=properties({show:literal(false)});
+ center.visual.visualContainerObjects.background=properties({show:literal(false)});
+ center.visual.visualContainerObjects.padding=padding(0);
+ addVisual('Resumen',center);
+ [['Vanos totales',palette.ink],['Vanos terminados',palette.green],['Vanos pendientes',palette.gray]].forEach(([name,color],i)=>addVisual('Resumen',card('resumen'+i,val(name),516+i*306,364,288,color)));
+ [['Vanos en proceso',palette.amber],['Promedio vanos dia',palette.green],['Finalizacion estimada',palette.green]].forEach(([name,color],i)=>addVisual('Resumen',card('contexto'+i,val(name),516+i*306,516,288,color)));
+ const byLine=visual('porLinea','columnChart','Vanos por línea',196,690,592,252,{Category:[col('Linea')],Y:[val('Vanos terminados'),val('Vanos en proceso'),val('Vanos pendientes')]});
+ byLine.visual.objects={dataPoint:seriesPoints([['Vanos terminados',palette.green],['Vanos en proceso',palette.amber],['Vanos pendientes',palette.gray]]),legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(10)}),labels:properties({show:literal(true),fontSize:literal(10)})};
  addVisual('Resumen',byLine);
- addVisual('Resumen',textbox('nota','Los filtros y los segmentos de los gráficos actualizan los indicadores. El avance porcentual respeta la línea y la fecha seleccionadas.',24,704,1232,36,14));
- const production=[
-  ['Vanos fechados',palette.green],['BD fechados',palette.blue],['Promedio BD dia',palette.blue],
-  ['Dias registrados',palette.ink],['Terminados sin fecha',palette.amber]
- ];
- production.forEach(([name,color],i)=>addVisual('Produccion',card('produccion'+i,val(name),24+i*250,216,232,color)));
- const daily=visual('diario','clusteredColumnChart','BD colocados por fecha de finalización',24,360,784,328,{Category:[col('FechaFinalizacion')],Y:[val('BD fechados')]});
- daily.visual.query.sortDefinition={sort:[{field:col('FechaFinalizacion').field,direction:'Ascending'}],isDefaultSort:false};
- daily.visual.objects={dataPoint:properties({defaultColor:solid(palette.blue)}),labels:properties({show:literal(true),fontSize:literal(11)})};
- addVisual('Produccion',daily);
- const dailyTable=visual('detalleDiario','tableEx','Producción diaria',832,360,424,328,{Values:[col('FechaFinalizacion'),val('Vanos fechados'),val('BD fechados')]});
+ addVisual('Resumen',nativeLine('evolucion','Vanos terminados por día',808,690,608,252,'Vanos fechados'));
+ const production=[['Vanos fechados',palette.green],['Promedio vanos dia',palette.green],['Dias registrados',palette.ink],['Terminados sin fecha',palette.amber]];
+ production.forEach(([name,color],i)=>addVisual('Produccion',card('produccion'+i,val(name),196+i*309,364,293,color)));
+ addVisual('Produccion',nativeLine('diario','Evolución diaria · vanos finalizados',196,510,802,330,'Vanos fechados'));
+ const dailyTable=visual('detalleDiario','tableEx','Producción diaria',1018,510,398,330,{Values:[col('FechaFinalizacion'),val('Vanos fechados'),val('Vanos acumulados')]});
  dailyTable.visual.query.sortDefinition={sort:[{field:col('FechaFinalizacion').field,direction:'Ascending'}],isDefaultSort:false};
- addVisual('Produccion',dailyTable);
- addVisual('Produccion',textbox('nota','El promedio usa días con producción registrada. Los terminados sin fecha suman al avance; quedan fuera del rendimiento y del gráfico diario.',24,704,1232,36,14));
- ['Vanos totales','Avance de la seleccion','BD colocados','BD pendientes'].forEach((name,i)=>addVisual('Vanos',card('detalleKpi'+i,val(name),24+i*312,216,296)));
- const detail=visual('detalle','tableEx','Detalle de vanos · filtrá arriba para buscar',24,360,1232,368,{
-  Values:['Vano','Linea','Estado','Fecha','BDPrevistos','BDColocados','OrigenConteo','Responsable','Observaciones'].map(col)
- });
- detail.visual.objects={
-  grid:properties({gridVertical:literal(false),rowPadding:literal(8)}),
-  columnHeaders:properties({fontSize:literal(11),fontColor:solid(palette.white),backColor:solid(palette.ink)}),
-  values:properties({fontSize:literal(11),fontColorPrimary:solid(palette.ink)})
+ dailyTable.visual.objects=tableStyle;addVisual('Produccion',dailyTable);
+ addVisual('Produccion',textbox('metodo','Rendimiento: vanos terminados con fecha ÷ días distintos con producción. Los terminados sin fecha suman al avance, pero no al promedio. La proyección estima días calendario al ritmo registrado.',196,866,1220,70,14));
+ const matrix=(name:string,title:string,line:string,y:number,h:number)=>{
+  const v=visual(name,'pivotTable',title,196,y,1220,h,{Rows:[col('FilaVano')],Columns:[col('PosicionVano')],Values:[val('Ficha del vano')]});
+  const color={solid:{color:{expr:{Conditional:{Cases:stateColors.map(([state,color])=>({Condition:{Comparison:{ComparisonKind:0,Left:{Measure:{Expression:{SourceRef:{Entity:'Vanos'}},Property:'Estado del vano'}},Right:{Literal:{Value:"'"+state+"'"}}}},Value:{Literal:{Value:"'"+color+"'"}}}))}}}}};
+  v.visual.objects={
+   grid:properties({gridVertical:literal(true),gridHorizontal:literal(true),rowPadding:literal(12)}),
+   rowHeaders:properties({fontSize:literal(10),fontColor:solid(palette.muted),wordWrap:literal(false),showExpandCollapseButtons:literal(false)}),
+   columnHeaders:properties({fontSize:literal(10),fontColor:solid(palette.green),backColor:solid('#E0EEEA'),autoSizeColumnWidth:literal(false)}),
+   values:[{properties:{fontSize:literal(11),fontColorPrimary:solid(palette.white),fontColorSecondary:solid(palette.white),wordWrap:literal(true)}},{properties:{backColorPrimary:color,backColorSecondary:color},selector:{data:[{dataViewWildcard:{matchingOption:1}}],metadata:'Vanos.Ficha del vano'}}],
+   columnWidth:[{properties:{value:literal(166)},selector:{metadata:'Vanos.Ficha del vano'}}],
+   subTotals:properties({rowSubtotals:literal(false),columnSubtotals:literal(false)}),
+   rowGrandTotal:properties({show:literal(false)}),columnGrandTotal:properties({show:literal(false)})
+  };
+  v.filters=[{name:'solo'+line,expression:col('Linea').field.Column,type:'Categorical',howCreated:0,filter:{Version:2,From:[{Name:'v',Entity:'Vanos',Type:0}],Where:[{Condition:{In:{Expressions:[{Column:{Expression:{SourceRef:{Source:'v'}},Property:'Linea'}}],Values:[[{Literal:{Value:"'"+line+"'"}}]]}}}]}}];
+  return v;
  };
+ addVisual('Vanos',matrix('matrizLarga','Línea larga · estado por vano','Larga',364,390));
+ addVisual('Vanos',matrix('matrizCorta','Línea corta · estado por vano','Corta',776,166));
+ addVisual('Detalle',card('detalleTerminados',val('Vanos terminados'),196,364,394,palette.green));
+ addVisual('Detalle',card('detalleProceso',val('Vanos en proceso'),610,364,394,palette.amber));
+ addVisual('Detalle',card('detallePendientes',val('Vanos pendientes'),1024,364,392,palette.gray));
+ const detail=visual('detalle','tableEx','Detalle de vanos',196,510,1220,432,{Values:['Vano','Linea','Estado','Fecha','LongitudM','Responsable','BDPrevistos','BDColocados','Observaciones'].map(col)});
+ detail.visual.objects=tableStyle;
  detail.visual.query.sortDefinition={sort:[{field:col('Vano').field,direction:'Ascending'}],isDefaultSort:false};
- addVisual('Vanos',detail);
+ addVisual('Detalle',detail);
  put(reportFolder+'/report.json',report);
  files['ABRIR_EN_PC.txt'] = [
   'AVANCES BD LMT — POWER BI DESKTOP '+powerBiTarget,
@@ -315,7 +369,7 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   '1. Extrae TODO el ZIP en una carpeta de la PC.',
   '2. Abre Avances_BD_LMT.pbip con tu Power BI Desktop de febrero de 2025.',
   '3. Pulsa Actualizar para cargar las tablas incluidas y ver los graficos.',
-  '4. Usa los botones Resumen / Producción / Vanos para navegar (Ctrl + clic en el modo edición de Desktop).',
+  '4. Usa Resumen / Producción / Por vano / Detalle (Ctrl + clic en el modo edición de Desktop).',
   '5. Filtra por línea, estado, responsable y fechas. Limpiar filtros restablece los selectores de la página.',
   '6. Selecciona una barra o segmento para filtrar los demás gráficos e indicadores.',
   '7. Guarda el informe como .pbix una vez cargadas las tablas.',
@@ -328,6 +382,10 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   'El nombre interno definition.pbir también existe en el formato heredado. Abre el archivo .pbip de la carpeta principal.',
   'Si Desktop pide habilitar proyectos PBIP: Archivo > Opciones y configuración > Opciones > Características de versión preliminar > Power BI Project (.pbip) save option. Reinicia Desktop.',
   'No hace falta habilitar PBIR mejorado ni actualizar Power BI a una versión posterior para este diseño.',
+  '',
+  'DISEÑO: cabecera de obra, indicadores verdes, evolución diaria y matrices de estado por vano. No usa visuales personalizados.',
+  'La matriz muestra el estado registrado. En proceso no se convierte en un porcentaje de montaje supuesto.',
+  'Revision: '+powerBiDesignRevision,
   '',
   'Origen: registros privados leidos de Supabase desde la sesion de la app.',
   'Extraccion UTC: '+extractedAt,
@@ -343,13 +401,16 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  return files;
 }
 
-export function powerBiZip(inventory:Inventory, events:Event[], today=localDate()) {
- const files = powerBiProject(inventory,events,today);
- return zipSync(Object.fromEntries(Object.entries(files).map(([path,text]) => [path,strToU8(text)])),{level:6});
+export function powerBiZip(inventory:Inventory, events:Event[], today=localDate(), photo?:Uint8Array) {
+ if(photo&&(photo.length<4||photo[0]!==0xff||photo[1]!==0xd8))throw Error('La fotografía de cabecera no es un JPEG válido.');
+ const files=powerBiProject(inventory,events,today,undefined,!!photo);
+ const entries:Record<string,Uint8Array>=Object.fromEntries(Object.entries(files).map(([path,text])=>[path,strToU8(text)]));
+ if(photo)entries[reportFolder+'/StaticResources/RegisteredResources/obra-lmt.jpg']=photo;
+ return zipSync(entries,{level:6});
 }
 
-export async function powerBiFromCloud(inventory:Inventory, cloud:Pick<SyncAdapter,'listEvents'>, today=localDate()) {
+export async function powerBiFromCloud(inventory:Inventory, cloud:Pick<SyncAdapter,'listEvents'>, today=localDate(), photo?:Uint8Array) {
  const events = await cloud.listEvents();
  if(!events.length)throw Error('Supabase todavia no tiene avances en esta sesion. Sincroniza los datos antes de descargar Power BI.');
- return powerBiZip(inventory,events,today);
+ return powerBiZip(inventory,events,today,photo);
 }

@@ -13,7 +13,7 @@ const ajv = new Ajv({allErrors:true,strict:false,validateFormats:false,loadSchem
 }});
 const inventory = JSON.parse(fs.readFileSync(new URL('../public/assets/inventory.json',import.meta.url)));
 const files = powerBiProject(inventory,[],'2026-11-10');
-const roles = {card:['Values'],slicer:['Values'],donutChart:['Category','Y'],stackedColumnChart:['Category','Y'],clusteredColumnChart:['Category','Y'],tableEx:['Values'],textbox:[],actionButton:[]};
+const roles = {card:['Values'],slicer:['Values'],donutChart:['Category','Y'],columnChart:['Category','Y'],lineChart:['Category','Y'],pivotTable:['Rows','Columns','Values'],image:[],tableEx:['Values'],textbox:[],actionButton:[]};
 assert.equal(JSON.parse(files['Avances.Report/definition.pbir']).version,'1.0');
 assert.ok(!Object.keys(files).some(path=>path.startsWith('Avances.Report/definition/')),'No debe exportarse PBIR mejorado');
 const report=JSON.parse(files['Avances.Report/report.json']);
