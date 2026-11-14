@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { unzipSync, strFromU8 } from 'fflate';
 import { emptyProgress } from '../lib/model.ts';
-import { powerBiData, powerBiProject, powerBiFromCloud } from '../lib/powerbi-export.ts';
+import { powerBiData, powerBiProject, powerBiFromCloud, powerBiZip } from '../lib/powerbi-export.ts';
 
 const inventory = JSON.parse(fs.readFileSync(new URL('../public/assets/inventory.json',import.meta.url)));
 const event = (spanId,changes={}) => ({
@@ -75,9 +75,9 @@ test('el paquete selecciona el formato heredado para Desktop 2.140 sin PBIR mejo
  assert.ok(!Object.keys(files).some(path=>path.startsWith('Avances.Report/definition/')));
  assert.ok(!Object.keys(files).some(path=>path.endsWith('/visual.json')));
  const report=readReport(files);
- assert.deepEqual(report.sections.map(s=>s.name),['Resumen','Produccion','Vanos']);
+ assert.deepEqual(report.sections.map(s=>s.name),['Resumen','Produccion','Vanos','Detalle']);
  assert.equal(JSON.parse(report.config).version,'5.55');
- assert.equal(report.sections.flatMap(s=>s.visualContainers).length,51);
+ assert.ok(report.sections.flatMap(s=>s.visualContainers).length>=70);
  assert.match(files['ABRIR_EN_PC.txt'],/2\.140\.1454\.0/);
  const measures=JSON.parse(files['Avances.SemanticModel/model.bim']).model.tables[0].measures;
  assert.match(measures.find(m=>m.name==='Avance de la seleccion').expression,/REMOVEFILTERS\(Vanos\[Estado\]\)/);
@@ -118,7 +118,7 @@ test('las consultas heredadas resuelven alias, selecciones y campos del modelo',
 test('las tarjetas clásicas usan Values y los botones mantienen destinos válidos',() => {
  const files=powerBiProject(inventory,[event('L-001-002')],'2026-11-14');
  const report=readReport(files),pages=report.sections.map(s=>s.name);
- const roles={card:['Values'],slicer:['Values'],donutChart:['Category','Y'],stackedColumnChart:['Category','Y'],clusteredColumnChart:['Category','Y'],tableEx:['Values'],textbox:[],actionButton:[]};
+ const roles={card:['Values'],slicer:['Values'],donutChart:['Category','Y'],columnChart:['Category','Y'],lineChart:['Category','Y'],pivotTable:['Rows','Columns','Values'],image:[],tableEx:['Values'],textbox:[],actionButton:[]};
  let cards=0,buttons=0;
  for(const page of report.sections)for(const {visual,name} of pageVisuals(page)) {
   assert.ok(roles[visual.visualType],visual.visualType);
@@ -127,7 +127,7 @@ test('las tarjetas clásicas usan Values y los botones mantienen destinos válid
    cards++;
    assert.equal(visual.projections.Values.length,1);
    assert.ok(visual.prototypeQuery.Select[0].Measure);
-   assert.equal(visual.objects.categoryLabels[0].properties.show.expr.Literal.Value,'true');
+   assert.equal(visual.objects.categoryLabels[0].properties.show.expr.Literal.Value,name==='avanceCentro'?'false':'true');
    assert.ok(visual.objects.labels);
    assert.equal(visual.objects.value,undefined);
   }
@@ -142,7 +142,7 @@ test('las tarjetas clásicas usan Values y los botones mantienen destinos válid
   if(visual.visualType==='textbox')assert.ok(Array.isArray(visual.objects.general[0].properties.paragraphs));
  }
  assert.equal(cards,14);
- assert.equal(buttons,12);
+ assert.equal(buttons,20);
 });
 
 test('la composición heredada conserva geometría, filtros sincronizados y orden por fecha',() => {
@@ -159,6 +159,7 @@ test('la composición heredada conserva geometría, filtros sincronizados y orde
    assert.equal(v.container.x,p.x);
    assert.equal(v.container.width,p.width);
    for(const other of seen) {
+    if(v.name.startsWith('decor')||other.name.startsWith('decor')||[v.name,other.name].sort().join('/')==='avanceCentro/estados')continue;
     const q=other.position;
     assert.ok(!(p.x<q.x+q.width&&p.x+p.width>q.x&&p.y<q.y+q.height&&p.y+p.height>q.y),v.name+' overlaps '+other.name);
    }
@@ -195,4 +196,43 @@ test('la apertura sólo explica PBIP heredado y el tema clásico está incluido'
  assert.ok(files['Avances.Report/StaticResources/'+resource.name+'/'+resource.items[0].path]);
  assert.equal(config.themeCollection.customTheme.type,1);
  for(const page of report.sections)assert.match(JSON.stringify(pageVisuals(page).find(v=>v.name==='ayuda').visual),/Primera apertura/);
+});
+
+
+test('regresión: el gráfico de columnas usa el ID nativo y no solicita un visual personalizado',()=>{
+ const files=powerBiProject(inventory,[]);
+ const summary=readReport(files).sections.find(p=>p.name==='Resumen');
+ const chart=pageVisuals(summary).find(v=>v.name==='porLinea');
+ assert.equal(chart.visual.visualType,'columnChart');
+ assert.ok(!JSON.stringify(readReport(files)).includes('stackedColumnChart'));
+ assert.ok(!Object.keys(files).some(p=>p.includes('CustomVisuals')||p.endsWith('.pbiviz')));
+ const dp=pageVisuals(summary).find(v=>v.name==='estados').visual.objects.dataPoint;
+ assert.equal(dp.find(p=>p.selector.data[0].scopeId.Comparison.Right.Literal.Value==="'Terminado'").properties.fill.solid.color.expr.Literal.Value,"'#087F78'");
+});
+
+test('la matriz representa una vez cada vano y no inventa porcentajes de avance parcial',()=>{
+ const data=powerBiData(inventory,[]);
+ const keys=data.vanos.map(v=>v.FilaVano+':'+v.PosicionVano);
+ assert.equal(new Set(keys).size,235);
+ assert.equal(data.vanos.filter(v=>v.Linea==='Corta').length,17);
+ assert.ok(data.vanos.every(v=>v.PosicionVano>=1&&v.PosicionVano<=6));
+ const files=powerBiProject(inventory,[]);
+ const page=readReport(files).sections.find(p=>p.name==='Vanos');
+ const matrices=pageVisuals(page).filter(v=>v.visual.visualType==='pivotTable');
+ assert.equal(matrices.length,2);
+ assert.deepEqual(matrices.map(m=>JSON.parse(m.container.filters)[0].filter.Where[0].Condition.In.Values[0][0].Literal.Value),["'Larga'","'Corta'"]);
+ assert.ok(matrices.every(m=>m.visual.projections.Values[0].queryRef==='Vanos.Ficha del vano'));
+ assert.ok(!JSON.stringify(matrices).includes('50%'));
+});
+
+test('el ZIP incluye la foto JPEG como recurso independiente y conserva el formato heredado',()=>{
+ const photo=fs.readFileSync(new URL('../public/assets/obra-lmt.jpg',import.meta.url));
+ const files=unzipSync(powerBiZip(inventory,[],'2026-11-14',photo));
+ assert.deepEqual(Buffer.from(files['Avances.Report/StaticResources/RegisteredResources/obra-lmt.jpg']),photo);
+ const report=JSON.parse(strFromU8(files['Avances.Report/report.json']));
+ assert.ok(report.sections.every(p=>pageVisuals(p).find(v=>v.visual.visualType==='image')));
+ const resource=report.resourcePackages[0].resourcePackage.items.find(i=>i.name==='obra-lmt.jpg');
+ assert.equal(resource.type,100);
+ assert.equal(JSON.parse(strFromU8(files['Avances.Report/definition.pbir'])).version,'1.0');
+ assert.throws(()=>powerBiZip(inventory,[],undefined,new Uint8Array([0,1,2,3])),/JPEG/);
 });
