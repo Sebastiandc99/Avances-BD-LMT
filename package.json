@@ -14,7 +14,10 @@
     "db:generate": "drizzle-kit generate",
     "test": "node --experimental-strip-types --test tests/model.test.mjs tests/database.test.mjs tests/api.test.mjs",
     "build:pages": "vite build --config vite.pages.config.ts",
-    "verify:pages": "node scripts/verify-pages.mjs"
+    "verify:pages": "node scripts/verify-pages.mjs",
+    "build:cloudflare": "node scripts/cloudflare.mjs build",
+    "verify:cloudflare": "node scripts/cloudflare.mjs verify",
+    "deploy:cloudflare": "node scripts/cloudflare.mjs deploy"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

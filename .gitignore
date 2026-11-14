@@ -53,3 +53,7 @@ yarn-error.log*
 *.[zZ][iI][pP]
 *.[7][zZ]
 *.[rR][aA][rR]
+
+# Local Cloudflare build and transient dependency lock
+/cloudflare-dist/
+/pnpm-lock.yaml
