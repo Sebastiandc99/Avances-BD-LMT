@@ -562,3 +562,8 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Las instrucciones explican cómo abrir PBIP y cargar las tablas, sin exigir PBIR mejorado ni una versión posterior de Desktop. Ver docs/POWERBI_COMPATIBILIDAD.md.
 - La apertura real en la versión exacta de Desktop sigue pendiente de verificar. Las comprobaciones de estructura y compilación no se presentan como una prueba de apertura.
 - Validación local aprobada: 78 pruebas, TypeScript, tres metadatos contra esquemas oficiales, enlaces de los 51 visuales, compilación, rutas, inventario y control de documentos privados. Publicación pendiente.
+
+### Publicación del formato heredado confirmada
+- Corrección autorizada por el usuario y publicada tras fusionar el PR #2. Comprobaciones de GitHub y despliegue de Pages completados correctamente.
+- La publicación pasó 78 pruebas, TypeScript, validación de metadatos, enlaces del informe heredado, compilación y comprobación de rutas e inventario.
+- La descarga se identifica con PowerBI_Feb2025. La apertura y visualización en Desktop 2.140.1454.0 siguen pendientes de comprobar en ese programa.
