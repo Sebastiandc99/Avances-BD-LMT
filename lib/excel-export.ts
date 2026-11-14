@@ -27,21 +27,12 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
   ['Piquetes',inventory.piquetes.length,'Línea larga + línea corta'],
   ['Vanos totales',f(`COUNTA(${range('A')})`,m.total),'Ambas líneas'],
   ['Vanos terminados',f(`COUNTIFS(${range('E')},"Terminado")`,m.done),'vanos'],
-  ['Vanos en proceso',f(`COUNTIFS(${range('E')},"En proceso")`,m.inProgress),'vanos'],
-  ['Vanos pendientes',f(`COUNTIFS(${range('E')},"Pendiente")`,m.pending),'Sin iniciar'],
-  ['Vanos que faltan terminar',f('B7-B8',m.remaining),'Incluye los vanos en proceso'],
   ['Avance total',f('IF(B7>0,B8/B7,0)',m.total?m.done/m.total:0),'Terminados / total de ambas líneas'],
-  ['BD calculados totales',f(`SUM(${range('G')})`,m.planned),'Estimación del procedimiento y geometría del DWG'],
-  ['BD colocados',f(`SUM(${range('H')})`,m.installed),'Cantidades reales informadas o calculadas por estado'],
-  ['BD calculados por estado',f(`SUMIFS(${range('H')},${range('I')},"Calculados por estado")`,m.calculatedInstalled),'Vanos terminados sin cantidad real informada'],
-  ['BD reales informados',f(`SUMIFS(${range('H')},${range('I')},"Informados en campo")`,m.reportedInstalled),'Cantidades reales prioritarias'],
   ['Terminados con fecha válida',f(`SUM(${dailyRange('B')})`,m.datedDone),'Se incluyen en el rendimiento'],
-  ['Terminados sin fecha válida',f('B8-B17',m.undatedDone),'Suman avance y BD; quedan fuera del rendimiento'],
-  ['Días con ejecución registrada',f(`COUNT(${dailyRange('A')})`,m.days),'Fechas distintas con vanos terminados'],
-  ['Rendimiento promedio',f('IF(B19>0,B17/B19,"Sin datos con fecha")',m.days?m.average:'Sin datos con fecha'),'vanos/día'],
-  ['Rendimiento promedio de BD',f(`IF(B19>0,SUM(${dailyRange('C')})/B19,"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/día'],
-  ['Días para finalizar',f('IF(B11=0,0,IF(B17>0,ROUNDUP(B11*B19/B17,0),"Sin estimación"))',m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
-  ['Fecha estimada de finalización',f('IF(B11=0,"Finalizado",IF(ISNUMBER(B22),B3+B22,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte']
+  ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,B10/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/día'],
+  ['Rendimiento promedio de BD',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('C')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/día'],
+  ['Días para finalizar',f(`IF(B7=B8,0,IF(B10>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/B10,0),"Sin estimación"))`,m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
+  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B13),B3+B13,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte']
  );
  const daily=head('Producción por fecha de ejecución',['Fecha de ejecución','Vanos terminados','BD colocados']);
  for(const [i,date] of dates.entries()){
@@ -70,13 +61,19 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
  for(const [path,content] of Object.entries(template.files))files[path]=strToU8(content);
  const sheets=productionSheets(inventory,events,today);
  const slices=progressSlices(metrics(inventory.vanos,events,today));
+ const summaryStyleRows:Record<number,number>={9:12,10:17,11:20,12:21,13:22,14:23};
+ const summaryStates=['Terminado','En proceso','Pendiente'];
  const chartParts=Object.entries(template.files).filter(([path])=>/\/charts\/chart\d+\.xml$/.test(path));
  if(chartParts.length!==1)throw new Error('No se encontró el gráfico del resumen de Excel.');
  for(const [path,source] of chartParts){
   const cache='<c:numCache><c:formatCode>#,##0</c:formatCode><c:ptCount val="3"/>'+slices.map((s,i)=>`<c:pt idx="${i}"><c:v>${s.value}</c:v></c:pt>`).join('')+'</c:numCache>';
-  const categories='<c:strCache><c:ptCount val="3"/>'+sheets[0].rows.slice(7,10).map((r,i)=>`<c:pt idx="${i}"><c:v>${xml(String(r[0]))}</c:v></c:pt>`).join('')+'</c:strCache>';
+  const categories='<c:strCache><c:ptCount val="3"/>'+slices.map((s,i)=>`<c:pt idx="${i}"><c:v>${xml(s.label)}</c:v></c:pt>`).join('')+'</c:strCache>';
   const points=slices.map((s,i)=>`<c:dPt><c:idx val="${i}"/><c:spPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:solidFill><a:srgbClr val="${s.color.slice(1).toUpperCase()}"/></a:solidFill><a:ln w="12700"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:dPt>`).join('');
-  files[path]=strToU8(source.replace(/<c:numCache>[\s\S]*?<\/c:numCache>/,cache).replace(/<c:strCache>[\s\S]*?<\/c:strCache>/,categories).replace('<c:cat>',points+'<c:cat>'));
+  let chart=source.replace(/<c:numCache>[\s\S]*?<\/c:numCache>/,cache).replace(/<c:strCache>[\s\S]*?<\/c:strCache>/,categories).replace('<c:cat>',points+'<c:cat>');
+  // Keep editable chart data in hidden columns, without restoring removed rows.
+  chart=chart.replaceAll("'Resumen'!$A$8:$A$10","'Resumen'!$X$6:$X$8").replaceAll("'Resumen'!$B$8:$B$10","'Resumen'!$Y$6:$Y$8");
+  chart=/<c:plotVisOnly\b/.test(chart)?chart.replace(/<c:plotVisOnly[^>]*\/>/,'<c:plotVisOnly val="0"/>'):chart.replace('</c:chart>','<c:plotVisOnly val="0"/></c:chart>');
+  files[path]=strToU8(chart);
  }
  for(const [i,sheet] of sheets.entries()){
   const path=`xl/worksheets/sheet${i+1}.xml`,source=template.files[path as keyof typeof template.files];
@@ -85,16 +82,22 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
   const heights:Record<number,number>={};
   for(const row of source.matchAll(/<x:row\b[^>]*\br="(\d+)"[^>]*\bht="([\d.]+)"/g))heights[Number(row[1])]=Number(row[2]);
   const rows=sheet.rows.map((cells,j)=>{
-   const r=j+1,pattern=r>5&&[1,2].includes(i)?(r%2?7:6):r;
-   const baseHeight=heights[r]||heights[pattern]||28;
+   const r=j+1,pattern=i===0?(summaryStyleRows[r]||r):r>5&&[1,2].includes(i)?(r%2?7:6):r;
+   const baseHeight=heights[pattern]||heights[r]||28;
    const lines=(value:Cell,width:number)=>String(value??'').split(/\r?\n/).reduce((n,line)=>n+Math.max(1,Math.ceil(line.length/width)),0);
    const h=i===2&&r>5?Math.min(409.5,Math.max(baseHeight,Math.max(lines(cells[8],27),lines(cells[10],28),lines(cells[11],55))*16+8)):baseHeight;
-   return `<x:row r="${r}" ht="${h}" customHeight="1">${cells.map((c,k)=>{const col=column(k),address=col+r,style=styles[address]||styles[col+pattern]||styles[col+'6']||styles['A6']||'0';return cellXML(address,c,style);}).join('')}</x:row>`;
+   return `<x:row r="${r}" ht="${h}" customHeight="1">${cells.map((c,k)=>{const col=column(k),address=col+r,style=styles[col+(i===0?pattern:r)]||styles[col+pattern]||styles[col+'6']||styles['A6']||'0';return cellXML(address,c,style);}).join('')}${i===0&&r>=6&&r<=8?cellXML('X'+r,slices[r-6].label,styles['A6']||'0')+cellXML('Y'+r,f(`COUNTIFS('Vanos'!$E$6:$E${5+inventory.vanos.length},"${summaryStates[r-6]}")`,slices[r-6].value),styles['B6']||'0'):''}</x:row>`;
   }).join('');
   let sheetXML=source.replace(/<x:sheetData>[\s\S]*?<\/x:sheetData>/,`<x:sheetData>${rows}</x:sheetData>`);
+  if(i===0)sheetXML=sheetXML.replace('</x:cols>','<x:col min="24" max="25" width="0" hidden="1" customWidth="1"/></x:cols>');
   if(i===1||i===2)sheetXML=sheetXML.replace('</x:sheetData>',`</x:sheetData><x:autoFilter ref="A5:${i===2?'L':'C'}${sheet.rows.length}"/>`);
   if(i===3)sheetXML=sheetXML.replace('</x:worksheet>','<x:drawing xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rIdMap"/></x:worksheet>');
   files[path]=strToU8(sheetXML);
+ }
+ // Move the summary chart up with its compacted table.
+ for(const [path,source] of Object.entries(template.files))if(/^xl\/drawings\/drawing\d+\.xml$/.test(path)&&source.includes('<c:chart')){
+  const rows=[...source.matchAll(/<xdr:row>(\d+)<\/xdr:row>/g)].map(m=>Number(m[1]));
+  if(rows.length===2){const top=sheets[0].rows.length+2,bottom=top+rows[1]-rows[0];let index=0;files[path]=strToU8(source.replace(/<xdr:row>\d+<\/xdr:row>/g,()=>'<xdr:row>'+[top,bottom][index++]+'</xdr:row>'));}
  }
  const rel='http://schemas.openxmlformats.org/package/2006/relationships',docRel='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
  files['xl/worksheets/_rels/sheet4.xml.rels']=strToU8(`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${rel}"><Relationship Id="rIdMap" Type="${docRel}/drawing" Target="../drawings/map.xml"/></Relationships>`);

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-const out=path.resolve('pages-dist'),base='/Avances-BD-LMT/';
+const cloudflare=process.env.LMT_DEPLOY_TARGET==='cloudflare';
+const out=path.resolve(cloudflare?'cloudflare-dist':'pages-dist'),base=cloudflare?'/':'/Avances-BD-LMT/';
 const html=fs.readFileSync(path.join(out,'index.html'),'utf8');
-assert.ok(html.includes(base+'assets/'),'Los recursos deben usar el subdirectorio del repositorio.');
+assert.ok(html.includes(base+'assets/'),'Los recursos deben usar la ruta de publicación elegida.');
 const resources=[...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(m=>m[1]);
 for(const resource of resources){if(resource.startsWith(base))assert.ok(fs.existsSync(path.join(out,resource.slice(base.length))),'Falta '+resource);}
 const data=JSON.parse(fs.readFileSync(path.join(out,'assets/inventory.json'),'utf8'));
@@ -17,4 +18,5 @@ assert.ok(hero.length>10000&&hero[0]===0xff&&hero[1]===0xd8,'Debe publicarse la 
 assert.ok(fs.readFileSync(path.join(out,'sw.js'),'utf8').includes("BASE+'assets/obra-lmt.jpg'"),'La foto debe conservarse para uso sin conexión.');
 const background=fs.readFileSync(path.join(out,'assets/fondo-esquematico.svg'),'utf8');
 assert.ok(!background.includes('base64')&&!background.includes('<image'));
-console.log('GitHub Pages: recursos, ruta, inventario, fondo y manifiesto verificados.');
+if(cloudflare)assert.ok(!html.includes('/Avances-BD-LMT/'),'Cloudflare debe publicar en la raíz.');
+console.log((cloudflare?'Cloudflare':'GitHub Pages')+': recursos, ruta, inventario, fondo y manifiesto verificados.');

@@ -37,3 +37,10 @@ Este archivo resume el estado vigente. Las etapas anteriores se conservan en el 
 - Nueva descarga identificada como Verde_Feb2025_R2 e inclusión del JPEG como recurso independiente. El esquema de almacenamiento de la app no cambia.
 - Las pruebas ahora verifican el identificador nativo del gráfico, la distribución de cada vano una sola vez en la matriz y la inclusión de la fotografía. La apertura final de los nuevos visuales debe comprobarse en Desktop.
 - Validación local aprobada: 81 pruebas, TypeScript, esquemas de metadatos, compilación, rutas, inventario y comprobación de documentos privados. PR #4 fusionado y publicado. GitHub Actions 43624614222: build y deploy completados con éxito. El bundle publicado contiene la revisión Verde_Feb2025_R2 y no contiene stackedColumnChart.
+
+
+## 14/11/2026 — Cloudflare y resumen de Excel simplificado
+- Preparada la misma app para Cloudflare Pages con rutas en la raíz, manifiesto y service worker propios del destino. Se mantiene la publicación de GitHub Pages y el backend existente de Supabase.
+- Retiradas las nueve filas del resumen de Excel indicadas por el usuario. Conservados el detalle de los 235 vanos, las fechas y el rendimiento. Fórmulas, estilos y posición del gráfico ajustados a la tabla más corta; el gráfico mantiene datos auxiliares en columnas ocultas.
+- Validación local: 82 pruebas aprobadas, TypeScript, compilaciones y comprobaciones de recursos/rutas para GitHub Pages y Cloudflare, además del control de documentos privados. La comprobación mediante Excel instalado no pudo iniciarse por un error COM del sistema; no se presenta como una apertura real.
+- Publicación de los cambios y autorización de la cuenta de Cloudflare en curso.
