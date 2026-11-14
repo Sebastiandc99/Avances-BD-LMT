@@ -24,6 +24,7 @@ Se aplica el primer diseño seleccionado por el usuario, con su fotografía de o
 - Revisión visual de escritorio y móvil a 390 px aprobada, sin desbordamiento horizontal.
 - Comprobados filtros de estado, búsqueda y fecha; edición y guardado; apertura de carga masiva; mapa y resumen; descarga Excel.
 - Las pruebas de interfaz se realizaron con registros sintéticos aislados. Los archivos de prueba y esos registros no forman parte de la publicación.
-- Despliegue pendiente de verificar en GitHub Pages.
+- Publicado en GitHub Pages tras fusionar el PR #3. GitHub Actions 43604913938: build y deploy completados con éxito; 78 pruebas, tipos, formato Power BI y compilación aprobados.
+- Comprobación visual de la app publicada: inicio en Vanos, navegación simplificada y fotografía real cargada correctamente.
 
 Este archivo resume el estado vigente. Las etapas anteriores se conservan en el historial de Git.
