@@ -553,3 +553,12 @@ Recuperar y guardar el código ejecutable antes de cambiar funcionalidades o pre
 - Repositorio de datos con cuatro entradas esperadas: README, ESTADO_PROYECTO, backups y su archivo de preparación. Visibilidad privada confirmada mediante metadatos. No contiene el JSON recuperado ni fotografías/documentos originales.
 - Pendiente que el usuario genere y conecte su autorización granular en la app, y que confirme la transferencia específica del JSON recuperado si quiere esa copia inicial en GitHub. La copia en Drive no se modifica. No se afirma sincronización activa del dispositivo antes del primer envío o lectura comprobados.
 - Durante la comprobación visual el navegador informó Kernel state was reset after inactivity antes de ejecutar la apertura; se reabrió una vez y se verificó el resultado. No se repitieron operaciones de escritura ni se reinició el proyecto.
+
+
+## 14/11/2026 — Exportación Power BI para febrero de 2025
+- Objetivo de compatibilidad: Desktop 2.140.1454.0, 64 bits. Se cambia el informe de PBIR mejorado a diseño heredado report.json y metadato definition.pbir 1.0.
+- Se conservan las tres páginas, los filtros y la navegación; las tarjetas usan el visual clásico. La descarga se identifica con PowerBI_Feb2025.
+- Consultas y enlaces del diseño contrastados con muestras públicas de Microsoft anteriores a la versión objetivo. Se añaden pruebas de estructura del ZIP, alias de consulta, roles clásicos y ausencia de archivos PBIR mejorados.
+- Las instrucciones explican cómo abrir PBIP y cargar las tablas, sin exigir PBIR mejorado ni una versión posterior de Desktop. Ver docs/POWERBI_COMPATIBILIDAD.md.
+- La apertura real en la versión exacta de Desktop sigue pendiente de verificar. Las comprobaciones de estructura y compilación no se presentan como una prueba de apertura.
+- Validación local aprobada: 78 pruebas, TypeScript, tres metadatos contra esquemas oficiales, enlaces de los 51 visuales, compilación, rutas, inventario y control de documentos privados. Publicación pendiente.
