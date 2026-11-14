@@ -8,6 +8,7 @@ type Column = { name:string; dataType:'string'|'int64'|'double'|'dateTime' };
 const schema = 'https://developer.microsoft.com/json-schemas/fabric/';
 const reportFolder = 'Avances.Report';
 const modelFolder = 'Avances.SemanticModel';
+export const powerBiTarget = '2.140.1454.0 (febrero de 2025)';
 
 export function powerBiData(inventory:Inventory, events:Event[], today=localDate()) {
  const records = latestRecords(events);
@@ -123,12 +124,12 @@ function button(name:string, label:string, x:number, action:string, destination=
 }
 
 function card(name:string, measure:ReturnType<typeof projection>, x:number, y:number, width:number, color=palette.blue) {
- const v=visual(name,'cardVisual','',x,y,width,120,{Data:[measure]});
+ // The classic card and its Values role predate February 2025. Do not use the
+ // newer cardVisual/Data format or its preview-only formatting objects here.
+ const v=visual(name,'card','',x,y,width,120,{Values:[measure]});
  v.visual.objects={
-  value:[{properties:{fontSize:literal(32),fontColor:solid(color)},selector:{id:'default'}}],
-  label:[{properties:{fontSize:literal(12),fontColor:solid(palette.muted)},selector:{id:'default'}}],
-  padding:[{properties:{paddingUniform:literal(8)},selector:{id:'default'}}],
-  layout:[{properties:{paddingUniform:literal(0)},selector:{id:'default'}}]
+  labels:properties({fontSize:literal(32),color:solid(color),labelDisplayUnits:literal(1)}),
+  categoryLabels:properties({show:literal(true),fontSize:literal(12),color:solid(palette.muted)})
  };
  return v;
 }
@@ -146,6 +147,40 @@ function slicer(name:string, title:string, field:ReturnType<typeof projection>, 
  // Dates apply to activity in overview/detail, and completion in production.
  v.visual.syncGroup={groupName:'LMT_'+name,fieldChanges:true,filterChanges:true};
  return v;
+}
+
+/** Serializes the original single-file report layout, not enhanced PBIR.
+ * The shape (config/layouts/singleVisual/prototypeQuery) follows Microsoft's
+ * pre-2025 Desktop samples. Expressions use query aliases in this format.
+ */
+function legacyContainer(v:ReturnType<typeof visual>) {
+ const aliases=new Map<string,string>();
+ const expression=(field:ReturnType<typeof projection>['field']) => {
+  const [kind,value]=Object.entries(field)[0];
+  const entity=value.Expression.SourceRef.Entity;
+  if(!aliases.has(entity))aliases.set(entity,'t'+aliases.size);
+  return {[kind]:{...value,Expression:{SourceRef:{Source:aliases.get(entity)!}}}};
+ };
+ const selects=new Map<string,Record<string,unknown>>();
+ const projections=Object.fromEntries(Object.entries(v.visual.query.queryState).map(([role,state]) => [role,state.projections.map(p => {
+  if(!selects.has(p.queryRef))selects.set(p.queryRef,{...expression(p.field),Name:p.queryRef,NativeReferenceName:p.nativeQueryRef});
+  return {queryRef:p.queryRef,...(p.field.Column?{active:true}:{})};
+ })]));
+ const order=v.visual.query.sortDefinition?.sort.map(s => ({Direction:s.direction==='Ascending'?1:2,Expression:expression(s.field)}));
+ const singleVisual={
+  visualType:v.visual.visualType,
+  ...(selects.size?{
+   projections,
+   prototypeQuery:{Version:2,From:[...aliases].map(([Entity,Name]) => ({Name,Entity,Type:0})),Select:[...selects.values()],...(order?.length?{OrderBy:order}:{})},
+   hasDefaultSort:!v.visual.query.sortDefinition || v.visual.query.sortDefinition.isDefaultSort,
+   columnProperties:Object.fromEntries(Object.values(v.visual.query.queryState).flatMap(s=>s.projections).map(p=>[p.queryRef,{displayName:p.displayName}]))
+  }:{}),
+  objects:v.visual.objects,vcObjects:v.visual.visualContainerObjects,
+  ...(v.visual.syncGroup?{syncGroup:v.visual.syncGroup}:{}),
+  drillFilterOtherVisuals:true
+ };
+ const {tabOrder,...position}=v.position;
+ return {...position,tabOrder,config:JSON.stringify({name:v.name,layouts:[{id:0,position:v.position}],singleVisual}),filters:'[]'};
 }
 
 /** Creates a private, portable snapshot. Credentials and photo contents are excluded. */
@@ -194,29 +229,35 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
    relationships:[{name:'Historial_Vanos',fromTable:'Historial',fromColumn:'Vano',toTable:'Vanos',toColumn:'Vano',crossFilteringBehavior:'oneDirection'}]
   }
  });
- put(reportFolder+'/definition.pbir',{$schema:schema+'item/report/definitionProperties/2.0.0/schema.json',version:'4.0',datasetReference:{byPath:{path:'../'+modelFolder}}});
- put(reportFolder+'/definition/version.json',{$schema:schema+'item/report/definition/versionMetadata/1.0.0/schema.json',version:'2.0.0'});
- put(reportFolder+'/definition/report.json',{
-  $schema:schema+'item/report/definition/report/2.0.0/schema.json',
-  themeCollection:{customTheme:{name:'LMT',reportVersionAtImport:'5.55',type:'RegisteredResources'}},
-  resourcePackages:[{name:'RegisteredResources',type:'RegisteredResources',items:[{name:'LMT',path:'LMT.json',type:'CustomTheme'}]}],
-  settings:{defaultFilterActionIsDataFilter:true,defaultDrillFilterOtherVisuals:true,useEnhancedTooltips:true}
- });
+ // Version 1.0 selects the legacy report.json layout. The metadata filename
+ // definition.pbir is used by both formats; there is no enhanced /definition/.
+ put(reportFolder+'/definition.pbir',{$schema:schema+'item/report/definitionProperties/1.0.0/schema.json',version:'1.0',datasetReference:{byPath:{path:'../'+modelFolder}}});
+ const report={
+  config:JSON.stringify({version:'5.55',themeCollection:{customTheme:{name:'LMT.json',version:'5.55',type:1}},activeSectionIndex:0,defaultFilterActionIsDataFilter:true,defaultDrillFilterOtherVisuals:true,
+   settings:{useNewFilterPaneExperience:true,useStylableVisualContainerHeader:true,allowChangeFilterTypes:true,useEnhancedTooltips:true,exportDataMode:1}}),
+  layoutOptimization:0,
+  resourcePackages:[{resourcePackage:{name:'RegisteredResources',type:1,items:[{name:'LMT.json',path:'LMT.json',type:201}],disabled:false}}],
+  sections:[] as {name:string;displayName:string;displayOption:number;width:number;height:number;config:string;filters:string;visualContainers:ReturnType<typeof legacyContainer>[]}[]
+ };
  put(reportFolder+'/StaticResources/RegisteredResources/LMT.json',{
   name:'LMT',dataColors:[palette.green,palette.amber,palette.gray,palette.blue],
   background:palette.white,foreground:palette.ink,tableAccent:palette.blue,
   textClasses:{title:{fontFace:'Segoe UI Semibold',fontSize:13,color:palette.ink},label:{fontFace:'Segoe UI',fontSize:11,color:palette.muted}}
  });
- put(reportFolder+'/definition/pages/pages.json',{$schema:schema+'item/report/definition/pagesMetadata/1.0.0/schema.json',pageOrder:['Resumen','Produccion','Vanos'],activePageName:'Resumen'});
- const addVisual = (page:string, v:ReturnType<typeof visual>) => put(reportFolder+'/definition/pages/'+page+'/visuals/'+v.name+'/visual.json',v);
+ const addVisual = (page:string, v:ReturnType<typeof visual>) => {
+  const section=report.sections.find(s=>s.name===page);
+  if(!section)throw Error('Página Power BI inexistente: '+page);
+  section.visualContainers.push(legacyContainer(v));
+ };
  const col = (name:string) => projection('Vanos',name);
  const val = (name:string) => projection('Vanos',name,true);
  const readableDate = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Salta',dateStyle:'short',timeStyle:'short'}).format(new Date(extractedAt));
  const pages=[{name:'Resumen',label:'Resumen'},{name:'Produccion',label:'Producción'},{name:'Vanos',label:'Vanos'}];
  for(const page of pages) {
-  put(reportFolder+'/definition/pages/'+page.name+'/page.json',{
-   $schema:schema+'item/report/definition/page/2.0.0/schema.json',name:page.name,displayName:page.label,displayOption:'FitToPage',width:1280,height:800,
-   objects:{background:properties({color:solid(palette.paper),transparency:literal(0)})}
+  report.sections.push({
+   name:page.name,displayName:page.label,displayOption:1,width:1280,height:800,
+   config:JSON.stringify({objects:{background:properties({color:solid(palette.paper),transparency:literal(0)})}}),
+   filters:'[]',visualContainers:[]
   });
   addVisual(page.name,textbox('titulo','Avances BD LMT  /  '+page.label,24,20,550,40,26,palette.ink));
   pages.forEach((target,i)=>addVisual(page.name,button('abrir'+target.name,target.label,600+i*150,'PageNavigation',target.name,target.name===page.name)));
@@ -267,11 +308,12 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  };
  detail.visual.query.sortDefinition={sort:[{field:col('Vano').field,direction:'Ascending'}],isDefaultSort:false};
  addVisual('Vanos',detail);
+ put(reportFolder+'/report.json',report);
  files['ABRIR_EN_PC.txt'] = [
-  'AVANCES BD LMT — POWER BI DESKTOP',
+  'AVANCES BD LMT — POWER BI DESKTOP '+powerBiTarget,
   '',
   '1. Extrae TODO el ZIP en una carpeta de la PC.',
-  '2. Abre Avances_BD_LMT.pbip con Power BI Desktop actualizado.',
+  '2. Abre Avances_BD_LMT.pbip con tu Power BI Desktop de febrero de 2025.',
   '3. Pulsa Actualizar para cargar las tablas incluidas y ver los graficos.',
   '4. Usa los botones Resumen / Producción / Vanos para navegar (Ctrl + clic en el modo edición de Desktop).',
   '5. Filtra por línea, estado, responsable y fechas. Limpiar filtros restablece los selectores de la página.',
@@ -282,7 +324,10 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   'Los datos ya están incluidos en las consultas del proyecto. Esa carga no pide acceso a Supabase.',
   'Si Actualizar devuelve un error, conserva el mensaje exacto para revisar el problema.',
   'La apertura visual en Power BI Desktop debe comprobarse en tu PC.',
-  'Si Desktop pide habilitar proyectos PBIP o el formato PBIR, activalos en Opciones > Caracteristicas de version preliminar y reinicia Desktop.',
+  'FORMATO: informe heredado report.json, con definition.pbir versión 1.0. No usa PBIR mejorado ni tarjetas nuevas.',
+  'El nombre interno definition.pbir también existe en el formato heredado. Abre el archivo .pbip de la carpeta principal.',
+  'Si Desktop pide habilitar proyectos PBIP: Archivo > Opciones y configuración > Opciones > Características de versión preliminar > Power BI Project (.pbip) save option. Reinicia Desktop.',
+  'No hace falta habilitar PBIR mejorado ni actualizar Power BI a una versión posterior para este diseño.',
   '',
   'Origen: registros privados leidos de Supabase desde la sesion de la app.',
   'Extraccion UTC: '+extractedAt,
