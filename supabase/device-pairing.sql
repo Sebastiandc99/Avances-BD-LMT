@@ -17,6 +17,8 @@ create table lmt_private.pairing_codes (
  used_by uuid references auth.users(id) on delete set null,
  consumed_at timestamptz
 );
+create index pairing_owner_idx on lmt_private.pairing_codes(owner_id);
+create index pairing_used_by_idx on lmt_private.pairing_codes(used_by);
 alter table lmt_private.devices enable row level security;
 alter table lmt_private.pairing_codes enable row level security;
 revoke all on all tables in schema lmt_private from public, anon, authenticated;
