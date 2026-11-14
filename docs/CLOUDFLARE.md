@@ -20,4 +20,4 @@ La publicación no convierte la exportación de Power BI en una conexión en viv
 
 ## Estado
 
-Preparación de Cloudflare y comprobación de publicación en curso.
+Compilación y verificación de Cloudflare completadas. La publicación está pendiente de autorizar la cuenta de Cloudflare.
