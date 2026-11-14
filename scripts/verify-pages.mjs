@@ -12,6 +12,9 @@ assert.equal(data.vanos.reduce((sum,s)=>sum+s.bd_propuestos_pendientes_validacio
 const manifest=JSON.parse(fs.readFileSync(path.join(out,'manifest.webmanifest'),'utf8'));
 assert.equal(manifest.start_url,base);assert.equal(manifest.scope,base);
 assert.ok(fs.existsSync(path.join(out,'sw.js')));
+const hero=fs.readFileSync(path.join(out,'assets/obra-lmt.jpg'));
+assert.ok(hero.length>10000&&hero[0]===0xff&&hero[1]===0xd8,'Debe publicarse la fotografía JPEG de obra.');
+assert.ok(fs.readFileSync(path.join(out,'sw.js'),'utf8').includes("BASE+'assets/obra-lmt.jpg'"),'La foto debe conservarse para uso sin conexión.');
 const background=fs.readFileSync(path.join(out,'assets/fondo-esquematico.svg'),'utf8');
 assert.ok(!background.includes('base64')&&!background.includes('<image'));
 console.log('GitHub Pages: recursos, ruta, inventario, fondo y manifiesto verificados.');
