@@ -32,9 +32,10 @@ export async function claimLocalRecords(owner:string){
 
 /** Copies device records into the linked workspace atomically, preserving both originals and existing target rows. */
 export async function copyDeviceRecords(sourceOwner:string,targetOwner:string,remoteEvents:Event[]=[],remotePhotos:Photo[]=[]){
- if(sourceOwner===targetOwner)return;
+ if(sourceOwner===targetOwner)return 0;
  const d=await db();
- return new Promise<void>((resolve,reject)=>{
+ return new Promise<number>((resolve,reject)=>{
+  let copied=0;
   const tx=d.transaction(['events','photos'],'readwrite');
   for(const name of ['events','photos']){
    const store=tx.objectStore(name),request=store.getAll();
@@ -46,10 +47,10 @@ export async function copyDeviceRecords(sourceOwner:string,targetOwner:string,re
     for(const [id,value] of additions){
      if(existing.has(id))continue;
      const next=name==='events'?{...value,sync:(value as Event).sync==='discarded'?'discarded':'pending'}:{...value,uploaded:false};
-     store.put({key:targetOwner+':'+id,owner:targetOwner,value:next});
+     store.put({key:targetOwner+':'+id,owner:targetOwner,value:next});copied++;
     }
    };
   }
-  tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+  tx.oncomplete=()=>resolve(copied);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
  });
 }

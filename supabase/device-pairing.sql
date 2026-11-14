@@ -14,7 +14,8 @@ create table lmt_private.pairing_codes (
  issuer_id uuid not null unique references auth.users(id) on delete cascade,
  owner_id uuid not null references auth.users(id) on delete cascade,
  expires_at timestamptz not null,
- used_by uuid references auth.users(id) on delete set null
+ used_by uuid references auth.users(id) on delete set null,
+ consumed_at timestamptz
 );
 alter table lmt_private.devices enable row level security;
 alter table lmt_private.pairing_codes enable row level security;
@@ -63,7 +64,7 @@ begin
  if not found then raise exception 'Codigo invalido o vencido.'; end if;
  current_owner:=lmt_private.workspace_owner();
  if invitation.used_by=actor and current_owner=invitation.owner_id then return current_owner; end if;
- if invitation.expires_at<=now() or invitation.used_by is not null then raise exception 'Codigo invalido o vencido.'; end if;
+ if invitation.expires_at<=clock_timestamp() or invitation.consumed_at is not null then raise exception 'Codigo invalido o vencido.'; end if;
  issuer_owner:=coalesce((select owner_id from lmt_private.devices where user_id=invitation.issuer_id),invitation.issuer_id);
  if issuer_owner<>invitation.owner_id then raise exception 'Genera un codigo nuevo desde el equipo con los avances.'; end if;
  if current_owner<>invitation.owner_id then
@@ -73,7 +74,7 @@ begin
   insert into lmt_private.devices(user_id,owner_id) values(actor,invitation.owner_id)
   on conflict(user_id) do update set owner_id=excluded.owner_id,created_at=now();
  end if;
- update lmt_private.pairing_codes set used_by=actor where code_hash=invitation.code_hash;
+ update lmt_private.pairing_codes set used_by=actor,consumed_at=clock_timestamp() where code_hash=invitation.code_hash;
  return invitation.owner_id;
 end $$;
 create function public.lmt_pair_device(p_code text) returns uuid

@@ -63,10 +63,10 @@ export default function App(){
   workspaceJob.current=(async()=>{
    setConnecting(true);
    try{
-    const owner=await workspaceForDevice(id);
+    const {owner,copied}=await workspaceForDevice(id);
     if(!active.current||sessionRef.current?.user.id!==id)return;
     localStorage.setItem(workspaceKey(id),owner);
-    setWorkspace(owner);setResolvedAuth(id);setCloudError('');
+    setWorkspace(owner);setResolvedAuth(id);setCloudError('');if(copied)setRevision(n=>n+1);
    }catch(e){
     if(active.current&&sessionRef.current?.user.id===id){
      setResolvedAuth('');setCloudError(e instanceof Error?e.message:'No se pudo conectar el equipo.');
