@@ -1,4 +1,4 @@
-export type BackupStatusInput={signedIn:boolean;online:boolean;syncing:boolean;pending:number;conflicts:number;lastVerified:string;error:string;autoConnect?:boolean;connecting?:boolean;deviceOnly?:boolean};
+export type BackupStatusInput={signedIn:boolean;online:boolean;syncing:boolean;pending:number;conflicts:number;lastVerified:string;error:string;autoConnect?:boolean;connecting?:boolean;deviceOnly?:boolean;savedRecords?:number};
 /** A connection or a local save alone never proves that a cloud backup exists. */
 export function backupStatus(s:BackupStatusInput){
  if(!s.signedIn&&s.autoConnect){
@@ -13,5 +13,6 @@ export function backupStatus(s:BackupStatusInput){
  if(s.syncing)return {kind:'syncing',tone:'pending',title:'Comprobando la sincronización',detail:'Mantené la app abierta hasta que se confirme la copia en la nube.'};
  if(s.pending)return {kind:'pending',tone:'warning',title:`${s.pending} registro(s) pendientes de subir`,detail:'Están guardados en este equipo. La sincronización automática reintenta con la app abierta y conexión.'};
  if(!s.lastVerified)return {kind:'unverified',tone:'pending',title:'Copia en la nube todavía sin comprobar',detail:'Tener la sesión iniciada no confirma el respaldo. Esperá la comprobación de sincronización.'};
+ if(s.deviceOnly&&s.savedRecords===0)return {kind:'empty-device',tone:'warning',title:'Esta sesión todavía no tiene avances',detail:'Si ya cargaste avances en el celular, vinculá tu correo desde ese celular e ingresá con la misma cuenta en esta PC.'};
  return {kind:'verified',tone:'success',title:`Sincronización comprobada · ${s.lastVerified}`,detail:s.deviceOnly?'Los registros están guardados en Supabase. Vinculá tu correo en Datos y respaldo para recuperar esta copia desde otro equipo.':'No hay registros pendientes de subir. Usá esta misma cuenta para consultar los avances desde otro equipo.'};
 }

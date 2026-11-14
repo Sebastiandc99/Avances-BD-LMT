@@ -26,3 +26,10 @@ test('un guardado posterior o perder conexión retira la confirmación hasta com
  assert.equal(backupStatus({...signed,pending:1,syncing:true}).kind,'syncing');
  assert.equal(backupStatus({...signed,lastVerified:'14:31'}).kind,'verified');
 });
+
+test('la sesión nueva de otro dispositivo muestra cómo recuperar los avances en vez de confirmar una copia vacía',()=>{
+ const empty=backupStatus({...signed,deviceOnly:true,savedRecords:0});
+ assert.equal(empty.kind,'empty-device');assert.equal(empty.tone,'warning');assert.match(empty.detail,/desde ese celular/);
+ assert.equal(backupStatus({...signed,deviceOnly:true,savedRecords:179}).kind,'verified');
+ assert.equal(backupStatus({...signed,deviceOnly:false,savedRecords:0}).kind,'verified');
+});
