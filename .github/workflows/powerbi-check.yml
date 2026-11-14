@@ -1,0 +1,31 @@
+name: Validar Power BI
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/powerbi-export.ts'
+      - 'tests/powerbi.test.mjs'
+      - 'scripts/verify-powerbi.mjs'
+      - '.github/workflows/powerbi-check.yml'
+permissions:
+  contents: read
+jobs:
+  powerbi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Pruebas del informe de Power BI
+        run: node --experimental-strip-types --test tests/powerbi.test.mjs
+      - name: Esquemas oficiales y roles de visuales
+        run: node --experimental-strip-types scripts/verify-powerbi.mjs
+      - name: TypeScript
+        run: node node_modules/typescript/bin/tsc --noEmit
+      - name: Compilar aplicación
+        run: npm run build:pages
+      - name: Verificar inventario y rutas
+        run: npm run verify:pages

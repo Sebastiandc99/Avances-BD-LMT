@@ -12,10 +12,18 @@ const ajv = new Ajv({allErrors:true,strict:false,validateFormats:false,loadSchem
 }});
 const inventory = JSON.parse(fs.readFileSync(new URL('../public/assets/inventory.json',import.meta.url)));
 const files = powerBiProject(inventory,[],'2026-11-10');
+const roles = {cardVisual:['Data'],slicer:['Values'],donutChart:['Category','Y'],stackedColumnChart:['Category','Y'],clusteredColumnChart:['Category','Y'],tableEx:['Values'],textbox:[],actionButton:[]};
 let count = 0;
 for(const [path,text] of Object.entries(files)) {
  if(path.endsWith('.txt'))continue;
  const value = JSON.parse(text);
+ if(path.endsWith('/visual.json')) {
+  const visual=value.visual;
+  const expected=roles[visual.visualType];
+  if(!expected)throw Error(path+' unknown visual type');
+  const actual=Object.keys(visual.query?.queryState||{}).sort();
+  if(JSON.stringify(actual)!==JSON.stringify([...expected].sort()))throw Error(path+' invalid data roles: '+actual);
+ }
  if(!value.$schema)continue;
  let validate = schemas.get(value.$schema);
  if(!validate) {

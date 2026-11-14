@@ -60,25 +60,92 @@ function modelTable(name:string, rows:Row[], columns:Column[]) {
 function projection(table:string, name:string, measure=false) {
  return {
   field:{[measure ? 'Measure' : 'Column']:{Expression:{SourceRef:{Entity:table}},Property:name}},
-  queryRef:table + '.' + name, nativeQueryRef:name
+  queryRef:table + '.' + name, nativeQueryRef:name, displayName:name
  };
 }
 
+const palette = {ink:'#18324D',muted:'#526579',blue:'#2474DD',green:'#22946B',amber:'#C98B12',gray:'#7C8998',paper:'#F1F5F9',white:'#FFFFFF'};
+const literal = (value:string|number|boolean) => ({expr:{Literal:{Value:typeof value === 'string' ? "'" + value.replaceAll("'","''") + "'" : typeof value === 'number' ? value + 'D' : String(value)}}});
+const solid = (color:string) => ({solid:{color:literal(color)}});
+const properties = (value:Record<string,unknown>) => [{properties:value}];
+const padding = (size:number) => properties({top:literal(size),bottom:literal(size),left:literal(size),right:literal(size)});
+
 function visual(name:string, type:string, title:string, x:number, y:number, width:number, height:number,
  roles:Record<string,ReturnType<typeof projection>[]>) {
+ const objects:Record<string,unknown> = {};
+ const visualContainerObjects:Record<string,unknown> = {
+  title:properties({show:literal(!!title),text:literal(title),fontColor:solid(palette.ink),fontSize:literal(13),fontFamily:literal('Segoe UI Semibold')}),
+  background:properties({show:literal(true),color:solid(palette.white),transparency:literal(0)}),
+  border:properties({show:literal(false)}),
+  padding:padding(12),
+  visualHeader:properties({show:literal(true)})
+ };
  return {
   $schema:schema + 'item/report/definition/visualContainer/2.1.0/schema.json',
-  name, position:{x,y,z:0,width,height,tabOrder:0},
+  name, position:{x,y,z:1000,width,height,tabOrder:y*10+x},
   visual:{
    visualType:type,
-   query:{queryState:Object.fromEntries(Object.entries(roles).map(([role,projections]) => [role,{projections}]))},
-   visualContainerObjects:{title:[{properties:{
-    show:{expr:{Literal:{Value:'true'}}},
-    text:{expr:{Literal:{Value:"'" + title.replaceAll("'","''") + "'"}}}
-   }}]},
-   drillFilterOtherVisuals:true
+   syncGroup:undefined as {groupName:string;fieldChanges:boolean;filterChanges:boolean}|undefined,
+   query:{sortDefinition:undefined as {sort:{field:ReturnType<typeof projection>['field'];direction:string}[];isDefaultSort:boolean}|undefined,queryState:Object.fromEntries(Object.entries(roles).map(([role,projections]) => [role,{projections}]))},
+   objects, visualContainerObjects, drillFilterOtherVisuals:true
   }
  };
+}
+
+function textbox(name:string, text:string, x:number, y:number, width:number, height:number, size=14, color=palette.muted) {
+ const v=visual(name,'textbox','',x,y,width,height,{});
+ v.visual.objects.general=properties({paragraphs:[{textRuns:[{value:text,textStyle:{fontFamily:'Segoe UI',fontSize:size+'px',color}}],horizontalTextAlignment:'left'}]});
+ v.visual.visualContainerObjects.background=properties({show:literal(false)});
+ v.visual.visualContainerObjects.padding=padding(0);
+ v.visual.visualContainerObjects.visualHeader=properties({show:literal(false)});
+ return v;
+}
+
+function button(name:string, label:string, x:number, action:string, destination='', selected=false) {
+ const v=visual(name,'actionButton','',x,20,name==='limpiar'?200:140,48,{});
+ const state = (value:Record<string,unknown>, id='default') => ({properties:value,selector:{id}});
+ v.visual.objects={
+  text:[...properties({show:literal(true)}),state({text:literal(label),fontSize:literal(12),fontColor:solid(selected?palette.white:palette.ink),horizontalAlignment:literal('center')})],
+  icon:[...properties({show:literal(false)}),state({shapeType:literal('blank'),placement:literal('left')})],
+  fill:[...properties({show:literal(true)}),state({fillColor:solid(selected?palette.blue:palette.white)}),state({fillColor:solid('#DCEAFB')},'hover')],
+  outline:properties({show:literal(false)}),
+  shape:[...properties({tileShape:literal('rectangleRounded'),roundEdge:literal(8)}),state({tileShape:literal('rectangleRounded')})]
+ };
+ v.visual.visualContainerObjects.background=properties({show:literal(false)});
+ v.visual.visualContainerObjects.padding=padding(0);
+ v.visual.visualContainerObjects.visualHeader=properties({show:literal(false)});
+ v.visual.visualContainerObjects.visualLink=properties({
+  show:literal(true),type:literal(action),
+  tooltip:literal(action==='PageNavigation'?'Abrir '+label:'Restablecer los filtros de esta página'),
+  ...(destination?{navigationSection:literal(destination)}:{})
+ });
+ return v;
+}
+
+function card(name:string, measure:ReturnType<typeof projection>, x:number, y:number, width:number, color=palette.blue) {
+ const v=visual(name,'cardVisual','',x,y,width,120,{Data:[measure]});
+ v.visual.objects={
+  value:[{properties:{fontSize:literal(32),fontColor:solid(color)},selector:{id:'default'}}],
+  label:[{properties:{fontSize:literal(12),fontColor:solid(palette.muted)},selector:{id:'default'}}],
+  padding:[{properties:{paddingUniform:literal(8)},selector:{id:'default'}}],
+  layout:[{properties:{paddingUniform:literal(0)},selector:{id:'default'}}]
+ };
+ return v;
+}
+
+function slicer(name:string, title:string, field:ReturnType<typeof projection>, x:number, width:number, range=false) {
+ const v=visual(name,'slicer','',x,88,width,104,{Values:[field]});
+ v.visual.objects={
+  data:properties({mode:literal(range?'Between':'Dropdown')}),
+  header:properties({show:literal(true),text:literal(title),textSize:literal(12),fontColor:solid(palette.ink)}),
+  items:properties({textSize:literal(11),fontColor:solid(palette.ink)}),
+  selection:properties({singleSelect:literal(false),selectAllCheckboxEnabled:literal(true)})
+ };
+ v.visual.visualContainerObjects.padding=padding(8);
+ // Keep line, status and responsible selections while navigating pages.
+ // Dates apply to activity in overview/detail, and completion in production.
+ v.visual.syncGroup={groupName:'LMT_'+name,fieldChanges:true,filterChanges:true};
+ return v;
 }
 
 /** Creates a private, portable snapshot. Credentials and photo contents are excluded. */
@@ -95,13 +162,16 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  const vanos = modelTable('Vanos',data.vanos,columns);
  const measure = (name:string, expression:string, formatString='#,0') => ({name,expression,formatString});
  const measures = [
-  measure('Vanos totales','COUNTROWS(Vanos)'),
+  measure('Vanos totales','COALESCE(COUNTROWS(Vanos), 0)'),
   measure('Vanos terminados','COALESCE(SUM(Vanos[Terminado]), 0)'),
   measure('Vanos en proceso','COALESCE(SUM(Vanos[EnProceso]), 0)'),
   measure('Vanos pendientes','COALESCE(SUM(Vanos[Pendiente]), 0)'),
   measure('BD previstos','SUM(Vanos[BDPrevistos])'),
   measure('BD colocados','COALESCE(SUM(Vanos[BDColocados]), 0)'),
   measure('Avance total','DIVIDE([Vanos terminados], CALCULATE(COUNTROWS(Vanos), ALL(Vanos)), 0)','0.0%'),
+  measure('Avance de la seleccion','DIVIDE([Vanos terminados], CALCULATE([Vanos totales], REMOVEFILTERS(Vanos[Estado])), 0)','0.0%'),
+  measure('BD pendientes','MAX(0, COALESCE(SUM(Vanos[BDPrevistos]), 0) - [BD colocados])'),
+  measure('Terminados sin fecha','COALESCE(CALCULATE(SUM(Vanos[Terminado]), KEEPFILTERS(Vanos[TerminadoConFecha] = 0)), 0)'),
   measure('Vanos fechados','CALCULATE(SUM(Vanos[Terminado]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
   measure('Dias registrados','CALCULATE(DISTINCTCOUNT(Vanos[FechaFinalizacion]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
   measure('Promedio vanos dia','DIVIDE([Vanos fechados], [Dias registrados])','0.00'),
@@ -126,42 +196,92 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  });
  put(reportFolder+'/definition.pbir',{$schema:schema+'item/report/definitionProperties/2.0.0/schema.json',version:'4.0',datasetReference:{byPath:{path:'../'+modelFolder}}});
  put(reportFolder+'/definition/version.json',{$schema:schema+'item/report/definition/versionMetadata/1.0.0/schema.json',version:'2.0.0'});
- put(reportFolder+'/definition/report.json',{$schema:schema+'item/report/definition/report/2.0.0/schema.json',themeCollection:{}});
- put(reportFolder+'/definition/pages/pages.json',{$schema:schema+'item/report/definition/pagesMetadata/1.0.0/schema.json',pageOrder:['Resumen','Vanos','Historial'],activePageName:'Resumen'});
- const addPage = (name:string, displayName:string) => put(reportFolder+'/definition/pages/'+name+'/page.json',{
-  $schema:schema+'item/report/definition/page/2.0.0/schema.json',name,displayName,displayOption:'FitToPage',width:1280,height:800
+ put(reportFolder+'/definition/report.json',{
+  $schema:schema+'item/report/definition/report/2.0.0/schema.json',
+  themeCollection:{customTheme:{name:'LMT',reportVersionAtImport:'5.55',type:'RegisteredResources'}},
+  resourcePackages:[{name:'RegisteredResources',type:'RegisteredResources',items:[{name:'LMT',path:'LMT.json',type:'CustomTheme'}]}],
+  settings:{defaultFilterActionIsDataFilter:true,defaultDrillFilterOtherVisuals:true,useEnhancedTooltips:true}
  });
+ put(reportFolder+'/StaticResources/RegisteredResources/LMT.json',{
+  name:'LMT',dataColors:[palette.green,palette.amber,palette.gray,palette.blue],
+  background:palette.white,foreground:palette.ink,tableAccent:palette.blue,
+  textClasses:{title:{fontFace:'Segoe UI Semibold',fontSize:13,color:palette.ink},label:{fontFace:'Segoe UI',fontSize:11,color:palette.muted}}
+ });
+ put(reportFolder+'/definition/pages/pages.json',{$schema:schema+'item/report/definition/pagesMetadata/1.0.0/schema.json',pageOrder:['Resumen','Produccion','Vanos'],activePageName:'Resumen'});
  const addVisual = (page:string, v:ReturnType<typeof visual>) => put(reportFolder+'/definition/pages/'+page+'/visuals/'+v.name+'/visual.json',v);
- addPage('Resumen','Resumen de avances');
- addPage('Vanos','Detalle de vanos');
- addPage('Historial','Historial de Supabase');
  const col = (name:string) => projection('Vanos',name);
  const val = (name:string) => projection('Vanos',name,true);
- ['Vanos terminados','Vanos en proceso','Vanos pendientes','BD colocados','Avance total'].forEach((name,i) => {
-  addVisual('Resumen',visual('indicador'+i,'card',name,20+i*250,15,240,125,{Values:[val(name)]}));
+ const readableDate = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Salta',dateStyle:'short',timeStyle:'short'}).format(new Date(extractedAt));
+ const pages=[{name:'Resumen',label:'Resumen'},{name:'Produccion',label:'Producción'},{name:'Vanos',label:'Vanos'}];
+ for(const page of pages) {
+  put(reportFolder+'/definition/pages/'+page.name+'/page.json',{
+   $schema:schema+'item/report/definition/page/2.0.0/schema.json',name:page.name,displayName:page.label,displayOption:'FitToPage',width:1280,height:800,
+   objects:{background:properties({color:solid(palette.paper),transparency:literal(0)})}
+  });
+  addVisual(page.name,textbox('titulo','Avances BD LMT  /  '+page.label,24,20,550,40,26,palette.ink));
+  pages.forEach((target,i)=>addVisual(page.name,button('abrir'+target.name,target.label,600+i*150,'PageNavigation',target.name,target.name===page.name)));
+  addVisual(page.name,button('limpiar','Limpiar filtros',1056,'ClearAllSlicers'));
+  addVisual(page.name,slicer('linea','Línea',col('Linea'),24,240));
+  addVisual(page.name,slicer('estado','Estado',col('Estado'),280,240));
+  addVisual(page.name,slicer('responsable','Responsable',col('Responsable'),536,240));
+  const date=slicer(page.name==='Produccion'?'fechaProduccion':'fechaActividad',page.name==='Produccion'?'Fecha de finalización':'Fecha de actividad',col(page.name==='Produccion'?'FechaFinalizacion':'Fecha'),792,464,true);
+  addVisual(page.name,date);
+  addVisual(page.name,textbox('ayuda','Primera apertura: Inicio → Actualizar. Botones en Desktop: Ctrl + clic. Copia de Supabase: '+readableDate+'.',24,752,1232,32,14));
+ }
+ const summary=[
+  ['Avance de la seleccion',palette.blue],['Vanos terminados',palette.green],
+  ['Vanos en proceso',palette.amber],['Vanos pendientes',palette.gray],['BD colocados',palette.blue]
+ ];
+ summary.forEach(([name,color],i)=>addVisual('Resumen',card('indicador'+i,val(name),24+i*250,216,232,color)));
+ const stateChart=visual('estados','donutChart','Vanos por estado · seleccioná un segmento',24,360,400,328,{Category:[col('Estado')],Y:[val('Vanos totales')]});
+ stateChart.visual.objects={
+  legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(11)}),
+  labels:properties({show:literal(true),fontSize:literal(12)})
+ };
+ addVisual('Resumen',stateChart);
+ const byLine=visual('porLinea','stackedColumnChart','Avance por línea',448,360,808,328,{Category:[col('Linea')],Y:[val('Vanos terminados'),val('Vanos en proceso'),val('Vanos pendientes')]});
+ byLine.visual.objects={legend:properties({show:literal(true),position:literal('Bottom')}),labels:properties({show:literal(true),fontSize:literal(12)})};
+ addVisual('Resumen',byLine);
+ addVisual('Resumen',textbox('nota','Los filtros y los segmentos de los gráficos actualizan los indicadores. El avance porcentual respeta la línea y la fecha seleccionadas.',24,704,1232,36,14));
+ const production=[
+  ['Vanos fechados',palette.green],['BD fechados',palette.blue],['Promedio BD dia',palette.blue],
+  ['Dias registrados',palette.ink],['Terminados sin fecha',palette.amber]
+ ];
+ production.forEach(([name,color],i)=>addVisual('Produccion',card('produccion'+i,val(name),24+i*250,216,232,color)));
+ const daily=visual('diario','clusteredColumnChart','BD colocados por fecha de finalización',24,360,784,328,{Category:[col('FechaFinalizacion')],Y:[val('BD fechados')]});
+ daily.visual.query.sortDefinition={sort:[{field:col('FechaFinalizacion').field,direction:'Ascending'}],isDefaultSort:false};
+ daily.visual.objects={dataPoint:properties({defaultColor:solid(palette.blue)}),labels:properties({show:literal(true),fontSize:literal(11)})};
+ addVisual('Produccion',daily);
+ const dailyTable=visual('detalleDiario','tableEx','Producción diaria',832,360,424,328,{Values:[col('FechaFinalizacion'),val('Vanos fechados'),val('BD fechados')]});
+ dailyTable.visual.query.sortDefinition={sort:[{field:col('FechaFinalizacion').field,direction:'Ascending'}],isDefaultSort:false};
+ addVisual('Produccion',dailyTable);
+ addVisual('Produccion',textbox('nota','El promedio usa días con producción registrada. Los terminados sin fecha suman al avance; quedan fuera del rendimiento y del gráfico diario.',24,704,1232,36,14));
+ ['Vanos totales','Avance de la seleccion','BD colocados','BD pendientes'].forEach((name,i)=>addVisual('Vanos',card('detalleKpi'+i,val(name),24+i*312,216,296)));
+ const detail=visual('detalle','tableEx','Detalle de vanos · filtrá arriba para buscar',24,360,1232,368,{
+  Values:['Vano','Linea','Estado','Fecha','BDPrevistos','BDColocados','OrigenConteo','Responsable','Observaciones'].map(col)
  });
- addVisual('Resumen',visual('avance','pieChart','Vanos por estado',20,160,390,300,{Category:[col('Estado')],Y:[val('Vanos totales')]}));
- addVisual('Resumen',visual('produccion','clusteredColumnChart','Vanos terminados por fecha',430,160,830,300,{Category:[col('FechaFinalizacion')],Y:[val('Vanos fechados')]}));
- ['Promedio vanos dia','Promedio BD dia','Dias restantes','Finalizacion estimada'].forEach((name,i) => {
-  addVisual('Resumen',visual('rendimiento'+i,'card',name,20+i*315,480,305,120,{Values:[val(name)]}));
- });
- addVisual('Resumen',visual('linea','slicer','Filtrar linea',20,620,390,160,{Values:[col('Linea')]}));
- addVisual('Resumen',visual('responsable','slicer','Filtrar responsable',430,620,400,160,{Values:[col('Responsable')]}));
- addVisual('Resumen',visual('fecha','slicer','Filtrar fecha de actividad',850,620,410,160,{Values:[col('Fecha')]}));
- addVisual('Vanos',visual('linea','slicer','Linea',20,15,390,140,{Values:[col('Linea')]}));
- addVisual('Vanos',visual('estado','slicer','Estado',430,15,400,140,{Values:[col('Estado')]}));
- addVisual('Vanos',visual('fecha','slicer','Fecha de actividad',850,15,410,140,{Values:[col('Fecha')]}));
- addVisual('Vanos',visual('detalle','tableEx','Detalle de los 235 vanos',20,175,1240,600,{Values:['Vano','Linea','Estado','Fecha','BDPrevistos','BDColocados','OrigenConteo','Responsable','Observaciones'].map(col)}));
- addVisual('Historial',visual('cambios','tableEx','Cambios guardados en Supabase',20,20,1240,760,{
-  Values:['Registro','Vano','Version','Estado','Fecha','RegistroUTC','BDReales','Responsable','Observaciones'].map(name => projection('Historial',name))
- }));
+ detail.visual.objects={
+  grid:properties({gridVertical:literal(false),rowPadding:literal(8)}),
+  columnHeaders:properties({fontSize:literal(11),fontColor:solid(palette.white),backColor:solid(palette.ink)}),
+  values:properties({fontSize:literal(11),fontColorPrimary:solid(palette.ink)})
+ };
+ detail.visual.query.sortDefinition={sort:[{field:col('Vano').field,direction:'Ascending'}],isDefaultSort:false};
+ addVisual('Vanos',detail);
  files['ABRIR_EN_PC.txt'] = [
   'AVANCES BD LMT — POWER BI DESKTOP',
   '',
   '1. Extrae TODO el ZIP en una carpeta de la PC.',
   '2. Abre Avances_BD_LMT.pbip con Power BI Desktop actualizado.',
   '3. Pulsa Actualizar para cargar las tablas incluidas y ver los graficos.',
-  '4. Puedes filtrar los datos, editar el informe y guardarlo como .pbix.',
+  '4. Usa los botones Resumen / Producción / Vanos para navegar (Ctrl + clic en el modo edición de Desktop).',
+  '5. Filtra por línea, estado, responsable y fechas. Limpiar filtros restablece los selectores de la página.',
+  '6. Selecciona una barra o segmento para filtrar los demás gráficos e indicadores.',
+  '7. Guarda el informe como .pbix una vez cargadas las tablas.',
+  '',
+  'SI LOS INDICADORES ESTÁN EN BLANCO: este proyecto no incluye cache.abf; pulsa Inicio > Actualizar.',
+  'Los datos ya están incluidos en las consultas del proyecto. Esa carga no pide acceso a Supabase.',
+  'Si Actualizar devuelve un error, conserva el mensaje exacto para revisar el problema.',
+  'La apertura visual en Power BI Desktop debe comprobarse en tu PC.',
   'Si Desktop pide habilitar proyectos PBIP o el formato PBIR, activalos en Opciones > Caracteristicas de version preliminar y reinicia Desktop.',
   '',
   'Origen: registros privados leidos de Supabase desde la sesion de la app.',
@@ -171,7 +291,8 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   'Actualizar en Desktop vuelve a cargar esta copia. La conexion permanente con Supabase se configura por separado.',
   'El rendimiento usa solo vanos terminados con fecha explicita. Los terminados sin fecha cuentan en el avance.',
   'La estimacion suma dias calendario a la fecha de exportacion segun el promedio de dias con produccion cargada.',
-  'El porcentaje usa como denominador los 235 vanos de ambas lineas.',
+  'Avance de la selección respeta línea, fechas y responsable; retira solo el filtro de estado del denominador.',
+  'El historial completo también está disponible como tabla Historial en la vista Datos de Desktop.',
   'El archivo contiene informacion de obra. Compartelo solo con personas autorizadas.'
  ].join('\r\n');
  return files;
