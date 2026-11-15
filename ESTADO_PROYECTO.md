@@ -7,7 +7,7 @@
 - Cámara del mapa, filtros de Vanos y fecha guardados en sessionStorage por navegador. Mapa y Vanos tienen filtros de línea independientes.
 - Resumen inspirado en Power BI verde, con Resumen, Producción, Por vano, Detalle, limpiar filtros, filtros por línea/estado/responsable/fechas y gráficos seleccionables.
 - Cuadrillas opcionales en nube, respaldos JSON/GitHub, CSV, Excel y datos de Power BI. Restricción aplicada en Supabase mediante crew-count.sql.
-- Pruebas locales aprobadas, TypeScript y formatos de publicación verificados. La carga en Cloudflare requiere acceso de publicación a su cuenta.
+- 86 pruebas aprobadas, TypeScript, formatos de publicación y pipeline de GitHub verificados. En la app publicada se comprobó la cámara al alternar apartados, la fecha de Vanos, el conteo de selección y los campos de ambas fichas. Cloudflare queda preparado para carga directa, pendiente de acceso a su cuenta.
 
 ## 15/11/2026 — Acceso difícil entre piquetes 40 y 60
 

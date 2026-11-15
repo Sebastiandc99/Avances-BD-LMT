@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Activity, BarChart3, List, RotateCcw, UtilityPole } from 'lucide-react';
 import { dailyActivity } from '../lib/daily-completion';
 import { colors, dateLabel, latestRecords, metrics, statuses, type Event, type Inventory, type Span } from '../lib/model';
@@ -26,14 +26,27 @@ function savedSummary() {
 }
 function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoose: (day: string) => void }) {
  const days = Object.keys(daily).sort();
+ const host = useRef<SVGSVGElement>(null);
+ const [width, setWidth] = useState(640);
+ const hasDays = days.length > 0;
+ useEffect(() => {
+  if (!host.current) return;
+  const observer = new ResizeObserver(entries => {
+   const next = entries[0].contentRect.width;
+   if (next > 0) setWidth(Math.max(240, next));
+  });
+  observer.observe(host.current);
+  return () => observer.disconnect();
+ }, [hasDays]);
  if (!days.length) return <p className="summary-empty">Agregá fechas a los vanos terminados para ver la producción diaria.</p>;
  const start = Date.parse(days[0]), end = Date.parse(days.at(-1)!);
- const width = 640, height = 220, left = 42, right = 24, top = 22, bottom = 45;
+ const height = 220, left = 42, right = 24, top = 22, bottom = 45;
  const max = Math.max(1, ...Object.values(daily));
  const x = (day: string) => left + (end === start ? .5 : (Date.parse(day) - start) / (end - start)) * (width - left - right);
  const y = (value: number) => height - bottom - value / max * (height - top - bottom);
- const ticks = days.filter((_, i) => i === 0 || i === days.length - 1 || i % Math.max(1, Math.ceil(days.length / 5)) === 0);
- return <svg className="summary-daily-chart" viewBox={`0 0 ${width} ${height}`} role="group" aria-label="Vanos terminados por fecha de ejecución">
+ const tickCount = Math.min(days.length, width < 420 ? 3 : 5);
+ const ticks = Array.from({ length: tickCount }, (_, i) => days[Math.round(i * (days.length - 1) / Math.max(1, tickCount - 1))]);
+ return <svg ref={host} className="summary-daily-chart" viewBox={`0 0 ${width} ${height}`} role="group" aria-label="Vanos terminados por fecha de ejecución">
   {[0, .5, 1].map(t => <g key={t}><line x1={left} x2={width - right} y1={y(max * t)} y2={y(max * t)} stroke="#dce7e3" /><text x={left - 9} y={y(max * t) + 4} textAnchor="end">{fmt(max * t, 1)}</text></g>)}
   <polyline points={days.map(day => `${x(day)},${y(daily[day])}`).join(' ')} fill="none" stroke="#087f78" strokeWidth={2.5} />
   {days.map(day => <g key={day} role="button" tabIndex={0} aria-label={`${dateLabel(day)}: ${daily[day]} vanos terminados. Filtrar este día.`} onClick={() => onChoose(day)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChoose(day); } }}>
@@ -70,7 +83,7 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
   { label: 'Pendientes', value: fmt(stats.pending), tone: 'pending' },
   { label: 'En proceso', value: fmt(stats.inProgress), tone: 'process' },
   { label: 'Promedio de vanos / día', value: stats.days ? fmt(stats.average, 1) : '—', tone: 'rate' },
-  { label: 'Finalización estimada', value: stats.eta ? dateLabel(stats.eta) : 'Sin estimación', tone: 'eta' },
+  { label: 'Finalización estimada', value: stats.total > 0 && stats.remaining === 0 ? 'Finalizado' : stats.eta ? dateLabel(stats.eta) : 'Sin estimación', tone: 'eta' },
  ];
  return <div className="production-report">
   <aside className="report-nav" aria-label="Páginas del informe">
@@ -101,7 +114,7 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
      <section className="report-chart-card"><h4>Vanos por línea</h4><div className="report-line-columns">{['larga', 'corta'].map(line => {
       const group = spans.filter(s => s.linea === line), total = metrics(group, events, today);
       const maximum = Math.max(1, ...['larga', 'corta'].map(l => spans.filter(s => s.linea === l).length));
-      return <div key={line} className="report-line-column"><div className="report-column-space"><div className="report-column" style={{ height: total.total / maximum * 100 + '%' }}>{progressSlices(total).filter(part => part.value).map(part => <button key={part.key} aria-label={`${line === 'larga' ? 'Línea larga' : 'Línea corta FP'}, ${part.value} ${part.label}`} title={`${part.label}: ${part.value}`} style={{ background: part.color, flex: part.value }} onClick={() => change({ line, status: part.key })}>{part.value}</button>)}</div></div><button className="report-column-label" onClick={() => change({ line })}>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</button></div>;
+      return <div key={line} className="report-line-column"><div className="report-column-space"><span className="report-column-total">{total.total}</span><div className="report-column" style={{ height: total.total / maximum * 100 + '%' }}>{progressSlices(total).filter(part => part.value).map(part => <button key={part.key} aria-label={`${line === 'larga' ? 'Línea larga' : 'Línea corta FP'}, ${part.value} ${part.label}`} title={`${part.label}: ${part.value}`} style={{ background: part.color, flex: part.value }} onClick={() => change({ line, status: part.key })}>{part.value / maximum * 170 >= 18 ? part.value : ''}</button>)}</div></div><button className="report-column-label" onClick={() => change({ line })}>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</button></div>;
      })}</div><p className="report-chart-hint">Seleccioná una columna o un estado para filtrar.</p></section>
      <section className="report-chart-card"><h4>Vanos terminados por día</h4><DailyChart daily={stats.daily} onChoose={chooseDay} /></section>
     </div>
