@@ -9,7 +9,7 @@ type Cell=Value|Formula;
 export type ExportSheet={name:string;rows:Cell[][]};
 export type MapImage={png:Uint8Array;width:number;height:number};
 const label=(s:Span)=>`${s.linea==='corta'?'FP ':''}${Number(s.desde.split('-')[1])} — ${s.linea==='corta'?'FP ':''}${Number(s.hasta.split('-')[1])}`;
-const origin=(e?:Event)=>diverterBasis(e)==='calculated'?'Calculados por estado':diverterBasis(e)==='reported'?'Informados en campo':'Sin cantidad colocada';
+const origin=(e?:Event)=>diverterBasis(e)==='calculated'?'Planilla por estado':diverterBasis(e)==='reported'?'Informados en campo':'Sin cantidad colocada';
 const f=(formula:string,value:Value):Formula=>({formula,value});
 export function excelDate(iso:string):number|null{
  if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return null;
@@ -32,7 +32,9 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
   ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,B10/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/día'],
   ['Rendimiento promedio de BD',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('C')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/día'],
   ['Días para finalizar',f(`IF(B7=B8,0,IF(B10>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/B10,0),"Sin estimación"))`,m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
-  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B13),B3+B13,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte']
+  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B13),B3+B13,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte'],
+  ['Diverters terminados',f(`SUM(${range('H')})`,m.installed),'Unidades instaladas según avances y cantidades informadas'],
+  ['Diverters pendientes',f(`SUMPRODUCT((${range('G')}>${range('H')})*(${range('G')}-${range('H')}))`,m.remainingBD),'Por vano: cantidad de planilla menos colocados, mínimo cero']
  );
  const daily=head('Producción por fecha de ejecución',['Fecha de ejecución','Vanos terminados','BD colocados']);
  for(const [i,date] of dates.entries()){
@@ -40,7 +42,7 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
   daily.push([excelDate(date),f(`COUNTIFS(${range('E')},"Terminado",${range('F')},A${row})`,m.daily[date]),f(`SUMIFS(${range('H')},${range('E')},"Terminado",${range('F')},A${row})`,m.dailyBD[date])]);
  }
  if(!dates.length)daily.push(['Sin producción fechada',null,null]);
- const spans=head('Registro de vanos',['ID del vano','Línea','Vano','Longitud (m)','Estado','Fecha de ejecución','BD calculados','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones','Cantidad de cuadrillas']);
+ const spans=head('Registro de vanos',['ID del vano','Línea','Vano','Longitud (m)','Estado','Fecha de ejecución','BD según planilla','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones','Cantidad de cuadrillas']);
  for(const s of inventory.vanos){const e=records[s.id];spans.push([s.id,s.linea==='larga'?'Larga':'Corta FP',label(s),s.longitud_planta_m,statuses[e?.status||'pendiente'],excelDate(e?.date||''),plannedDiverters(s),installedDiverters(s,e),origin(e),e?.installed||0,e?.responsible||'',e?.notes||'',e?.crews??null]);}
  const aerial:Cell[][]=[['Vista aérea del avance'],['Traza completa de ambas líneas. Esquema orientativo del DWG.'],['Fecha de corte',excelDate(today)],['Pendiente: gris. En proceso: amarillo. Terminado: verde.']];
  return [{name:'Resumen',rows:summary},{name:'Rendimiento',rows:daily},{name:'Vanos',rows:spans},{name:'Vista aérea',rows:aerial}];
@@ -90,7 +92,7 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
   }).join('');
   let sheetXML=source.replace(/<x:sheetData>[\s\S]*?<\/x:sheetData>/,`<x:sheetData>${rows}</x:sheetData>`);
   if(i===0)sheetXML=sheetXML.replace('</x:cols>','<x:col min="24" max="25" width="0" hidden="1" customWidth="1"/></x:cols>');
-  if(i===1||i===2)sheetXML=sheetXML.replace('</x:sheetData>',`</x:sheetData><x:autoFilter ref="A5:${i===2?'L':'C'}${sheet.rows.length}"/>`);
+  if(i===1||i===2)sheetXML=sheetXML.replace('</x:sheetData>',`</x:sheetData><x:autoFilter ref="A5:${i===2?'M':'C'}${sheet.rows.length}"/>`);
   if(i===3)sheetXML=sheetXML.replace('</x:worksheet>','<x:drawing xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rIdMap"/></x:worksheet>');
   files[path]=strToU8(sheetXML);
  }

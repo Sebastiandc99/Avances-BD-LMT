@@ -16,6 +16,7 @@ test('Excel incluye 235 vanos, fechas numéricas y resumen global coherente con 
  const summary=Object.fromEntries(sheets[0].rows.slice(5).map(r=>[r[0],value(r[1])]));
  assert.equal(summary['Vanos totales'],235);assert.equal(summary['Vanos terminados'],3);assert.equal(summary['Vanos en proceso'],undefined);assert.equal(summary['Vanos pendientes'],undefined);
  assert.equal(summary['Avance total'],3/235);assert.equal(sheets[2].rows.slice(5).reduce((n,r)=>n+value(r[7]),0),m.installed);
+ assert.equal(summary['Diverters terminados'],m.installed);assert.equal(summary['Diverters pendientes'],m.remainingBD);assert.equal(summary['Rendimiento promedio de BD'],m.averageBD);
  assert.equal(summary['Rendimiento promedio'],1);assert.equal(summary['Terminados sin fecha válida'],undefined);assert.equal(summary['Días para finalizar'],232);
  assert.deepEqual(sheets[1].rows.slice(5).map(r=>value(r[1])),[1,1]);
  assert.equal(sheets[2].rows.filter(r=>r[1]==='Corta FP').length,17);
@@ -32,7 +33,7 @@ test('XLSX contiene cuatro hojas, fórmulas, formatos, filtros e imagen embebida
  const files=unzipSync(productionXlsx(inventory,events,{png,width:4400,height:3400},'2026-11-10'));
  const read=p=>strFromU8(files[p]);
  assert.ok(read('xl/workbook.xml').includes('Vista aérea'));assert.ok(read('xl/workbook.xml').includes('fullCalcOnLoad="1"'));
- assert.ok(read('xl/worksheets/sheet1.xml').includes('<x:f>SUM('));assert.ok(read('xl/worksheets/sheet3.xml').includes('autoFilter ref="A5:L240"'));
+ assert.ok(read('xl/worksheets/sheet1.xml').includes('<x:f>SUM('));assert.ok(read('xl/worksheets/sheet3.xml').includes('autoFilter ref="A5:M240"'));
  assert.match(read('xl/worksheets/sheet3.xml'),/<x:c r="L6"[^>]*t="inlineStr">/);assert.ok(read('xl/worksheets/sheet3.xml').includes('&lt;&amp;&gt;'));assert.ok(!read('xl/worksheets/sheet3.xml').includes('\u0001'));
  assert.ok(read('xl/worksheets/sheet4.xml').includes('r:id="rIdMap"'));assert.ok(read('xl/drawings/map.xml').includes('r:embed="rIdImage"'));assert.ok(read('[Content_Types].xml').includes('image/png'));
  assert.deepEqual(files['xl/media/traza.png'],png);
@@ -69,7 +70,7 @@ test('Resumen elimina las nueve filas solicitadas y conserva fórmulas y gráfic
  const removed=['BD calculados totales','BD colocados','BD calculados por estado','BD reales informados','Terminados sin fecha válida','Días con ejecución registrada','Vanos en proceso','Vanos pendientes','Vanos que faltan terminar'];
  const events=[event('L-001-002',{date:'2026-11-08'}),event('L-002-003'),event('L-003-004',{status:'ejecucion'})];
  const sheets=productionSheets(inventory,events,'2026-11-10');
- assert.equal(sheets[0].rows.length,14);
+ assert.equal(sheets[0].rows.length,16);
  for(const label of removed)assert.ok(!sheets[0].rows.some(row=>row[0]===label),label);
  const files=unzipSync(productionXlsx(inventory,events,{png,width:4400,height:3400},'2026-11-10'));
  const summary=strFromU8(files['xl/worksheets/sheet1.xml']);
@@ -84,5 +85,5 @@ test('Resumen elimina las nueve filas solicitadas y conserva fórmulas y gráfic
  assert.equal(sheetRows['Avance total'].value.formula,'IF(B7>0,B8/B7,0)');
  assert.ok(sheetRows['Días para finalizar'].value.formula.includes('(B7-B8)*COUNT('));
  assert.ok(sheetRows['Fecha estimada de finalización'].value.formula.includes('B3+B13'));
- assert.ok(strFromU8(files['xl/drawings/drawing1.xml']).includes('<xdr:row>16</xdr:row>'));
+ assert.ok(strFromU8(files['xl/drawings/drawing1.xml']).includes('<xdr:row>18</xdr:row>'));
 });

@@ -19,7 +19,7 @@ test('Power BI mantiene las cantidades y las fechas explicitas con la revision v
  ];
  const data = powerBiData(inventory,events,'2026-11-10');
  assert.equal(data.vanos.length,235);
- assert.equal(data.vanos.reduce((n,v) => n+v.BDPrevistos,0),1743);
+ assert.equal(data.vanos.reduce((n,v) => n+v.BDPrevistos,0),1863);
  assert.equal(data.vanos.filter(v => v.Linea==='Corta').length,17);
  assert.equal(data.vanos[0].Fecha,'2026-11-09');
  assert.equal(data.vanos[1].FechaFinalizacion,null);
@@ -141,7 +141,7 @@ test('las tarjetas clásicas usan Values y los botones mantienen destinos válid
   }
   if(visual.visualType==='textbox')assert.ok(Array.isArray(visual.objects.general[0].properties.paragraphs));
  }
- assert.equal(cards,14);
+ assert.equal(cards,17);
  assert.equal(buttons,20);
 });
 

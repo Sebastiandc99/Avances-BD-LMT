@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Activity, BarChart3, List, RotateCcw, UtilityPole } from 'lucide-react';
 import { dailyActivity } from '../lib/daily-completion';
-import { colors, dateLabel, latestRecords, metrics, statuses, type Event, type Inventory, type Span } from '../lib/model';
+import { colors, dateLabel, latestRecords, metrics, plannedDiverters, installedDiverters, statuses, type Event, type Inventory, type Span } from '../lib/model';
 import { progressGradient, progressSlices } from '../lib/progress-pie';
 
 const fmt = (n: number, digits = 0) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: digits }).format(n);
@@ -103,6 +103,12 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
    <button className="report-today" onClick={() => { setFilters({ ...emptyFilters, from: today, to: today, status: 'active' }); setPage('detail'); }} aria-label={`Ver los ${currentDay.total} vanos con actividad hoy`}>
     <span><Activity size={22} /><b>Vanos de hoy</b><small>{dateLabel(today)} · Ambas líneas</small></span><strong>{currentDay.total}</strong><span>{currentDay.done} terminados <i /> {currentDay.inProgress} en proceso</span>
    </button>
+   <section className="report-bd-stats" aria-label="Bird diverters">
+    <div className="report-bd-heading"><h4>Bird diverters</h4><span>{fmt(stats.planned)} según planilla en la selección</span></div>
+    <article><h4>Diverters terminados</h4><strong>{fmt(stats.installed)}</strong></article>
+    <article><h4>Diverters pendientes</h4><strong>{fmt(stats.remainingBD)}</strong></article>
+    <article><h4>Rendimiento promedio</h4><strong>{stats.days ? fmt(stats.averageBD, 1) : '—'}<small> BD/día</small></strong></article>
+   </section>
    {page === 'overview' && <>
     <div className="report-overview">
      <section className="report-donut-card"><h4>Avance de la selección</h4><div className="report-donut" style={{ background: progressGradient(stats) }} role="img" aria-label={`${fmt(stats.pct, 1)} % de ${stats.total} vanos terminados`}><div><strong>{fmt(stats.pct, 1)}<small>%</small></strong><span>{stats.done} de {stats.total}</span></div></div>
@@ -124,10 +130,10 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
     <section className="report-chart-card"><h4>Evolución diaria</h4><DailyChart daily={stats.daily} onChoose={chooseDay} /></section>
     <div className="table-scroll"><table className="report-table"><thead><tr><th>Fecha</th><th>Vanos terminados</th><th>Acumulados</th></tr></thead><tbody>{days.map(([day, count], i) => <tr key={day}><td><button onClick={() => { chooseDay(day); setPage('detail'); }}>{dateLabel(day)}</button></td><td>{count}</td><td>{days.slice(0, i + 1).reduce((n, [, value]) => n + value, 0)}</td></tr>)}</tbody></table></div>
    </>}
-   {page === 'spans' && <><p className="report-chart-hint">Seleccioná un vano para abrir su ficha.</p>{['larga', 'corta'].map(line => <section key={line} className="report-span-section"><h4>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</h4><div className="report-span-grid">{spans.filter(s => s.linea === line).map(s => <button key={s.id} style={{ '--span-color': colors[records[s.id]?.status || 'pendiente'] } as React.CSSProperties} onClick={() => onOpenSpan(s.id)}><b>{spanName(s)}</b><span>{statuses[records[s.id]?.status || 'pendiente']}</span></button>)}</div></section>)}</>}
-   {page === 'detail' && <div className="table-scroll"><table className="report-table"><thead><tr><th>Vano</th><th>Estado</th><th>Fecha de actividad</th><th>Cuadrillas</th><th>Responsable</th></tr></thead><tbody>{spans.map(s => <tr key={s.id}><td><button onClick={() => onOpenSpan(s.id)}>{spanName(s)}</button></td><td><span className="report-state"><i style={{ background: colors[records[s.id]?.status || 'pendiente'] }} />{statuses[records[s.id]?.status || 'pendiente']}</span></td><td>{dateLabel(records[s.id]?.date || '')}</td><td>{records[s.id]?.crews ?? '—'}</td><td>{records[s.id]?.responsible || '—'}</td></tr>)}</tbody></table></div>}
+   {page === 'spans' && <><p className="report-chart-hint">Seleccioná un vano para abrir su ficha.</p>{['larga', 'corta'].map(line => <section key={line} className="report-span-section"><h4>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</h4><div className="report-span-grid">{spans.filter(s => s.linea === line).map(s => <button key={s.id} style={{ '--span-color': colors[records[s.id]?.status || 'pendiente'] } as React.CSSProperties} onClick={() => onOpenSpan(s.id)}><b>{spanName(s)}</b><span>{statuses[records[s.id]?.status || 'pendiente']}</span><span>{installedDiverters(s, records[s.id])} / {plannedDiverters(s)} BD</span></button>)}</div></section>)}</>}
+   {page === 'detail' && <div className="table-scroll"><table className="report-table"><thead><tr><th>Vano</th><th>Estado</th><th>Fecha de actividad</th><th>BD planilla</th><th>BD terminados</th><th>BD pendientes</th><th>Cuadrillas</th><th>Responsable</th></tr></thead><tbody>{spans.map(s => <tr key={s.id}><td><button onClick={() => onOpenSpan(s.id)}>{spanName(s)}</button></td><td><span className="report-state"><i style={{ background: colors[records[s.id]?.status || 'pendiente'] }} />{statuses[records[s.id]?.status || 'pendiente']}</span></td><td>{dateLabel(records[s.id]?.date || '')}</td><td>{plannedDiverters(s)}</td><td>{installedDiverters(s, records[s.id])}</td><td>{Math.max(0, plannedDiverters(s) - installedDiverters(s, records[s.id]))}</td><td>{records[s.id]?.crews ?? '—'}</td><td>{records[s.id]?.responsible || '—'}</td></tr>)}</tbody></table></div>}
    {!spans.length && <p className="summary-empty">No hay vanos con estos filtros.</p>}
-   <p className="report-method">Rendimiento = vanos actualmente terminados con fecha ÷ días distintos con producción. La finalización se proyecta desde hoy a ese ritmo. {stats.undatedDone > 0 && `${stats.undatedDone} terminados sin fecha quedan fuera del rendimiento.`}</p>
+   <p className="report-method">Rendimientos = vanos o diverters de vanos actualmente terminados con fecha ÷ días distintos con producción. Los diverters terminados incluyen los conteos informados en proceso y las cantidades de planilla de vanos terminados sin conteo informado. La finalización se proyecta desde hoy a ese ritmo. {stats.undatedDone > 0 && `${stats.undatedDone} terminados sin fecha quedan fuera del rendimiento.`}</p>
   </div>
  </div>;
 }

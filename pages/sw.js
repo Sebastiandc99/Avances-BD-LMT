@@ -1,7 +1,7 @@
 const BASE=new URL('./',self.location.href).pathname;
 const PREFIX='lmt-pages:'+BASE+':';
-const CACHE=PREFIX+'v4';
-const CORE=[BASE,BASE+'assets/inventory.json',BASE+'assets/fondo-esquematico.svg',BASE+'manifest.webmanifest',BASE+'assets/obra-lmt.jpg'];
+const CACHE=PREFIX+'v5-planillas-20261115';
+const CORE=[BASE,BASE+'assets/inventory.json?revision=planillas-2026-11-15',BASE+'assets/fondo-esquematico.svg',BASE+'manifest.webmanifest',BASE+'assets/obra-lmt.jpg'];
 const belongs=u=>u.origin===self.location.origin&&u.pathname.startsWith(BASE);
 const asset=u=>belongs(u)&&(/\.(?:js|css|woff2|svg|png)$/.test(u.pathname)||u.pathname.startsWith(BASE+'assets/'));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));

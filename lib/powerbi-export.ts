@@ -9,7 +9,7 @@ type Column = { name:string; dataType:'string'|'int64'|'double'|'dateTime' };
 const schema = 'https://developer.microsoft.com/json-schemas/fabric/';
 const reportFolder = 'Avances.Report';
 const modelFolder = 'Avances.SemanticModel';
-export const powerBiDesignRevision = 'Verde_Feb2025_R2';
+export const powerBiDesignRevision = 'Verde_Feb2025_R3';
 export const powerBiTarget = '2.140.1454.0 (febrero de 2025)';
 
 export function powerBiData(inventory:Inventory, events:Event[], today=localDate()) {
@@ -31,7 +31,7 @@ export function powerBiData(inventory:Inventory, events:Event[], today=localDate
    FechaFinalizacion:finished ? record.date || null : null,
    LongitudM:span.longitud_planta_m, BDPrevistos:plannedDiverters(span),
    BDColocados:installedDiverters(span,record), BDReales:record?.installed || 0,
-   OrigenConteo:diverterBasis(record) === 'reported' ? 'Informado' : diverterBasis(record) === 'calculated' ? 'Calculado por vano terminado' : 'Sin cantidad',
+   OrigenConteo:diverterBasis(record) === 'reported' ? 'Informado' : diverterBasis(record) === 'calculated' ? 'Planilla por vano terminado' : 'Sin cantidad',
    Terminado:finished ? 1 : 0, EnProceso:['ejecucion','observaciones'].includes(status) ? 1 : 0,
    Pendiente:status === 'pendiente' ? 1 : 0, TerminadoConFecha:finished && record.date ? 1 : 0,
    Responsable:record?.responsible || '', Observaciones:record?.notes || '', Cuadrillas:record?.crews??null
@@ -215,7 +215,8 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   measure('BD colocados','COALESCE(SUM(Vanos[BDColocados]), 0)'),
   measure('Avance total','DIVIDE([Vanos terminados], CALCULATE(COUNTROWS(Vanos), ALL(Vanos)), 0)','0.0%'),
   measure('Avance de la seleccion','DIVIDE([Vanos terminados], CALCULATE([Vanos totales], REMOVEFILTERS(Vanos[Estado])), 0)','0.0%'),
-  measure('BD pendientes','MAX(0, COALESCE(SUM(Vanos[BDPrevistos]), 0) - [BD colocados])'),
+  measure('BD pendientes','SUMX(Vanos, MAX(0, Vanos[BDPrevistos] - Vanos[BDColocados]))'),
+  measure('BD terminados','[BD colocados]'),
   measure('Terminados sin fecha','COALESCE(CALCULATE(SUM(Vanos[Terminado]), KEEPFILTERS(Vanos[TerminadoConFecha] = 0)), 0)'),
   measure('Vanos fechados','CALCULATE(SUM(Vanos[Terminado]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
   measure('Dias registrados','CALCULATE(DISTINCTCOUNT(Vanos[FechaFinalizacion]), KEEPFILTERS(Vanos[TerminadoConFecha] = 1))'),
@@ -289,17 +290,17 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  if(includePhoto)report.resourcePackages[0].resourcePackage.items.push({name:'obra-lmt.jpg',path:'obra-lmt.jpg',type:100});
  for(const page of pages) {
   report.sections.push({
-   name:page.name,displayName:page.label,displayOption:1,width:1440,height:1000,
+   name:page.name,displayName:page.label,displayOption:1,width:1440,height:page.name==='Resumen'?1150:1000,
    config:JSON.stringify({objects:{background:properties({color:solid(palette.paper),transparency:literal(0)})}}),
    filters:'[]',visualContainers:[]
   });
-  addVisual(page.name,panel('decorSidebar',16,16,156,968));
+  addVisual(page.name,panel('decorSidebar',16,16,156,page.name==='Resumen'?1118:968));
   addVisual(page.name,panel('decorHeader',196,16,1220,204));
   addVisual(page.name,textbox('marca','AVANCES',32,40,126,24,12,palette.muted));
   addVisual(page.name,textbox('marcaLmt','LMT',32,70,126,44,30,palette.green));
   addVisual(page.name,textbox('menuLabel','INFORME DE OBRA',32,146,126,40,10,palette.muted));
   pages.forEach((target,i)=>addVisual(page.name,button('abrir'+target.name,target.label,28,202+i*58,'PageNavigation',target.name,target.name===page.name,132)));
-  addVisual(page.name,button('limpiar','Limpiar filtros',28,902,'ClearAllSlicers','',false,132));
+  addVisual(page.name,button('limpiar','Limpiar filtros',28,page.name==='Resumen'?1052:902,'ClearAllSlicers','',false,132));
   addVisual(page.name,textbox('titulo','Control de vanos',220,46,560,54,32,palette.ink));
   addVisual(page.name,textbox('subtitulo','LMT larga y corta · Salar del Rincón',220,108,560,30,16,palette.muted));
   addVisual(page.name,textbox('corte','DATOS AL '+readableDate,220,156,550,24,11,palette.green));
@@ -314,7 +315,7 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   addVisual(page.name,slicer('estado','Estado',col('Estado'),402,190));
   addVisual(page.name,slicer('responsable','Responsable',col('Responsable'),608,260));
   addVisual(page.name,slicer(page.name==='Produccion'?'fechaProduccion':'fechaActividad',page.name==='Produccion'?'Fecha de finalización':'Fecha de actividad',col(page.name==='Produccion'?'FechaFinalizacion':'Fecha'),884,532,true));
-  addVisual(page.name,textbox('ayuda','Primera apertura: Inicio → Actualizar. Navegación: Ctrl + clic. Copia al '+readableDate+' · '+powerBiDesignRevision,196,964,1220,24,11));
+  addVisual(page.name,textbox('ayuda','Primera apertura: Inicio → Actualizar. Navegación: Ctrl + clic. Copia al '+readableDate+' · '+powerBiDesignRevision,196,page.name==='Resumen'?1114:964,1220,24,11));
  }
  const donut=visual('estados','donutChart','Estado de los vanos',196,364,300,300,{Category:[col('Estado')],Y:[val('Vanos totales')]});
  donut.visual.objects={dataPoint:statePoints,legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(10)}),labels:properties({show:literal(false)})};
@@ -327,10 +328,11 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  addVisual('Resumen',center);
  [['Vanos totales',palette.ink],['Vanos terminados',palette.green],['Vanos pendientes',palette.gray]].forEach(([name,color],i)=>addVisual('Resumen',card('resumen'+i,val(name),516+i*306,364,288,color)));
  [['Vanos en proceso',palette.amber],['Promedio vanos dia',palette.green],['Finalizacion estimada',palette.green]].forEach(([name,color],i)=>addVisual('Resumen',card('contexto'+i,val(name),516+i*306,516,288,color)));
- const byLine=visual('porLinea','columnChart','Vanos por línea',196,690,592,252,{Category:[col('Linea')],Y:[val('Vanos terminados'),val('Vanos en proceso'),val('Vanos pendientes')]});
+ [['BD terminados',palette.green],['BD pendientes',palette.gray],['Promedio BD dia',palette.green]].forEach(([name,color],i)=>addVisual('Resumen',card('diverters'+i,val(name),196+i*414,690,394,color)));
+ const byLine=visual('porLinea','columnChart','Vanos por línea',196,842,592,252,{Category:[col('Linea')],Y:[val('Vanos terminados'),val('Vanos en proceso'),val('Vanos pendientes')]});
  byLine.visual.objects={dataPoint:seriesPoints([['Vanos terminados',palette.green],['Vanos en proceso',palette.amber],['Vanos pendientes',palette.gray]]),legend:properties({show:literal(true),position:literal('Bottom'),fontSize:literal(10)}),labels:properties({show:literal(true),fontSize:literal(10)})};
  addVisual('Resumen',byLine);
- addVisual('Resumen',nativeLine('evolucion','Vanos terminados por día',808,690,608,252,'Vanos fechados'));
+ addVisual('Resumen',nativeLine('evolucion','Vanos terminados por día',808,842,608,252,'Vanos fechados'));
  const production=[['Vanos fechados',palette.green],['Promedio vanos dia',palette.green],['Dias registrados',palette.ink],['Terminados sin fecha',palette.amber]];
  production.forEach(([name,color],i)=>addVisual('Produccion',card('produccion'+i,val(name),196+i*309,364,293,color)));
  addVisual('Produccion',nativeLine('diario','Evolución diaria · vanos finalizados',196,510,802,330,'Vanos fechados'));

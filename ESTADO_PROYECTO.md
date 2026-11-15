@@ -1,5 +1,14 @@
 # Estado del proyecto Avances LMT
 
+## 15/11/2026 — Cantidades reales de las planillas
+
+- Tabla de cantidades por los 235 vanos, con 1.728 unidades en la larga y 135 en la corta. Extracción contrastada entre tablas y texto de los dos PDF.
+- La fila del piquete terminal FP 18 tiene 8 unidades con vano adelante vacío. Se consideran los 17 vanos existentes de esa línea y se documenta la fila terminal en los metadatos.
+- El Resumen muestra diverters terminados, pendientes y rendimiento diario. Las cantidades reales informadas en campo tienen prioridad. Los pendientes se suman por vano con mínimo cero.
+- Excel, CSV y Power BI usan las cantidades vigentes. Power BI Verde Feb2025 R3 incorpora los tres indicadores y conserva el informe heredado.
+- Mapa con difícil acceso entre piquetes 40 y 63, correspondiente a 23 vanos.
+- Cantidades compiladas y revisión de caché para equipos que conservan el inventario anterior.
+
 ## 15/11/2026 — Carga, consulta diaria y resumen interactivo
 
 - Carga simple y múltiple con cantidad de cuadrillas, responsable, notas, cantidades reales y fotos. Cada ficha precarga la fecha local vigente.

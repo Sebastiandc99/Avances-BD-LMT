@@ -14,7 +14,7 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
  // Offset both edges in screen pixels so zoom never covers the status stroke.
  const accessEdges=useMemo(()=>{
   if(line!=='all'&&line!=='larga')return [];
-  const route=data.piquetes.filter(p=>p.linea==='larga'&&Number(p.rotulo)>=40&&Number(p.rotulo)<=60)
+  const route=data.piquetes.filter(p=>p.linea==='larga'&&Number(p.rotulo)>=40&&Number(p.rotulo)<=63)
    .sort((a,b)=>Number(a.rotulo)-Number(b.rotulo));
   if(route.length<2)return [];
   const offset=8*view.w/size.w;

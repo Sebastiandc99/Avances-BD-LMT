@@ -1,9 +1,13 @@
+import quantities from '../data/bd-por-vano.json' with {type:'json'};
+
+export const inventoryRevision='planillas-2026-11-15';
+
 export const statuses = { pendiente: 'Pendiente', ejecucion: 'En proceso', terminado: 'Terminado', observaciones: 'En proceso' } as const;
 export const statusOptions = Object.entries(statuses).filter(([key]) => key !== 'observaciones');
 export type Status = keyof typeof statuses;
 export const colors: Record<Status,string> = { pendiente:'#8b9299', ejecucion:'#eab645', terminado:'#36a66e', observaciones:'#eab645' };
 export type Pole = { id:string; linea:string; rotulo:string; pixel:[number,number]; x_este_m:number; y_norte_m:number };
-export type Span = { id:string; linea:string; desde:string; hasta:string; longitud_planta_m:number; bd_propuestos_pendientes_validacion:number };
+export type Span = { id:string; linea:string; desde:string; hasta:string; longitud_planta_m:number; bd_propuestos_pendientes_validacion:number; bd_segun_planilla?:number };
 export type Inventory = { piquetes:Pole[]; vanos:Span[]; resumen:{linea:string;piquetes:number;vanos:number;longitud_planta_m:number;bd_propuestos_pendientes_validacion:number}[]; image:{width:number;height:number;url:string;calibration:unknown} };
 export type Progress = { status:Status; date:string; installed:number; notes:string; photos:string[]; responsible:string; crews?:number };
 export type Event = Progress & { id:string; spanId:string; version:number; baseVersion:number; createdAt:string; author:string; sync:'pending'|'synced'|'conflict'|'discarded' };
@@ -20,8 +24,11 @@ export function validProgress<T>(p:T):p is T & Progress {
   const crewsValid=a.crews===undefined||(Number.isSafeInteger(a.crews)&&a.crews>0);
   return crewsValid && Object.hasOwn(statuses,a.status) && dateValid && Number.isInteger(a.installed) && a.installed>=0 && a.installed<=1000 && (a.status!=='pendiente'||a.installed===0) && typeof a.notes==='string' && a.notes.length<=4000 && typeof a.responsible==='string' && a.responsible.length<=120 && Array.isArray(a.photos) && a.photos.length<=8 && a.photos.every(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id));
 }
-/** Same symmetric 10 m layout validated against the CAD-derived inventory. */
-export function plannedDiverters(span:Span){return Math.floor((.60*span.longitud_planta_m+.0001)/10)+1;}
+/** Official quantities also apply when a device still has the previous inventory cached. */
+export function plannedDiverters(span:Span){
+ const quantity=(quantities as Record<string,number>)[span.id];
+ return typeof quantity==='number'?quantity:span.bd_segun_planilla??Math.floor((.60*span.longitud_planta_m+.0001)/10)+1;
+}
 export function diverterBasis(record?:Progress):'reported'|'calculated'|'none'{
  if(record&&record.installed>0)return 'reported';
  return record?.status==='terminado'?'calculated':'none';
@@ -38,6 +45,7 @@ export function metrics(spans:Span[],events:Event[],today=localDate()) {
  const calculatedInstalled=spans.reduce((n,s)=>n+(diverterBasis(records[s.id])==='calculated'?installedDiverters(s,records[s.id]):0),0);
  const reportedInstalled=spans.reduce((n,s)=>n+(diverterBasis(records[s.id])==='reported'?installedDiverters(s,records[s.id]):0),0);
  const installed=calculatedInstalled+reportedInstalled;
+ const remainingBD=spans.reduce((n,s)=>n+Math.max(0,plannedDiverters(s)-installedDiverters(s,records[s.id])),0);
  const daily:Record<string,number>={},dailyBD:Record<string,number>={};
  // A completion's explicit date is authoritative. No fallback to the registration timestamp.
  for(const span of finished){const record=records[span.id],date=record.date;
@@ -48,6 +56,6 @@ export function metrics(spans:Span[],events:Event[],today=localDate()) {
  const undatedDone=done-datedDone,average=days?datedDone/days:0,averageBD=days?datedInstalled/days:0;
  const estimatedDays=spans.length>0&&remaining===0?0:average>0?Math.ceil(remaining*days/datedDone):null;
  const eta=estimatedDays!==null?localDate(new Date(Date.parse(today+'T12:00:00-03:00')+estimatedDays*86400000)):null;
- return {total:spans.length,done,inProgress,pending,installed,calculatedInstalled,reportedInstalled,planned,pct:spans.length?done/spans.length*100:0,remaining,average,averageBD,eta,estimatedDays,daily,dailyBD,days,datedDone,undatedDone,datedInstalled};
+ return {total:spans.length,done,inProgress,pending,installed,calculatedInstalled,reportedInstalled,planned,remainingBD,pct:spans.length?done/spans.length*100:0,remaining,average,averageBD,eta,estimatedDays,daily,dailyBD,days,datedDone,undatedDone,datedInstalled};
 }
 export function csvCell(x:unknown) { let s=String(x??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"'; }
