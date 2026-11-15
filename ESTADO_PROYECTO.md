@@ -1,5 +1,9 @@
 # Estado del proyecto Avances LMT
 
+## 15/11/2026 — Acceso compartido de prueba
+
+Quien abra el enlace puede consultar y editar la misma obra desde una sesión automática. La configuración está activa en Supabase y funciona con la versión publicada en Cloudflare. El código que todavía aparece en el menú de la app es opcional. `supabase/shared-pilot.sql` registra el cambio aplicado después de `device-pairing.sql`. Se probaron la lectura, la carga y la corrección entre dos identidades nuevas en una transacción revertida.
+
 ## 14/11/2026 — Cielo de obra
 
 Se aplica el primer diseño seleccionado por el usuario, con su fotografía de obra como cabecera y una paleta azul y blanca.
