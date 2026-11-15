@@ -9,7 +9,7 @@ const resources=[...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(m=>m[1]);
 for(const resource of resources){if(resource.startsWith(base))assert.ok(fs.existsSync(path.join(out,resource.slice(base.length))),'Falta '+resource);}
 const data=JSON.parse(fs.readFileSync(path.join(out,'assets/inventory.json'),'utf8'));
 assert.equal(data.piquetes.length,237);assert.equal(data.vanos.length,235);
-assert.equal(data.vanos.reduce((sum,s)=>sum+s.bd_segun_planilla,0),1863);
+assert.equal(data.vanos.reduce((sum,s)=>sum+s.bd_segun_planilla,0),1871);
 const manifest=JSON.parse(fs.readFileSync(path.join(out,'manifest.webmanifest'),'utf8'));
 assert.equal(manifest.start_url,base);assert.equal(manifest.scope,base);
 assert.ok(fs.existsSync(path.join(out,'sw.js')));

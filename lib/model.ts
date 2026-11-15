@@ -1,6 +1,6 @@
 import quantities from '../data/bd-por-vano.json' with {type:'json'};
 
-export const inventoryRevision='planillas-2026-11-15';
+export const inventoryRevision='planillas-2026-11-15-fp18';
 
 export const statuses = { pendiente: 'Pendiente', ejecucion: 'En proceso', terminado: 'Terminado', observaciones: 'En proceso' } as const;
 export const statusOptions = Object.entries(statuses).filter(([key]) => key !== 'observaciones');

@@ -19,7 +19,7 @@ test('Power BI mantiene las cantidades y las fechas explicitas con la revision v
  ];
  const data = powerBiData(inventory,events,'2026-11-10');
  assert.equal(data.vanos.length,235);
- assert.equal(data.vanos.reduce((n,v) => n+v.BDPrevistos,0),1863);
+ assert.equal(data.vanos.reduce((n,v) => n+v.BDPrevistos,0),1871);
  assert.equal(data.vanos.filter(v => v.Linea==='Corta').length,17);
  assert.equal(data.vanos[0].Fecha,'2026-11-09');
  assert.equal(data.vanos[1].FechaFinalizacion,null);

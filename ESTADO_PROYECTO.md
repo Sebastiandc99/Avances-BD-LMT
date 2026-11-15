@@ -3,13 +3,13 @@
 ## 15/11/2026 — Total de diverters y resumen de Excel
 
 - Quitada la fila Terminados con fecha válida del Excel. Rendimiento y proyección conservan su cálculo con las referencias ajustadas.
-- Diverters totales aparece encima de terminados y pendientes en Excel, Resumen de la app y Power BI Verde Feb2025 R4. La app y Power BI respetan los filtros seleccionados.
+- Diverters totales aparece encima de terminados y pendientes en Excel, Resumen de la app y Power BI Verde Feb2025 R5. La app y Power BI respetan los filtros seleccionados.
 - Compilación compartida para GitHub Pages y Cloudflare. La publicación en la cuenta de Cloudflare continúa pendiente de completar su acceso.
 
 ## 15/11/2026 — Cantidades reales de las planillas
 
-- Tabla de cantidades por los 235 vanos, con 1.728 unidades en la larga y 135 en la corta. Extracción contrastada entre tablas y texto de los dos PDF.
-- La fila del piquete terminal FP 18 tiene 8 unidades con vano adelante vacío. Se consideran los 17 vanos existentes de esa línea y se documenta la fila terminal en los metadatos.
+- Tabla de cantidades por los 235 vanos, con 1.728 unidades en la larga y 143 en la corta, con total de 1.871. Extracción contrastada entre tablas y texto de los dos PDF.
+- El usuario confirmó que las 8 unidades de la fila FP18 corresponden a FP17-FP18. Se suman a las 8 de la fila 17 y ese vano queda con 16. La aclaración está documentada en los metadatos.
 - El Resumen muestra diverters terminados, pendientes y rendimiento diario. Las cantidades reales informadas en campo tienen prioridad. Los pendientes se suman por vano con mínimo cero.
 - Excel, CSV y Power BI usan las cantidades vigentes. Power BI Verde Feb2025 R3 incorpora los tres indicadores y conserva el informe heredado.
 - Mapa con difícil acceso entre piquetes 40 y 63, correspondiente a 23 vanos.

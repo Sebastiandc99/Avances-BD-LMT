@@ -9,7 +9,7 @@ type Column = { name:string; dataType:'string'|'int64'|'double'|'dateTime' };
 const schema = 'https://developer.microsoft.com/json-schemas/fabric/';
 const reportFolder = 'Avances.Report';
 const modelFolder = 'Avances.SemanticModel';
-export const powerBiDesignRevision = 'Verde_Feb2025_R4';
+export const powerBiDesignRevision = 'Verde_Feb2025_R5';
 export const powerBiTarget = '2.140.1454.0 (febrero de 2025)';
 
 export function powerBiData(inventory:Inventory, events:Event[], today=localDate()) {

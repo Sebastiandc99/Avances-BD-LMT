@@ -2,7 +2,7 @@
 
 Esta versión reutiliza el formulario, el modelo, el mapa y IndexedDB de la aplicación existente. Se compila con `npm ci && npm run build:pages && npm run verify:pages`, con salida en `pages-dist/` y base `/Avances-BD-LMT/`.
 
-Mantiene 237 piquetes, 235 vanos y 1.863 desviadores según planilla, la fecha opcional, los tres estados y el esquema local. Los avances y las fotos se guardan en cada navegador. Exportar/importar JSON permite respaldarlos y transferirlos. GitHub Pages no ejecuta las API de D1/R2 ni el inicio de sesión de ChatGPT; esta versión no ofrece sincronización automática entre equipos.
+Mantiene 237 piquetes, 235 vanos y 1.871 desviadores según planilla, la fecha opcional, los tres estados y el esquema local. Los avances y las fotos se guardan en cada navegador. Exportar/importar JSON permite respaldarlos y transferirlos. GitHub Pages no ejecuta las API de D1/R2 ni el inicio de sesión de ChatGPT; esta versión no ofrece sincronización automática entre equipos.
 
 La publicación de Sites continúa en https://avances-bd-lmt.sebastiandc99.chatgpt.site con sus servicios de nube. La migración no modifica ese despliegue ni borra sus registros. Los orígenes web tienen almacenamientos separados: para transferir registros, exportar JSON desde la versión anterior e importarlo en GitHub Pages.
 
@@ -23,7 +23,7 @@ El guardado se confirma primero en IndexedDB, aun sin conexión. Con la app abie
 
 Los eventos y las fotos usan el proyecto Supabase independiente `ynhvceqjhcydsteyzrpt`: acceso por cuenta con RLS, bucket privado y clave de frontend publicable. No hay claves administrativas en el cliente. El repositorio contiene únicamente la configuración pública y el esquema reproducible `supabase/lmt-sync.sql`; no contiene los avances ni las fotos de cada cuenta.
 
-Los PDF/DWG originales no están incluidos ni son recursos de la app. El inventario derivado sigue público y mantiene 237 piquetes, 235 vanos y 1.863 BD según planilla. Exportar JSON sigue disponible como respaldo adicional.
+Los PDF/DWG originales no están incluidos ni son recursos de la app. El inventario derivado sigue público y mantiene 237 piquetes, 235 vanos y 1.871 BD según planilla. Exportar JSON sigue disponible como respaldo adicional.
 
 ## Cargar avances anteriores por tramos
 
@@ -36,7 +36,7 @@ Al confirmar una ficha individual, el guardado local cierra la ficha y vuelve al
 
 ## Cómputo y rendimiento corregidos (10/11/2026)
 
-El inventario vigente usa **1.863 BD** según las cantidades por vano informadas el 15/11/2026, con 1.728 en la larga y 135 en la corta. La aplicación considera los 235 vanos existentes. La fila terminal FP 18 queda documentada como observación de la planilla.
+El inventario vigente usa **1.871 BD** según las cantidades por vano informadas el 15/11/2026, con 1.728 en la larga y 143 en la corta. La aplicación considera los 235 vanos existentes. Las 8 unidades de la fila FP18 se suman a FP17-FP18, que totaliza 16, por aclaración del usuario.
 
 Al marcar un vano terminado, su cantidad de planilla se contabiliza automáticamente cuando no hay una cantidad real mayor a cero. Si se informa una cantidad real, tiene prioridad; en un vano en proceso solo se suma la cantidad real informada. Listado, historial, resumen y CSV distinguen cantidades calculadas de las informadas. Los indicadores nuevos también se aplican a los registros existentes, sin reescribirlos ni necesitar volver a cargarlos.
 

@@ -25,7 +25,7 @@ test('bulk completion keeps measured quantities, photos and notes; completed/con
 test('a dated historical load counts completed spans and derives BD without inventing measured entries',()=>{
  const plan=completionPlan(vanos,[{line:'corta',from:1,to:18}],{},[]);
  const events=completedEvents(plan.eligible,{},options,makeId,'2026-11-10T10:00:00Z');
- const summary=metrics(vanos,events,'2026-11-10');assert.equal(summary.done,17);assert.equal(summary.daily['2026-11-08'],17);assert.equal(summary.installed,135);assert.ok(events.every(e=>e.installed===0));assert.equal(summary.planned,1863);
+ const summary=metrics(vanos,events,'2026-11-10');assert.equal(summary.done,17);assert.equal(summary.daily['2026-11-08'],17);assert.equal(summary.installed,143);assert.ok(events.every(e=>e.installed===0));assert.equal(summary.planned,1871);
 });
 
 test('dates mode revises already completed spans without counting them twice or changing field data',()=>{

@@ -13,6 +13,7 @@ test('Excel incluye 235 vanos, fechas numéricas y resumen global coherente con 
  const sheets=productionSheets(inventory,events,'2026-11-10'),m=metrics(inventory.vanos,events,'2026-11-10');
  assert.deepEqual(sheets.map(s=>s.name),['Resumen','Rendimiento','Vanos','Vista aérea']);
  assert.equal(sheets[2].rows.length,240);assert.equal(sheets[2].rows[5][5],excelDate('2026-11-08'));assert.equal(sheets[2].rows[6][5],null);
+ assert.equal(sheets[2].rows.find(r=>r[0]==='FP-017-018')[6],16);
  const summary=Object.fromEntries(sheets[0].rows.slice(5).map(r=>[r[0],value(r[1])]));
  assert.equal(summary['Vanos totales'],235);assert.equal(summary['Vanos terminados'],3);assert.equal(summary['Vanos en proceso'],undefined);assert.equal(summary['Vanos pendientes'],undefined);
  assert.equal(summary['Avance total'],3/235);assert.equal(sheets[2].rows.slice(5).reduce((n,r)=>n+value(r[7]),0),m.installed);

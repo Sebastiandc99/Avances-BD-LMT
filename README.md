@@ -25,7 +25,7 @@ Aplicación independiente para controlar el montaje de desviadores de vuelo de l
 
 `docs/calibration.json` contiene hashes, matriz afín y validaciones. RMS del ajuste entre representaciones del mismo plano: **0,656 m**, máximo **1,256 m**. No equivale a exactitud geográfica comprobada contra terreno. Datum declarado: POSGAR / Gauss-Krüger faja 3; validar marco y puntos de control con topografía.
 
-Las cantidades vigentes provienen de las planillas del 15/11/2026, columna CANTIDAD por vano adelante. Se registran **1.728 BD en la línea larga + 135 en la corta = 1.863 BD** para los 235 vanos. La fila terminal FP 18 tiene 8 unidades con vano adelante vacío y queda identificada como observación en los metadatos. Las cantidades se mantienen en `data/bd-por-vano.json` y se aplican también si un dispositivo conserva el inventario anterior en caché.
+Las cantidades vigentes provienen de las planillas del 15/11/2026, columna CANTIDAD por vano adelante. Se registran **1.728 BD en la línea larga + 143 en la corta = 1.871 BD** para los 235 vanos. Las 8 unidades de la fila terminal FP18 se suman al vano FP17-FP18, que totaliza 16, según la aclaración del usuario del 15/11/2026. Las cantidades se mantienen en `data/bd-por-vano.json` y se aplican también si un dispositivo conserva el inventario anterior en caché.
 
 El avance incluye todos los vanos terminados, tengan o no fecha. Se muestran terminados, en proceso, pendientes de iniciar y el total que falta terminar (pendientes + en proceso). Los BD colocados suman la cantidad de planilla de cada terminado sin cantidad real; si hay una cantidad real mayor a cero, se usa esa cantidad, también para avances parciales en proceso.
 
