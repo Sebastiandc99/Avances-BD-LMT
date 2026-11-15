@@ -20,4 +20,8 @@ La publicación no convierte la exportación de Power BI en una conexión en viv
 
 ## Estado
 
-Compilación y verificación de Cloudflare completadas. La publicación está pendiente de autorizar la cuenta de Cloudflare.
+Publicado por carga directa en https://avances-lmt-seba.pages.dev/.
+
+Comprobación HTTP aprobada: HTML y programa de la app, manifiesto con alcance raíz, inventario de 235 vanos y 237 piquetes, foto JPEG y service worker. La versión publicada incluye el Excel simplificado y Power BI Verde R2. Esta comprobación no equivale a una prueba visual ni a un guardado en la cuenta de un dispositivo.
+
+La publicación actual de Cloudflare se actualiza mediante carga directa de una nueva compilación. No hay despliegue automático desde GitHub hacia Cloudflare configurado. La autorización de Wrangler no quedó conectada en esta sesión.
