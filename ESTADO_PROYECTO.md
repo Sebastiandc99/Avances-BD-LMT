@@ -1,5 +1,13 @@
 # Estado del proyecto Avances LMT
 
+## 15/11/2026 — Resumen anterior con gráfico diario
+
+- Restaurada la presentación de Resumen anterior al informe con aspecto de Power BI: torta de avance, promedio diario, días restantes y fecha estimada, en una vista única con el estilo azul de la aplicación.
+- Conservado el gráfico de líneas de vanos terminados por día. Al tocar una fecha muestra los vanos de ese día y permite abrir sus fichas. Los indicadores corresponden siempre al proyecto completo.
+- Se mantienen las cantidades corregidas de 1.871 desviadores y el detalle de totales, terminados, pendientes y rendimiento. El rendimiento continúa excluyendo terminados sin fecha.
+- Validación local: TypeScript y 22 pruebas de modelo, producción diaria y torta aprobadas. Revisión visual en escritorio y a 390 px, sin desbordamiento horizontal; comprobados el detalle de una fecha, apertura de un vano y estado sin carga, con datos sintéticos aislados.
+- Caché actualizada a v9-resumen-clasico-20261115 para recibir la revisión sin conexión. La compilación compartida actualiza GitHub Pages y el paquete de Cloudflare.
+
 ## 15/11/2026 — Acceso difícil en la vista aérea del Excel
 
 - La imagen exportada identifica los piquetes 40 a 63 de la línea larga con dos bordes rojos discontinuos, círculos y números rojos, siguiendo el tramo marcado en el mapa de la aplicación. Los colores del estado de cada vano siguen visibles.

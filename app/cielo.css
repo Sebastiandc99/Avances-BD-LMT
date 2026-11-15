@@ -174,3 +174,10 @@ input:focus,select:focus,textarea:focus{border-color:#2784d0;box-shadow:0 0 0 3p
 @media(prefers-reduced-motion:reduce){.cielo-progress-track>i{transition:none}}
 
 @media(max-width:600px){.cielo-shell .table-scroll{max-height:none}.cielo-shell .span-table{min-width:0}}
+.cielo-shell .summary-daily-card{margin:24px 0;padding:20px;border:1px solid #dae7f5;border-radius:12px;background:#fff;min-width:0}
+.cielo-shell .summary-daily-card h3{margin:0 0 14px}
+.cielo-shell .summary-day-detail{margin-top:16px;padding-top:16px;border-top:1px solid #dae7f5}
+.cielo-shell .summary-day-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cielo-shell .summary-day-heading h4{font-size:13px;color:#204a6d}
+.cielo-shell .summary-day-spans{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+@media(max-width:600px){.cielo-shell .summary-daily-card{padding:14px}}

@@ -146,7 +146,7 @@ export default function Dashboard({user,basePath='/',localOnly=false,cloud,accou
  const photoSource=(id:string)=>pendingPhotos.find(p=>p.id===id)?.data||photos[id]?.data||(cloud?'':'/api/photos/'+id);
  const activity=[...events].filter(e=>e.sync!=='discarded').sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
  if(!ready)return <main className="loading"><RadioTower size={38}/><h1>Avances LMT</h1><p>{error||'Preparando la traza de obra…'}</p>{error&&<button onClick={()=>location.reload()}>Reintentar</button>}</main>;
- return <div className={'app-shell cielo-shell'+(tab==='metrics'?' is-summary':'')}>
+ return <div className="app-shell cielo-shell">
  <div className="main-shell"><header className="topbar">
   <button className="cielo-brand" onClick={()=>setTab('list')} aria-label="Avances LMT, ir a vanos"><span className="cielo-brand-mark"><UtilityPole size={31}/></span><h1>Avances <b>LMT</b></h1></button>
   <nav className="cielo-nav" aria-label="Secciones de la aplicación">{[{key:'map',icon:MapIcon,label:'Mapa'},{key:'list',icon:List,label:'Vanos'},{key:'metrics',icon:TrendingUp,label:'Resumen'}].map(n=><button key={n.key} className={tab===n.key?'selected':''} aria-current={tab===n.key?'page':undefined} onClick={()=>setTab(n.key)}><n.icon size={21}/><span>{n.label}</span></button>)}</nav>

@@ -1,29 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Activity, BarChart3, List, RotateCcw, UtilityPole } from 'lucide-react';
-import { dailyActivity } from '../lib/daily-completion';
-import { colors, dateLabel, latestRecords, metrics, plannedDiverters, installedDiverters, statuses, type Event, type Inventory, type Span } from '../lib/model';
-import { progressGradient, progressSlices } from '../lib/progress-pie';
+import { ChevronDown, TrendingUp, X } from 'lucide-react';
+import { dailyCompletion } from '../lib/daily-completion';
+import { dateLabel, latestRecords, metrics, type Event, type Inventory, type Span } from '../lib/model';
+import ProgressPie from './progress-pie';
 
 const fmt = (n: number, digits = 0) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: digits }).format(n);
-const spanName = (s: Span) => `${s.linea === 'corta' ? 'FP ' : ''}${Number(s.desde.split('-')[1])}–${Number(s.hasta.split('-')[1])}`;
-const state = (event?: Event) => event?.status === 'observaciones' ? 'ejecucion' : event?.status || 'pendiente';
-const pages = [
- { id: 'overview', label: 'Resumen', icon: BarChart3 },
- { id: 'production', label: 'Producción', icon: Activity },
- { id: 'spans', label: 'Por vano', icon: UtilityPole },
- { id: 'detail', label: 'Detalle', icon: List },
-];
-type Filters = { line: string; status: string; responsible: string; from: string; to: string };
-const emptyFilters: Filters = { line: 'all', status: 'all', responsible: 'all', from: '', to: '' };
-const sessionKey = 'lmt-summary-session-v1';
-function savedSummary() {
- try {
-  const value = JSON.parse(sessionStorage.getItem(sessionKey) || '{}');
-  const filters = Object.fromEntries(Object.keys(emptyFilters).map(k => [k, typeof value.filters?.[k] === 'string' ? value.filters[k] : emptyFilters[k as keyof Filters]])) as Filters;
-  return { filters, page: pages.some(p => p.id === value.page) ? value.page : 'overview' };
- } catch { return { filters: { ...emptyFilters }, page: 'overview' }; }
-}
+const spanName = (s: Span) => `${s.linea === 'corta' ? 'FP ' : ''}${Number(s.desde.split('-')[1])}-${Number(s.hasta.split('-')[1])}`;
 function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoose: (day: string) => void }) {
  const days = Object.keys(daily).sort();
  const host = useRef<SVGSVGElement>(null);
@@ -58,83 +41,41 @@ function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoo
 export default function ProductionSummary({ inventory, events, today, onOpenSpan }: {
  inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void;
 }) {
- const [initial] = useState(savedSummary);
- const [filters, setFilters] = useState<Filters>(initial.filters);
- const [page, setPage] = useState(initial.page);
- useEffect(() => { try { sessionStorage.setItem(sessionKey, JSON.stringify({ filters, page })); } catch { /* The view remains available in this tab. */ } }, [filters, page]);
+ const [selectedDay, setSelectedDay] = useState('');
  const records = latestRecords(events);
- const responsible = [...new Set(Object.values(records).map(e => e.responsible).filter(Boolean))].sort();
- const spans = inventory.vanos.filter(s => {
-  const record = records[s.id];
-  return (filters.line === 'all' || s.linea === filters.line)
-   && (filters.status === 'all' || (filters.status === 'active' ? state(record) !== 'pendiente' : state(record) === filters.status))
-   && (filters.responsible === 'all' || record?.responsible === filters.responsible)
-   && (!filters.from || !!record?.date && record.date >= filters.from)
-   && (!filters.to || !!record?.date && record.date <= filters.to);
- });
- const stats = metrics(spans, events, today);
- const currentDay = dailyActivity(inventory.vanos, records, today, today);
- const days = Object.entries(stats.daily).sort(([a], [b]) => a.localeCompare(b));
- function change(value: Partial<Filters>) { setFilters(current => ({ ...current, ...value })); }
- function chooseDay(day: string) { change({ from: day, to: day }); }
- const cards = [
-  { label: 'Vanos totales', value: fmt(stats.total), tone: 'total' },
-  { label: 'Terminados', value: fmt(stats.done), tone: 'done' },
-  { label: 'Pendientes', value: fmt(stats.pending), tone: 'pending' },
-  { label: 'En proceso', value: fmt(stats.inProgress), tone: 'process' },
-  { label: 'Promedio de vanos / día', value: stats.days ? fmt(stats.average, 1) : '—', tone: 'rate' },
-  { label: 'Finalización estimada', value: stats.total > 0 && stats.remaining === 0 ? 'Finalizado' : stats.eta ? dateLabel(stats.eta) : 'Sin estimación', tone: 'eta' },
- ];
- return <div className="production-report">
-  <aside className="report-nav" aria-label="Páginas del informe">
-   <div className="report-brand">AVANCES <b>LMT</b></div>
-   <nav>{pages.map(item => <button key={item.id} onClick={() => setPage(item.id)} aria-current={page === item.id ? 'page' : undefined} className={page === item.id ? 'active' : ''}><item.icon size={18} />{item.label}</button>)}</nav>
-   <button className="report-reset" onClick={() => setFilters({ ...emptyFilters })}><RotateCcw size={17} />Limpiar filtros</button>
-  </aside>
-  <div className="report-content">
-   <div className="report-heading"><h3>{pages.find(p => p.id === page)?.label}</h3><span>{stats.total} vanos en la selección</span></div>
-   <div className="report-filters">
-    <label>Línea<select value={filters.line} onChange={e => change({ line: e.target.value })}><option value="all">Todas</option><option value="larga">Larga</option><option value="corta">Corta FP</option></select></label>
-    <label>Estado<select value={filters.status} onChange={e => change({ status: e.target.value })}><option value="all">Todos</option><option value="active">Terminados y en proceso</option><option value="terminado">Terminado</option><option value="ejecucion">En proceso</option><option value="pendiente">Pendiente</option></select></label>
-    <label>Responsable<select value={filters.responsible} onChange={e => change({ responsible: e.target.value })}><option value="all">Todos</option>{responsible.map(name => <option key={name}>{name}</option>)}</select></label>
-    <label>Desde<input type="date" min="2020-01-01" max={filters.to || today} value={filters.from} onChange={e => change({ from: e.target.value })} /></label>
-    <label>Hasta<input type="date" min={filters.from || '2020-01-01'} max={today} value={filters.to} onChange={e => change({ to: e.target.value })} /></label>
+ const stats = metrics(inventory.vanos, events, today);
+ const day = selectedDay ? dailyCompletion(inventory.vanos, records, selectedDay, today) : null;
+ return <>
+  <div className="panel-title"><h3><TrendingUp size={17} /> Resumen de producción</h3><span>Ambas líneas · Proyecto completo</span></div>
+  <div className="analytics">
+   <p className="project-total">Ambas líneas · {inventory.piquetes.length} piquetes · {stats.total} vanos</p>
+   <ProgressPie stats={stats} />
+   <div className="performance-summary">
+    <p><b>{stats.days ? fmt(stats.average, 1) : '—'} vanos/día</b></p>
+    <p>{stats.datedDone} terminados con fecha · {stats.days} día(s) de ejecución registrados · {stats.undatedDone} terminados sin fecha excluidos</p>
+    <div className="forecast-grid">
+     <div><span>Días para finalizar</span><strong>{stats.estimatedDays !== null ? stats.estimatedDays : '—'}<small> días</small></strong></div>
+     <div><span>Fecha estimada de finalización</span><strong>{stats.remaining === 0 ? 'Finalizado' : stats.eta ? dateLabel(stats.eta) : 'Sin estimación'}</strong></div>
+    </div>
+    <p>{stats.estimatedDays === null ? 'Agregá fechas de ejecución a los vanos terminados para obtener la proyección.' : stats.remaining === 0 ? 'Todos los vanos del proyecto están terminados.' : 'Proyección desde hoy al rendimiento promedio fechado, suponiendo una jornada de trabajo por día.'}</p>
    </div>
-   <button className="report-today" onClick={() => { setFilters({ ...emptyFilters, from: today, to: today, status: 'active' }); setPage('detail'); }} aria-label={`Ver los ${currentDay.total} vanos con actividad hoy`}>
-    <span><Activity size={22} /><b>Vanos de hoy</b><small>{dateLabel(today)} · Ambas líneas</small></span><strong>{currentDay.total}</strong><span>{currentDay.done} terminados <i /> {currentDay.inProgress} en proceso</span>
-   </button>
-   <section className="report-bd-stats" aria-label="Bird diverters">
-    <div className="report-bd-heading"><h4>Bird diverters</h4><span>Cantidades según planilla en la selección</span></div>
-    <article className="report-bd-total"><h4>Diverters totales</h4><strong>{fmt(stats.planned)}</strong></article>
-    <article><h4>Diverters terminados</h4><strong>{fmt(stats.installed)}</strong></article>
-    <article className="report-bd-pending"><h4>Diverters pendientes</h4><strong>{fmt(stats.remainingBD)}</strong></article>
-    <article><h4>Rendimiento promedio</h4><strong>{stats.days ? fmt(stats.averageBD, 1) : '—'}<small> BD/día</small></strong></article>
+   <section className="summary-daily-card" aria-labelledby="summary-daily-title">
+    <h3 id="summary-daily-title">Vanos terminados por día</h3>
+    <DailyChart daily={stats.daily} onChoose={setSelectedDay} />
+    {day && <div className="summary-day-detail">
+     <div className="summary-day-heading"><h4>{dateLabel(selectedDay)} · {day.total} vanos terminados</h4><button className="icon-button" aria-label="Cerrar detalle del día" onClick={() => setSelectedDay('')}><X size={17} /></button></div>
+     <div className="summary-day-spans">{day.spans.map(s => <button key={s.id} className="outline" onClick={() => onOpenSpan(s.id)}>Vano {spanName(s)}</button>)}</div>
+    </div>}
    </section>
-   {page === 'overview' && <>
-    <div className="report-overview">
-     <section className="report-donut-card"><h4>Avance de la selección</h4><div className="report-donut" style={{ background: progressGradient(stats) }} role="img" aria-label={`${fmt(stats.pct, 1)} % de ${stats.total} vanos terminados`}><div><strong>{fmt(stats.pct, 1)}<small>%</small></strong><span>{stats.done} de {stats.total}</span></div></div>
-      <div className="report-state-legend">{progressSlices(stats).map(item => <button key={item.key} onClick={() => change({ status: filters.status === item.key ? 'all' : item.key })} aria-pressed={filters.status === item.key}><i style={{ background: item.color }} />{item.label} <b>{item.value}</b></button>)}</div>
-     </section>
-     <div className="report-kpis">{cards.map(item => <article className={'report-kpi ' + item.tone} key={item.label}><h4>{item.label}</h4><strong>{item.value}</strong></article>)}</div>
-    </div>
-    <div className="report-charts">
-     <section className="report-chart-card"><h4>Vanos por línea</h4><div className="report-line-columns">{['larga', 'corta'].map(line => {
-      const group = spans.filter(s => s.linea === line), total = metrics(group, events, today);
-      const maximum = Math.max(1, ...['larga', 'corta'].map(l => spans.filter(s => s.linea === l).length));
-      return <div key={line} className="report-line-column"><div className="report-column-space"><span className="report-column-total">{total.total}</span><div className="report-column" style={{ height: total.total / maximum * 100 + '%' }}>{progressSlices(total).filter(part => part.value).map(part => <button key={part.key} aria-label={`${line === 'larga' ? 'Línea larga' : 'Línea corta FP'}, ${part.value} ${part.label}`} title={`${part.label}: ${part.value}`} style={{ background: part.color, flex: part.value }} onClick={() => change({ line, status: part.key })}>{part.value / maximum * 170 >= 18 ? part.value : ''}</button>)}</div></div><button className="report-column-label" onClick={() => change({ line })}>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</button></div>;
-     })}</div><p className="report-chart-hint">Seleccioná una columna o un estado para filtrar.</p></section>
-     <section className="report-chart-card"><h4>Vanos terminados por día</h4><DailyChart daily={stats.daily} onChoose={chooseDay} /></section>
-    </div>
-   </>}
-   {page === 'production' && <>
-    <div className="report-production-stats"><article><span>Terminados con fecha</span><strong>{stats.datedDone}</strong></article><article><span>Promedio de vanos / día</span><strong>{stats.days ? fmt(stats.average, 1) : '—'}</strong></article><article><span>Días con producción</span><strong>{stats.days}</strong></article><article><span>Días estimados restantes</span><strong>{stats.estimatedDays ?? '—'}</strong></article></div>
-    <section className="report-chart-card"><h4>Evolución diaria</h4><DailyChart daily={stats.daily} onChoose={chooseDay} /></section>
-    <div className="table-scroll"><table className="report-table"><thead><tr><th>Fecha</th><th>Vanos terminados</th><th>Acumulados</th></tr></thead><tbody>{days.map(([day, count], i) => <tr key={day}><td><button onClick={() => { chooseDay(day); setPage('detail'); }}>{dateLabel(day)}</button></td><td>{count}</td><td>{days.slice(0, i + 1).reduce((n, [, value]) => n + value, 0)}</td></tr>)}</tbody></table></div>
-   </>}
-   {page === 'spans' && <><p className="report-chart-hint">Seleccioná un vano para abrir su ficha.</p>{['larga', 'corta'].map(line => <section key={line} className="report-span-section"><h4>{line === 'larga' ? 'Línea larga' : 'Línea corta FP'}</h4><div className="report-span-grid">{spans.filter(s => s.linea === line).map(s => <button key={s.id} style={{ '--span-color': colors[records[s.id]?.status || 'pendiente'] } as React.CSSProperties} onClick={() => onOpenSpan(s.id)}><b>{spanName(s)}</b><span>{statuses[records[s.id]?.status || 'pendiente']}</span><span>{installedDiverters(s, records[s.id])} / {plannedDiverters(s)} BD</span></button>)}</div></section>)}</>}
-   {page === 'detail' && <div className="table-scroll"><table className="report-table"><thead><tr><th>Vano</th><th>Estado</th><th>Fecha de actividad</th><th>BD planilla</th><th>BD terminados</th><th>BD pendientes</th><th>Cuadrillas</th><th>Responsable</th></tr></thead><tbody>{spans.map(s => <tr key={s.id}><td><button onClick={() => onOpenSpan(s.id)}>{spanName(s)}</button></td><td><span className="report-state"><i style={{ background: colors[records[s.id]?.status || 'pendiente'] }} />{statuses[records[s.id]?.status || 'pendiente']}</span></td><td>{dateLabel(records[s.id]?.date || '')}</td><td>{plannedDiverters(s)}</td><td>{installedDiverters(s, records[s.id])}</td><td>{Math.max(0, plannedDiverters(s) - installedDiverters(s, records[s.id]))}</td><td>{records[s.id]?.crews ?? '—'}</td><td>{records[s.id]?.responsible || '—'}</td></tr>)}</tbody></table></div>}
-   {!spans.length && <p className="summary-empty">No hay vanos con estos filtros.</p>}
-   <p className="report-method">Rendimientos = vanos o diverters de vanos actualmente terminados con fecha ÷ días distintos con producción. Los diverters terminados incluyen los conteos informados en proceso y las cantidades de planilla de vanos terminados sin conteo informado. La finalización se proyecta desde hoy a ese ritmo. {stats.undatedDone > 0 && `${stats.undatedDone} terminados sin fecha quedan fuera del rendimiento.`}</p>
+   <details className="technical-details">
+    <summary>Detalle de desviadores <ChevronDown size={16} /></summary>
+    <p><b>Diverters totales: {fmt(stats.planned)}</b></p>
+    <p>Diverters terminados: {fmt(stats.installed)}</p>
+    <p>Diverters pendientes: {fmt(stats.remainingBD)}</p>
+    <p>{fmt(stats.calculatedInstalled)} según planilla de vanos terminados · {fmt(stats.reportedInstalled)} informados en campo.</p>
+    <p>{stats.days ? fmt(stats.averageBD, 1) : '—'} BD/día con fecha de ejecución.</p>
+   </details>
+   <p className="method-note">El rendimiento usa solo vanos actualmente terminados con fecha de ejecución: cantidad fechada dividida por días distintos con ejecución registrada. Los vanos sin fecha no afectan ese promedio. Corregir una fecha mueve el vano al día correcto; reabrirlo lo retira de la producción terminada. Las jornadas restantes son orientativas.</p>
   </div>
- </div>;
+ </>;
 }
