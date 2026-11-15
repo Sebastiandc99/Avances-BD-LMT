@@ -11,6 +11,19 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
  const pointers=useRef(new Map<number,{x:number;y:number}>()),gesture=useRef<{start:{x:number;y:number};last:{x:number;y:number};distance:number;moved:boolean}>({start:{x:0,y:0},last:{x:0,y:0},distance:0,moved:false});
  const dimensions=useRef(size),initialized=useRef(!!saved),previousLine=useRef(line),lastPoleFocus=useRef(memory?.poleFocusRequest);
  const poles=useMemo(()=>Object.fromEntries(data.piquetes.map(p=>[p.id,p])),[data]);
+ // Offset both edges in screen pixels so zoom never covers the status stroke.
+ const accessEdges=useMemo(()=>{
+  if(line!=='all'&&line!=='larga')return [];
+  const route=data.piquetes.filter(p=>p.linea==='larga'&&Number(p.rotulo)>=40&&Number(p.rotulo)<=60)
+   .sort((a,b)=>Number(a.rotulo)-Number(b.rotulo));
+  if(route.length<2)return [];
+  const offset=8*view.w/size.w;
+  return [-1,1].map(side=>route.map((pole,i)=>{
+   const before=route[Math.max(0,i-1)].pixel,after=route[Math.min(route.length-1,i+1)].pixel;
+   const dx=after[0]-before[0],dy=after[1]-before[1],length=Math.hypot(dx,dy)||1;
+   return [pole.pixel[0]-side*offset*dy/length,pole.pixel[1]+side*offset*dx/length].join(',');
+  }).join(' '));
+ },[data.piquetes,line,view.w,size.w]);
  const selectedSet=new Set(selectedIds);
  const spans=data.vanos.filter(s=>line==='all'||s.linea===line);
  function fit(targetSize=dimensions.current){const ps=data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=>p.pixel),xs=ps.map(p=>p[0]),ys=ps.map(p=>p[1]);const cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;const w=Math.max((Math.max(...xs)-Math.min(...xs))*1.17,(Math.max(...ys)-Math.min(...ys))*1.12*targetSize.w/targetSize.h);setView({x:cx-w/2,y:cy-w*targetSize.h/targetSize.w/2,w,h:w*targetSize.h/targetSize.w});}
@@ -29,6 +42,9 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
  return <div className='map plain' ref={host}>
   <svg ref={svg} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="none" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={e=>{pointers.current.delete(e.pointerId);gesture.current.moved=true}} aria-label="Plano interactivo de la LMT. Arrastrá para mover y usá dos dedos para acercar.">
    <image href={basePath+'assets/fondo-esquematico.svg'} width={data.image.width} height={data.image.height} pointerEvents="none"/>
+   <g className="access-edges" pointerEvents="none" aria-hidden="true">
+    {accessEdges.map((points,i)=><polyline key={i} points={points} fill="none" stroke="#b23639" strokeWidth="1.8" strokeDasharray="4 4" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/>)}
+   </g>
    {spans.map(s=>{const a=poles[s.desde].pixel,b=poles[s.hasta].pixel,sel=selected===s.id||selectedSet.has(s.id),c=colors[records[s.id]?.status||'pendiente'];return <g key={s.id} role="button" tabIndex={0} aria-label={'Vano '+(s.linea==='corta'?'FP ':'')+Number(s.desde.split('-')[1])+' a '+Number(s.hasta.split('-')[1])} aria-pressed={multiple?selectedSet.has(s.id):undefined} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(s.id);}}}><line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#fff':'#142426'} strokeWidth={sel?12:7} vectorEffect="non-scaling-stroke"/><line data-span={s.id} data-selected={sel?'true':undefined} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={sel?'#2563eb':c} strokeWidth={sel?7:4} vectorEffect="non-scaling-stroke"/></g>})}
    {data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=><g key={p.id} data-pole={p.id}><circle cx={p.pixel[0]} cy={p.pixel[1]} r={view.w/size.w*(poleTarget?.id===p.id?7:showLabels?3:1.7)} fill={poleTarget?.id===p.id?'#ffc85b':'#fff'} stroke={poleTarget?.id===p.id?'#9a4c0d':'#172a29'} strokeWidth={poleTarget?.id===p.id?3:1} vectorEffect="non-scaling-stroke"/>{showLabels&&<text x={p.pixel[0]+view.w/size.w*9} y={p.pixel[1]-view.w/size.w*8} fontSize={view.w/size.w*12} fontWeight="700" fill="#fff" stroke="#142426" strokeWidth={view.w/size.w*3} paintOrder="stroke">{p.rotulo}</text>}</g>)}
   </svg>

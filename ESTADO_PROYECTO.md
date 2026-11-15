@@ -1,5 +1,9 @@
 # Estado del proyecto Avances LMT
 
+## 15/11/2026 — Acceso difícil entre piquetes 40 y 60
+
+El mapa de la línea larga marca los 20 vanos comprendidos entre los piquetes 40 y 60 mediante bordes rojos discontinuos a ambos lados de la traza. La leyenda identifica los desniveles pronunciados. La compilación de Cloudflare se distribuye para carga directa.
+
 ## 15/11/2026 — Acceso compartido de prueba
 
 Quien abra el enlace puede consultar y editar la misma obra desde una sesión automática. La configuración está activa en Supabase y funciona con la versión publicada en Cloudflare. El código que todavía aparece en el menú de la app es opcional. `supabase/shared-pilot.sql` registra el cambio aplicado después de `device-pairing.sql`. Se probaron la lectura, la carga y la corrección entre dos identidades nuevas en una transacción revertida.
