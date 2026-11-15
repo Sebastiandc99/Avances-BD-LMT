@@ -8,7 +8,7 @@ type Formula={formula:string;value:Value};
 type Cell=Value|Formula;
 export type ExportSheet={name:string;rows:Cell[][]};
 export type MapImage={png:Uint8Array;width:number;height:number};
-const label=(s:Span)=>`${s.linea==='corta'?'FP ':''}${Number(s.desde.split('-')[1])} — ${s.linea==='corta'?'FP ':''}${Number(s.hasta.split('-')[1])}`;
+const label=(s:Span)=>`${s.linea==='corta'?'FP ':''}${Number(s.desde.split('-')[1])} - ${s.linea==='corta'?'FP ':''}${Number(s.hasta.split('-')[1])}`;
 const origin=(e?:Event)=>diverterBasis(e)==='calculated'?'Planilla por estado':diverterBasis(e)==='reported'?'Informados en campo':'Sin cantidad colocada';
 const f=(formula:string,value:Value):Formula=>({formula,value});
 export function excelDate(iso:string):number|null{
@@ -21,31 +21,31 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
  const range=(col:string)=>`'Vanos'!$${col}$6:$${col}$${end}`;
  const dates=Object.keys(m.daily).sort(),dailyEnd=Math.max(6,5+dates.length);
  const dailyRange=(col:string)=>`'Rendimiento'!${col}6:${col}${dailyEnd}`;
- const head=(title:string,headers:string[]):Cell[][]=>[[title],['Ambas líneas. Estado actual de los datos guardados en la aplicación.'],['Fecha de corte',excelDate(today)],[],headers];
- const summary=head('Avances BD LMT — Resumen',['Indicador','Valor','Unidad o criterio']);
+ const head=(title:string,headers:string[]):Cell[][]=>[[title],['Ambas l�neas. Estado actual de los datos guardados en la aplicaci�n.'],['Fecha de corte',excelDate(today)],[],headers];
+ const summary=head('Avances BD LMT - Resumen',['Indicador','Valor','Unidad o criterio']);
  summary.push(
-  ['Piquetes',inventory.piquetes.length,'Línea larga + línea corta'],
-  ['Vanos totales',f(`COUNTA(${range('A')})`,m.total),'Ambas líneas'],
+  ['Piquetes',inventory.piquetes.length,'L�nea larga + l�nea corta'],
+  ['Vanos totales',f(`COUNTA(${range('A')})`,m.total),'Ambas l�neas'],
   ['Vanos terminados',f(`COUNTIFS(${range('E')},"Terminado")`,m.done),'vanos'],
-  ['Avance total',f('IF(B7>0,B8/B7,0)',m.total?m.done/m.total:0),'Terminados / total de ambas líneas'],
-  ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('B')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/día'],
-  ['Rendimiento promedio de BD',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('C')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/día'],
-  ['Días para finalizar',f(`IF(B7=B8,0,IF(SUM(${dailyRange('B')})>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/SUM(${dailyRange('B')}),0),"Sin estimación"))`,m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
-  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B12),B3+B12,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte'],
-  ['Diverters totales',f(`SUM(${range('G')})`,m.planned),'Unidades según planilla de ambas líneas'],
-  ['Diverters terminados',f(`SUM(${range('H')})`,m.installed),'Unidades instaladas según avances y cantidades informadas'],
-  ['Diverters pendientes',f(`SUMPRODUCT((${range('G')}>${range('H')})*(${range('G')}-${range('H')}))`,m.remainingBD),'Por vano: cantidad de planilla menos colocados, mínimo cero']
+  ['Avance total',f('IF(B7>0,B8/B7,0)',m.total?m.done/m.total:0),'Terminados / total de ambas l�neas'],
+  ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('B')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/d�a'],
+  ['Rendimiento promedio de BD',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('C')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/d�a'],
+  ['D�as para finalizar',f(`IF(B7=B8,0,IF(SUM(${dailyRange('B')})>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/SUM(${dailyRange('B')}),0),"Sin estimaci�n"))`,m.estimatedDays??'Sin estimaci�n'),'Una jornada de trabajo por d�a'],
+  ['Fecha estimada de finalizaci�n',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B12),B3+B12,"Sin estimaci�n"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimaci�n'),'Proyecci�n desde la fecha de corte'],
+  ['Diverters totales',f(`SUM(${range('G')})`,m.planned),'Unidades seg�n planilla de ambas l�neas'],
+  ['Diverters terminados',f(`SUM(${range('H')})`,m.installed),'Unidades instaladas seg�n avances y cantidades informadas'],
+  ['Diverters pendientes',f(`SUMPRODUCT((${range('G')}>${range('H')})*(${range('G')}-${range('H')}))`,m.remainingBD),'Por vano: cantidad de planilla menos colocados, m�nimo cero']
  );
- const daily=head('Producción por fecha de ejecución',['Fecha de ejecución','Vanos terminados','BD colocados']);
+ const daily=head('Producci�n por fecha de ejecuci�n',['Fecha de ejecuci�n','Vanos terminados','BD colocados']);
  for(const [i,date] of dates.entries()){
   const row=6+i;
   daily.push([excelDate(date),f(`COUNTIFS(${range('E')},"Terminado",${range('F')},A${row})`,m.daily[date]),f(`SUMIFS(${range('H')},${range('E')},"Terminado",${range('F')},A${row})`,m.dailyBD[date])]);
  }
- if(!dates.length)daily.push(['Sin producción fechada',null,null]);
- const spans=head('Registro de vanos',['ID del vano','Línea','Vano','Longitud (m)','Estado','Fecha de ejecución','BD según planilla','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones','Cantidad de cuadrillas']);
+ if(!dates.length)daily.push(['Sin producci�n fechada',null,null]);
+ const spans=head('Registro de vanos',['ID del vano','L�nea','Vano','Longitud (m)','Estado','Fecha de ejecuci�n','BD seg�n planilla','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones','Cantidad de cuadrillas']);
  for(const s of inventory.vanos){const e=records[s.id];spans.push([s.id,s.linea==='larga'?'Larga':'Corta FP',label(s),s.longitud_planta_m,statuses[e?.status||'pendiente'],excelDate(e?.date||''),plannedDiverters(s),installedDiverters(s,e),origin(e),e?.installed||0,e?.responsible||'',e?.notes||'',e?.crews??null]);}
- const aerial:Cell[][]=[['Vista aérea del avance'],['Traza completa de ambas líneas. Esquema orientativo del DWG.'],['Fecha de corte',excelDate(today)],['Pendiente: gris. En proceso: amarillo. Terminado: verde.']];
- return [{name:'Resumen',rows:summary},{name:'Rendimiento',rows:daily},{name:'Vanos',rows:spans},{name:'Vista aérea',rows:aerial}];
+ const aerial:Cell[][]=[['Vista a�rea del avance'],['Traza completa de ambas l�neas. Esquema orientativo del DWG.'],['Fecha de corte',excelDate(today)],['Pendiente: gris. En proceso: amarillo. Terminado: verde.'],['Piquetes 40-63: dif�cil acceso por desniveles pronunciados. Borde rojo discontinuo.']];
+ return [{name:'Resumen',rows:summary},{name:'Rendimiento',rows:daily},{name:'Vanos',rows:spans},{name:'Vista a�rea',rows:aerial}];
 }
 
 const xml=(s:string)=>s.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&apos;');
@@ -53,12 +53,12 @@ const column=(n:number)=>String.fromCharCode(65+n);
 function cellXML(address:string,cell:Cell,style:string){
  if(cell===null)return `<x:c r="${address}" s="${style}"/>`;
  const formula=typeof cell==='object'?`<x:f>${xml(cell.formula)}</x:f>`:'',value=typeof cell==='object'?cell.value:cell;
- if(typeof value==='number'){if(!Number.isFinite(value))throw new Error('Hay un número inválido en la exportación.');return `<x:c r="${address}" s="${style}">${formula}<x:v>${value}</x:v></x:c>`;}
+ if(typeof value==='number'){if(!Number.isFinite(value))throw new Error('Hay un n�mero inv�lido en la exportaci�n.');return `<x:c r="${address}" s="${style}">${formula}<x:v>${value}</x:v></x:c>`;}
  if(formula)return `<x:c r="${address}" s="${style}" t="str">${formula}<x:v>${xml(value??'')}</x:v></x:c>`;
  return `<x:c r="${address}" s="${style}" t="inlineStr"><x:is><x:t xml:space="preserve">${xml(value??'')}</x:t></x:is></x:c>`;
 }
 export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage,today=localDate()):Uint8Array{
- if(!image.png.length||image.width<=0||image.height<=0)throw new Error('Falta la imagen de la vista aérea para exportar.');
+ if(!image.png.length||image.width<=0||image.height<=0)throw new Error('Falta la imagen de la vista a�rea para exportar.');
  const files:Record<string,Uint8Array>={};
  for(const [path,content] of Object.entries(template.files))files[path]=strToU8(content);
  const sheets=productionSheets(inventory,events,today);
@@ -66,7 +66,7 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
  const summaryStyleRows:Record<number,number>={9:12,10:20,11:21,12:22,13:23,14:13};
  const summaryStates=['Terminado','En proceso','Pendiente'];
  const chartParts=Object.entries(template.files).filter(([path])=>/\/charts\/chart\d+\.xml$/.test(path));
- if(chartParts.length!==1)throw new Error('No se encontró el gráfico del resumen de Excel.');
+ if(chartParts.length!==1)throw new Error('No se encontr� el gr�fico del resumen de Excel.');
  for(const [path,source] of chartParts){
   const cache='<c:numCache><c:formatCode>#,##0</c:formatCode><c:ptCount val="3"/>'+slices.map((s,i)=>`<c:pt idx="${i}"><c:v>${s.value}</c:v></c:pt>`).join('')+'</c:numCache>';
   const categories='<c:strCache><c:ptCount val="3"/>'+slices.map((s,i)=>`<c:pt idx="${i}"><c:v>${xml(s.label)}</c:v></c:pt>`).join('')+'</c:strCache>';
@@ -116,9 +116,9 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
 /** Uses the existing local map background; no satellite/online map calls or SVG data URLs. */
 export async function aerialImage(inventory:Inventory,events:Event[],basePath:string,today=localDate()):Promise<MapImage>{
  const canvas=document.createElement('canvas');canvas.width=4400;canvas.height=3400;
- const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Este navegador no pudo preparar la vista aérea.');
+ const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Este navegador no pudo preparar la vista a�rea.');
  const background=new Image();
- await new Promise<void>((resolve,reject)=>{background.onload=()=>resolve();background.onerror=()=>reject(new Error('No se pudo leer el fondo local del mapa. Conectate y recargá la app una vez.'));background.src=basePath+'assets/fondo-esquematico.svg';});
+ await new Promise<void>((resolve,reject)=>{background.onload=()=>resolve();background.onerror=()=>reject(new Error('No se pudo leer el fondo local del mapa. Conectate y recarg� la app una vez.'));background.src=basePath+'assets/fondo-esquematico.svg';});
  const ps=inventory.piquetes,records=latestRecords(events),poles=Object.fromEntries(ps.map(p=>[p.id,p]));
  const xs=ps.map(p=>p.pixel[0]),ys=ps.map(p=>p.pixel[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
  const scale=Math.min((canvas.width-180)/(maxX-minX),(canvas.height-300)/(maxY-minY));
@@ -127,25 +127,43 @@ export async function aerialImage(inventory:Inventory,events:Event[],basePath:st
  ctx.save();ctx.beginPath();ctx.rect(0,120,canvas.width,canvas.height-240);ctx.clip();
  ctx.drawImage(background,ox,oy,inventory.image.width*scale,inventory.image.height*scale);
  const point=(pixel:[number,number])=>[ox+pixel[0]*scale,oy+pixel[1]*scale];
+ const accessRoute=ps.filter(p=>p.linea==='larga'&&Number(p.rotulo)>=40&&Number(p.rotulo)<=63).sort((a,b)=>Number(a.rotulo)-Number(b.rotulo));
+ const accessPoles=new Set(accessRoute.map(p=>p.id));
  ctx.lineCap='round';
+ // Match the map's two red boundaries while keeping the progress stroke visible.
+ if(accessRoute.length>1){
+  const route=accessRoute.map(p=>point(p.pixel));
+  ctx.save();ctx.strokeStyle='#b23639';ctx.lineWidth=5;ctx.lineJoin='round';ctx.setLineDash([16,12]);
+  for(const side of [-1,1]){
+   ctx.beginPath();
+   for(const [i,p] of route.entries()){
+    const before=route[Math.max(0,i-1)],after=route[Math.min(route.length-1,i+1)];
+    const dx=after[0]-before[0],dy=after[1]-before[1],length=Math.hypot(dx,dy)||1;
+    const x=p[0]-side*18*dy/length,y=p[1]+side*18*dx/length;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+   }
+   ctx.stroke();
+  }
+  ctx.restore();
+ }
  for(const s of inventory.vanos){const a=point(poles[s.desde].pixel),b=point(poles[s.hasta].pixel);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='#18352f';ctx.lineWidth=11;ctx.stroke();ctx.strokeStyle=colors[records[s.id]?.status||'pendiente'];ctx.lineWidth=7;ctx.stroke();}
  ctx.font='bold 18px Arial';
  const occupied:{x:number;y:number;w:number;h:number}[]=[];
  for(const p of ps){
-  const [x,y]=point(p.pixel);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='#18352f';ctx.lineWidth=2;ctx.stroke();
+  const [x,y]=point(p.pixel),difficult=accessPoles.has(p.id);ctx.beginPath();ctx.arc(x,y,difficult?6:4,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle=difficult?'#b23639':'#18352f';ctx.lineWidth=difficult?3:2;ctx.stroke();
   const w=ctx.measureText(p.rotulo).width;
   const offsets=[[9,-9],[-w-9,-9],[9,25],[-w-9,25],[-w/2,-30],[-w/2,45],[15,-48],[-w-15,-48]];
   const boxes=offsets.map(([dx,dy])=>({x:x+dx,y:y+dy-18,w:w+5,h:23}));
   const box=boxes.find(b=>!occupied.some(o=>b.x<o.x+o.w+3&&b.x+b.w+3>o.x&&b.y<o.y+o.h+3&&b.y+b.h+3>o.y))||boxes.at(-1)!;
   occupied.push(box);
   if(Math.abs(box.x-x)>w+10||Math.abs(box.y+18-y)>30){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(box.x+w/2,box.y+12);ctx.lineWidth=1;ctx.strokeStyle='#405c51';ctx.stroke();}
-  ctx.strokeStyle='#18352f';ctx.lineWidth=5;ctx.strokeText(p.rotulo,box.x,box.y+18);ctx.fillStyle='white';ctx.fillText(p.rotulo,box.x,box.y+18);
+  ctx.strokeStyle=difficult?'white':'#18352f';ctx.lineWidth=5;ctx.strokeText(p.rotulo,box.x,box.y+18);ctx.fillStyle=difficult?'#b23639':'white';ctx.fillText(p.rotulo,box.x,box.y+18);
  }
  ctx.restore();
  // The CAD paths overlap near the branch. Separate insets keep both states visible.
  ctx.fillStyle='#fffefa';ctx.fillRect(2960,210,1350,1450);ctx.strokeStyle='#91a297';ctx.lineWidth=2;ctx.strokeRect(2960,210,1350,1450);
- ctx.fillStyle='#203a36';ctx.font='bold 30px Arial';ctx.fillText('Detalle de las dos líneas',3000,265);ctx.font='23px Arial';ctx.fillText('Sectores superpuestos en la vista general',3000,307);
- for(const [line,start,end,left,title] of [['larga',208,219,3010,'Larga · P208 a P219'],['corta',1,18,3680,'Corta · FP1 a FP18']] as const){
+ ctx.fillStyle='#203a36';ctx.font='bold 30px Arial';ctx.fillText('Detalle de las dos l�neas',3000,265);ctx.font='23px Arial';ctx.fillText('Sectores superpuestos en la vista general',3000,307);
+ for(const [line,start,end,left,title] of [['larga',208,219,3010,'Larga � P208 a P219'],['corta',1,18,3680,'Corta � FP1 a FP18']] as const){
   const subset=ps.filter(p=>p.linea===line&&Number(p.id.split('-')[1])>=start&&Number(p.id.split('-')[1])<=end);
   const bx=subset.map(p=>p.pixel[0]),by=subset.map(p=>p.pixel[1]),x0=Math.min(...bx),y0=Math.min(...by),dx=Math.max(...bx)-x0,dy=Math.max(...by)-y0;
   const k=Math.min(360/Math.max(1,dx),1170/Math.max(1,dy));
@@ -156,9 +174,11 @@ export async function aerialImage(inventory:Inventory,events:Event[],basePath:st
   for(const p of subset){const [x,y]=project(p.pixel);ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='#18352f';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#203a36';ctx.fillText(p.rotulo,x+15,y+8);}
  }
  ctx.fillStyle='#fffefa';ctx.fillRect(0,0,canvas.width,120);ctx.fillRect(0,canvas.height-120,canvas.width,120);
- ctx.fillStyle='#203a36';ctx.font='bold 38px Arial';ctx.fillText('Avances BD LMT — Ambas líneas',55,52);ctx.font='25px Arial';ctx.fillText(`${today.split('-').reverse().join('/')} · ${ps.length} piquetes · ${inventory.vanos.length} vanos · Esquema orientativo del DWG`,55,94);
+ ctx.fillStyle='#203a36';ctx.font='bold 38px Arial';ctx.fillText('Avances BD LMT - Ambas l�neas',55,52);ctx.font='25px Arial';ctx.fillText(`${today.split('-').reverse().join('/')} � ${ps.length} piquetes � ${inventory.vanos.length} vanos � Esquema orientativo del DWG`,55,94);
  let x=55;ctx.font='26px Arial';for(const status of ['pendiente','ejecucion','terminado'] as const){ctx.fillStyle=colors[status];ctx.fillRect(x,canvas.height-77,36,18);ctx.fillStyle='#203a36';ctx.fillText(statuses[status],x+48,canvas.height-60);x+=330;}
- ctx.font='24px Arial';ctx.fillText('Geometría de referencia. Mismo fondo local que la app.',55,canvas.height-20);
+ ctx.save();ctx.strokeStyle='#b23639';ctx.lineWidth=5;ctx.setLineDash([16,12]);ctx.beginPath();ctx.moveTo(x,canvas.height-68);ctx.lineTo(x+65,canvas.height-68);ctx.stroke();ctx.restore();
+ ctx.fillStyle='#b23639';ctx.fillText('Piquetes 40-63 � Dif�cil acceso por desniveles pronunciados',x+82,canvas.height-60);
+ ctx.fillStyle='#203a36';ctx.font='24px Arial';ctx.fillText('Geometr�a de referencia. Mismo fondo local que la app.',55,canvas.height-20);
  const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo preparar la imagen del mapa.')),'image/png'));
  const result={png:new Uint8Array(await blob.arrayBuffer()),width:canvas.width,height:canvas.height};canvas.width=1;canvas.height=1;return result;
 }
