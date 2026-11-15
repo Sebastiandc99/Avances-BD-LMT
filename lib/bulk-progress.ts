@@ -18,6 +18,6 @@ export function completionPlan(spans:Span[],ranges:CompletionRange[],records:Rec
 export function completedEvents(ids:string[],records:Record<string,Event>,options:{date:string;responsible:string;author:string;mode?:CompletionMode},makeId:()=>string,createdAt:string):Event[]{
  return ids.map(spanId=>{
   const old=records[spanId];
-  return {status:'terminado',date:options.date,installed:old?.installed||0,notes:old?.notes||'',photos:old?.photos||[],responsible:options.mode==='dates'?(old?.responsible||''):options.responsible||old?.responsible||'',id:makeId(),spanId,version:(old?.version||0)+1,baseVersion:old?.version||0,createdAt,author:options.author,sync:'pending'};
+  return {...(old?.crews!==undefined?{crews:old.crews}:{}),status:'terminado',date:options.date,installed:old?.installed||0,notes:old?.notes||'',photos:old?.photos||[],responsible:options.mode==='dates'?(old?.responsible||''):options.responsible||old?.responsible||'',id:makeId(),spanId,version:(old?.version||0)+1,baseVersion:old?.version||0,createdAt,author:options.author,sync:'pending'};
  });
 }

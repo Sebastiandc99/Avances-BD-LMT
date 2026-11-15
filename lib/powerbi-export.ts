@@ -34,13 +34,13 @@ export function powerBiData(inventory:Inventory, events:Event[], today=localDate
    OrigenConteo:diverterBasis(record) === 'reported' ? 'Informado' : diverterBasis(record) === 'calculated' ? 'Calculado por vano terminado' : 'Sin cantidad',
    Terminado:finished ? 1 : 0, EnProceso:['ejecucion','observaciones'].includes(status) ? 1 : 0,
    Pendiente:status === 'pendiente' ? 1 : 0, TerminadoConFecha:finished && record.date ? 1 : 0,
-   Responsable:record?.responsible || '', Observaciones:record?.notes || ''
+   Responsable:record?.responsible || '', Observaciones:record?.notes || '', Cuadrillas:record?.crews??null
   };
  });
  const historial:Row[] = events.map(event => ({
   Registro:event.id, Vano:event.spanId, Version:event.version, Estado:statuses[event.status],
   Fecha:event.date || null, RegistroUTC:event.createdAt,
-  BDReales:event.installed, Responsable:event.responsible, Observaciones:event.notes
+  BDReales:event.installed, Responsable:event.responsible, Observaciones:event.notes, Cuadrillas:event.crews??null
  }));
  return { vanos, historial, resumen:metrics(inventory.vanos,events,today) };
 }
@@ -197,7 +197,7 @@ function legacyContainer(v:ReturnType<typeof visual>) {
 export function powerBiProject(inventory:Inventory, events:Event[], today=localDate(), extractedAt=new Date().toISOString(), includePhoto=false) {
  const data = powerBiData(inventory,events,today);
  const textColumns = ['Vano','Linea','Estado','OrigenConteo','Responsable','Observaciones','FilaVano','EtiquetaVano'];
- const integerColumns = ['BDPrevistos','BDColocados','BDReales','Terminado','EnProceso','Pendiente','TerminadoConFecha','PosicionVano'];
+ const integerColumns = ['BDPrevistos','BDColocados','BDReales','Terminado','EnProceso','Pendiente','TerminadoConFecha','PosicionVano','Cuadrillas'];
  const columns:Column[] = [
   ...textColumns.map(name => ({name,dataType:'string' as const})),
   ...integerColumns.map(name => ({name,dataType:'int64' as const})),
@@ -229,7 +229,7 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
   measure('Finalizacion estimada','IF(ISBLANK([Dias restantes]), BLANK(), DATE(' + today.replaceAll('-',',') + ') + [Dias restantes])','dd/MM/yyyy')
  ];
  const historyColumns:Column[] = ['Registro','Vano','Estado','RegistroUTC','Responsable','Observaciones'].map(name => ({name,dataType:'string'}));
- historyColumns.push({name:'Version',dataType:'int64'},{name:'BDReales',dataType:'int64'},{name:'Fecha',dataType:'dateTime'});
+ historyColumns.push({name:'Cuadrillas',dataType:'int64'},{name:'Version',dataType:'int64'},{name:'BDReales',dataType:'int64'},{name:'Fecha',dataType:'dateTime'});
  const files:Record<string,string> = {};
  const put = (path:string, value:unknown) => {files[path] = JSON.stringify(value,null,2);};
  put('Avances_BD_LMT.pbip',{$schema:schema+'pbip/pbipProperties/1.0.0/schema.json',version:'1.0',artifacts:[{report:{path:reportFolder}}],settings:{enableAutoRecovery:true}});
@@ -358,7 +358,7 @@ export function powerBiProject(inventory:Inventory, events:Event[], today=localD
  addVisual('Detalle',card('detalleTerminados',val('Vanos terminados'),196,364,394,palette.green));
  addVisual('Detalle',card('detalleProceso',val('Vanos en proceso'),610,364,394,palette.amber));
  addVisual('Detalle',card('detallePendientes',val('Vanos pendientes'),1024,364,392,palette.gray));
- const detail=visual('detalle','tableEx','Detalle de vanos',196,510,1220,432,{Values:['Vano','Linea','Estado','Fecha','LongitudM','Responsable','BDPrevistos','BDColocados','Observaciones'].map(col)});
+ const detail=visual('detalle','tableEx','Detalle de vanos',196,510,1220,432,{Values:['Vano','Linea','Estado','Fecha','LongitudM','Responsable','Cuadrillas','BDPrevistos','BDColocados','Observaciones'].map(col)});
  detail.visual.objects=tableStyle;
  detail.visual.query.sortDefinition={sort:[{field:col('Vano').field,direction:'Ascending'}],isDefaultSort:false};
  addVisual('Detalle',detail);

@@ -11,3 +11,14 @@ test('a width change keeps the same screen scale and map center',()=>{
  const view={x:120,y:200,w:800,h:500},next=resizeMapView(view,{w:800,h:500},{w:400,h:300});
  assert.equal(next.w/400,view.w/800);assert.equal(next.x+next.w/2,view.x+view.w/2);assert.equal(next.y+next.h/2,view.y+view.h/2);
 });
+
+test('fecha, filtros y cámara se recuperan únicamente de la sesión de este navegador',async()=>{
+ const {readViewState,saveViewState}=await import('../lib/view-state.ts');
+ const first=new Map();
+ globalThis.sessionStorage={getItem:key=>first.get(key)||null,setItem:(key,value)=>first.set(key,value)};
+ const view={...readViewState(),tab:'map',mapLine:'larga',listLine:'corta',listDate:'2026-11-15',listFilter:'ejecucion',mapMemory:{line:'larga',view:{x:120,y:340,w:600,h:450},size:{w:800,h:600},spanFocusRequest:8}};
+ saveViewState(view);assert.deepEqual(readViewState(),view);
+ globalThis.sessionStorage={getItem:()=>null,setItem:()=>{}};
+ assert.equal(readViewState().listDate,'');assert.equal(readViewState().mapMemory,null);
+ delete globalThis.sessionStorage;
+});

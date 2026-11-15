@@ -1,6 +1,6 @@
-import { latestRecords, validProgress, type Event, type Span, type Status } from './model.ts';
+import { latestRecords, validProgress, type Event, type Span, type Status, type Progress } from './model.ts';
 
-export type SelectionValues={status:Status;date:string;withoutDate:boolean};
+export type SelectionValues={status:Status;date:string;withoutDate:boolean;changes?:Partial<Pick<Progress,'installed'|'crews'|'responsible'|'notes'>>;photoIds?:string[]};
 export function toggleSpanSelection(ids:string[],id:string){return ids.includes(id)?ids.filter(v=>v!==id):[...ids,id];}
 export function selectionEvents(spans:Span[],ids:string[],events:Event[],expected:Record<string,number>,values:SelectionValues,author:string,makeId:()=>string,createdAt:string):Event[]{
  const selected=[...new Set(ids)],allowed=new Set(spans.map(s=>s.id)),records=latestRecords(events);
@@ -14,10 +14,13 @@ export function selectionEvents(spans:Span[],ids:string[],events:Event[],expecte
  }
  const date=values.withoutDate?'':values.date;
  const additions=selected.map(spanId=>{const old=records[spanId];return {
-  status:values.status,date,installed:values.status==='pendiente'?0:old?.installed||0,
-  notes:old?.notes||'',photos:[...(old?.photos||[])],responsible:old?.responsible||'',
+  ...(old?.crews!==undefined?{crews:old.crews}:{}),
+  notes:old?.notes||'',responsible:old?.responsible||'',
+  ...values.changes,
+  status:values.status,date,photos:[...new Set([...(old?.photos||[]),...(values.photoIds||[])])],
+  installed:values.status==='pendiente'?0:values.changes?.installed??old?.installed??0,
   id:makeId(),spanId,baseVersion:old?.version||0,version:(old?.version||0)+1,createdAt,author,sync:'pending' as const,
  };});
- if(!additions.every(validProgress))throw Error('Revisá la fecha. Debe ser válida, desde 2020 y hasta hoy.');
+ if(!additions.every(validProgress))throw Error('Revisá la fecha, la cantidad de cuadrillas y los datos de la carga. Cada vano admite hasta 8 fotos.');
  return additions;
 }

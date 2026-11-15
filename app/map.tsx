@@ -9,7 +9,7 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
  const saved=memory?.line===line?memory:null;
  const [size,setSize]=useState(saved?.size||{w:800,h:600}),[view,setView]=useState(saved?.view||{x:0,y:0,w:4000,h:4442}),[candidates,setCandidates]=useState<Span[]>([]);
  const pointers=useRef(new Map<number,{x:number;y:number}>()),gesture=useRef<{start:{x:number;y:number};last:{x:number;y:number};distance:number;moved:boolean}>({start:{x:0,y:0},last:{x:0,y:0},distance:0,moved:false});
- const dimensions=useRef(size),initialized=useRef(!!saved),previousLine=useRef(line),lastPoleFocus=useRef(memory?.poleFocusRequest);
+ const dimensions=useRef(size),initialized=useRef(!!saved),previousLine=useRef(line),lastPoleFocus=useRef(memory?.poleFocusRequest),lastSpanFocus=useRef(memory?.spanFocusRequest||0);
  const poles=useMemo(()=>Object.fromEntries(data.piquetes.map(p=>[p.id,p])),[data]);
  // Offset both edges in screen pixels so zoom never covers the status stroke.
  const accessEdges=useMemo(()=>{
@@ -29,8 +29,8 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
  function fit(targetSize=dimensions.current){const ps=data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=>p.pixel),xs=ps.map(p=>p[0]),ys=ps.map(p=>p[1]);const cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;const w=Math.max((Math.max(...xs)-Math.min(...xs))*1.17,(Math.max(...ys)-Math.min(...ys))*1.12*targetSize.w/targetSize.h);setView({x:cx-w/2,y:cy-w*targetSize.h/targetSize.w/2,w,h:w*targetSize.h/targetSize.w});}
  useEffect(()=>{const r=new ResizeObserver(entries=>{const rect=entries[0].contentRect;if(rect.width<=0||rect.height<=0)return;const next={w:rect.width,h:rect.height},before=dimensions.current;dimensions.current=next;setSize(next);if(!initialized.current){initialized.current=true;fit(next);}else setView(v=>resizeMapView(v,before,next));});if(host.current)r.observe(host.current);return()=>r.disconnect();},[]);
  useEffect(()=>{if(previousLine.current!==line){previousLine.current=line;if(initialized.current)fit();}},[line]);
- useEffect(()=>{if(initialized.current)onViewChange({line,view,size,poleFocusRequest:lastPoleFocus.current});},[view,size,line]);
- useEffect(()=>{if(!selected)return;const s=data.vanos.find(s=>s.id===selected);if(!s)return;const a=poles[s.desde].pixel,b=poles[s.hasta].pixel;const w=Math.max(260,Math.hypot(a[0]-b[0],a[1]-b[1])*10);setView({x:(a[0]+b[0])/2-w/2,y:(a[1]+b[1])/2-w*size.h/size.w/2,w,h:w*size.h/size.w});},[focus]);
+ useEffect(()=>{if(initialized.current)onViewChange({line,view,size,poleFocusRequest:lastPoleFocus.current,spanFocusRequest:lastSpanFocus.current});},[view,size,line]);
+ useEffect(()=>{if(focus===lastSpanFocus.current||!selected)return;lastSpanFocus.current=focus;const s=data.vanos.find(s=>s.id===selected);if(!s)return;const a=poles[s.desde].pixel,b=poles[s.hasta].pixel;const w=Math.max(260,Math.hypot(a[0]-b[0],a[1]-b[1])*10);setView({x:(a[0]+b[0])/2-w/2,y:(a[1]+b[1])/2-w*size.h/size.w/2,w,h:w*size.h/size.w});},[focus]);
  useEffect(()=>{if(!poleTarget||lastPoleFocus.current===poleTarget.request||!initialized.current)return;const next=viewAtPole(data.piquetes,data.vanos,poleTarget.id,dimensions.current);if(next){lastPoleFocus.current=poleTarget.request;setCandidates([]);setView(next);}},[poleTarget,size]);
  function zoom(factor:number,px=size.w/2,py=size.h/2){setView(v=>{const w=Math.max(70,Math.min(10000,v.w*factor)),scale=w/v.w;return{x:v.x+px/size.w*v.w*(1-scale),y:v.y+py/size.h*v.h*(1-scale),w,h:w*size.h/size.w}});}
  useEffect(()=>{const el=host.current;if(!el)return;function wheel(e:WheelEvent){e.preventDefault();const r=el!.getBoundingClientRect();zoom(e.deltaY>0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top);}el.addEventListener('wheel',wheel,{passive:false});return()=>el.removeEventListener('wheel',wheel);},[size]);
@@ -49,6 +49,7 @@ export default function TraceMap({data,records,selected,onSelect,line,focus,base
    {data.piquetes.filter(p=>line==='all'||p.linea===line).map(p=><g key={p.id} data-pole={p.id}><circle cx={p.pixel[0]} cy={p.pixel[1]} r={view.w/size.w*(poleTarget?.id===p.id?7:showLabels?3:1.7)} fill={poleTarget?.id===p.id?'#ffc85b':'#fff'} stroke={poleTarget?.id===p.id?'#9a4c0d':'#172a29'} strokeWidth={poleTarget?.id===p.id?3:1} vectorEffect="non-scaling-stroke"/>{showLabels&&<text x={p.pixel[0]+view.w/size.w*9} y={p.pixel[1]-view.w/size.w*8} fontSize={view.w/size.w*12} fontWeight="700" fill="#fff" stroke="#142426" strokeWidth={view.w/size.w*3} paintOrder="stroke">{p.rotulo}</text>}</g>)}
   </svg>
   <div className="map-tag"><span className="live-dot"/> TRAZA LMT <small>237 piquetes · Plano de referencia</small></div>
+  <div className="map-selection-count" role="status">{multiple?selectedIds.length:selected?1:0} {(multiple?selectedIds.length:selected?1:0)===1?'vano seleccionado':'vanos seleccionados'}</div>
   <div className="map-tools"><button aria-label="Acercar mapa" onClick={()=>zoom(.65)}><Plus size={20}/></button><button aria-label="Alejar mapa" onClick={()=>zoom(1.5)}><Minus size={20}/></button><button aria-label="Ver traza completa" onClick={()=>fit()}><Scan size={20}/></button></div>
   <div className="map-north"><Navigation size={18}/><b>N</b></div>
   <div className="map-foot">Esquema orientativo · Geometría del DWG <span>Arrastrá · Pellizcá para acercar</span></div>

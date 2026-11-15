@@ -65,3 +65,9 @@ test('serialización explícita excluye fotos y credenciales, preserva fecha vac
  assert.throws(()=>parseGitHubBackup(JSON.stringify({format:'lmt-backup-v1',events:[event],photos:[{data:'image'}]})));
  assert.throws(()=>githubRecords([event,event]));
 });
+
+test('el respaldo conserva la cantidad opcional de cuadrillas',()=>{
+ const records=JSON.parse(githubRecords([{...event,crews:3}]));
+ assert.equal(records[0].crews,3);
+ assert.equal(parseGitHubBackup(text(records))[0].crews,3);
+});

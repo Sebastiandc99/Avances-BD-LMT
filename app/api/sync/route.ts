@@ -11,7 +11,7 @@ export async function POST(request:Request) {
   if(!validProgress(e)||!validSpanId(e.spanId)||!/^[a-f0-9-]{36}$/i.test(e.id)||!Number.isSafeInteger(e.baseVersion)||e.baseVersion<0||e.baseVersion>100000||e.version!==e.baseVersion+1||typeof e.createdAt!=='string'||isNaN(Date.parse(e.createdAt)))return json({error:'Revisá los datos del registro.'},400);
   const existing=await env.DB.prepare('SELECT owner FROM lmt_events WHERE id = ?').bind(e.id).first<{owner:string}>();if(existing)return existing.owner===u.userId?json({ok:true}):json({error:'Identificador no disponible.'},409);
   for(const photo of e.photos)if(!await env.BUCKET.head(`${u.userId}/${photo}`))return json({error:'Falta cargar una fotografía.'},400);
-  const payload={id:e.id,spanId:e.spanId,status:e.status,date:e.date,installed:e.installed,notes:e.notes,responsible:e.responsible,photos:e.photos,version:e.version,baseVersion:e.baseVersion,createdAt:e.createdAt};
+  const payload={...(e.crews!==undefined?{crews:e.crews}:{}),id:e.id,spanId:e.spanId,status:e.status,date:e.date,installed:e.installed,notes:e.notes,responsible:e.responsible,photos:e.photos,version:e.version,baseVersion:e.baseVersion,createdAt:e.createdAt};
   try {
     const r=await env.DB.prepare('INSERT INTO lmt_events (id,owner,span,version,payload,author,received_at) SELECT ?,?,?,?,?,?,? WHERE (SELECT COALESCE(MAX(version),0) FROM lmt_events WHERE owner=? AND span=?)=?').bind(e.id,u.userId,e.spanId,e.version,JSON.stringify(payload),u.displayName,new Date().toISOString(),u.userId,e.spanId,e.baseVersion).run();
     if(!r.meta.changes)return json({error:'Este vano cambió en otro equipo. Elegí qué versión conservar.'},409);

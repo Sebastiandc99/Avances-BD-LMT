@@ -35,3 +35,21 @@ test('conflictos, versiones nuevas, selección inválida y fechas inválidas blo
  for(const invalid of [{...values,status:'bad'},{...values,date:'2026-02-30'},{...values,date:'2100-01-01'},{...values,date:''}])assert.throws(()=>create([a.spanId],[a],{[a.spanId]:2},invalid));
  assert.equal(latestRecords([a])[a.spanId].version,2);
 });
+
+test('la carga múltiple aplica cuadrillas y detalles, agrega fotos y conserva los campos sin editar',()=>{
+ const photo='00000000-0000-4000-8000-000000000090',extra='00000000-0000-4000-8000-000000000091';
+ const a=old('L-001-002',{crews:2,photos:[photo],notes:'Nota A',responsible:'Equipo A',installed:4});
+ const b=old('FP-001-002',{crews:3,notes:'Nota B',responsible:'Equipo B'});
+ const values={status:'ejecucion',date:'2026-11-09',withoutDate:false,changes:{crews:5,notes:'Misma tarea'},photoIds:[extra]};
+ const batch=create([a.spanId,b.spanId],[a,b],{[a.spanId]:2,[b.spanId]:2},values);
+ assert.ok(batch.every(e=>e.crews===5&&e.notes==='Misma tarea'&&validProgress(e)));
+ assert.equal(batch[0].responsible,'Equipo A');assert.equal(batch[1].responsible,'Equipo B');
+ assert.equal(batch[0].installed,4);assert.deepEqual(batch[0].photos,[photo,extra]);assert.deepEqual(batch[1].photos,[extra]);
+ const untouched=create([a.spanId],[a],{[a.spanId]:2},{status:'terminado',date:'2026-11-09',withoutDate:false});
+ assert.equal(untouched[0].crews,2);
+ for(const crews of [0,-1,1.5,NaN,'2',Number.MAX_SAFE_INTEGER+1])assert.equal(validProgress({...a,crews}),false);
+ const cleared=create([a.spanId],[a],{[a.spanId]:2},{...values,changes:{crews:undefined,notes:'',responsible:''}})[0];
+ assert.equal(cleared.crews,undefined);assert.equal(cleared.responsible,'');assert.equal(cleared.notes,'');
+ const eight=Array.from({length:8},(_,i)=>`00000000-0000-4000-8000-${String(i+100).padStart(12,'0')}`);
+ assert.throws(()=>create([a.spanId],[{...a,photos:eight}],{[a.spanId]:2},values),/8 fotos/);
+});

@@ -6,3 +6,14 @@ export function dailyCompletion(spans:Span[],records:Readonly<Record<string,Prog
  const completed=valid?spans.filter(s=>records[s.id]?.status==='terminado'&&records[s.id]?.date===date):[];
  return {spans:completed,total:completed.length,installed:completed.reduce((n,s)=>n+installedDiverters(s,records[s.id]),0)};
 }
+
+/** Current dated activity includes both finished and in-progress spans. */
+export function dailyActivity(spans:Span[],records:Readonly<Record<string,Progress|undefined>>,date:string,today=localDate()){
+ const completed=dailyCompletion(spans,records,date,today);
+ const valid=/^\d{4}-\d{2}-\d{2}$/.test(date)&&!isNaN(Date.parse(date))&&date>='2020-01-01'&&date<=today
+  &&new Date(date+'T12:00:00Z').toISOString().slice(0,10)===date;
+ const active=valid?spans.filter(s=>records[s.id]?.date===date
+  &&['terminado','ejecucion','observaciones'].includes(records[s.id]?.status||'')):[];
+ return {spans:active,total:active.length,done:completed.total,inProgress:active.length-completed.total,
+  installed:active.reduce((n,s)=>n+installedDiverters(s,records[s.id]),0)};
+}

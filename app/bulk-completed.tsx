@@ -6,7 +6,7 @@ import { localDate, plannedDiverters } from '../lib/model';
 import { completionPlan, type CompletionMode, type CompletionRange } from '../lib/bulk-progress';
 export default function BulkCompleted({spans,records,conflicts,onClose,onSave}:{spans:Span[];records:Record<string,Event>;conflicts:string[];onClose:()=>void;onSave:(ranges:CompletionRange[],date:string,responsible:string,mode:CompletionMode)=>Promise<void>}){
  const [mode,setMode]=useState<CompletionMode>('complete');
- const [ranges,setRanges]=useState<CompletionRange[]>([{line:'larga',from:1,to:2}]),[date,setDate]=useState(''),[responsible,setResponsible]=useState(''),[saving,setSaving]=useState(false),[error,setError]=useState('');
+ const [ranges,setRanges]=useState<CompletionRange[]>([{line:'larga',from:1,to:2}]),[date,setDate]=useState(localDate),[responsible,setResponsible]=useState(''),[saving,setSaving]=useState(false),[error,setError]=useState('');
  let plan:ReturnType<typeof completionPlan>|null=null,rangeError='';
  try{plan=completionPlan(spans,ranges,records,conflicts,mode);}catch(e){rangeError=e instanceof Error?e.message:'Revisá los tramos.';}
  function change(index:number,value:Partial<CompletionRange>){setRanges(rows=>rows.map((r,i)=>i===index?{...r,...value}:r));setError('');}

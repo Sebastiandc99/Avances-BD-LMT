@@ -5,7 +5,7 @@ export const colors: Record<Status,string> = { pendiente:'#8b9299', ejecucion:'#
 export type Pole = { id:string; linea:string; rotulo:string; pixel:[number,number]; x_este_m:number; y_norte_m:number };
 export type Span = { id:string; linea:string; desde:string; hasta:string; longitud_planta_m:number; bd_propuestos_pendientes_validacion:number };
 export type Inventory = { piquetes:Pole[]; vanos:Span[]; resumen:{linea:string;piquetes:number;vanos:number;longitud_planta_m:number;bd_propuestos_pendientes_validacion:number}[]; image:{width:number;height:number;url:string;calibration:unknown} };
-export type Progress = { status:Status; date:string; installed:number; notes:string; photos:string[]; responsible:string };
+export type Progress = { status:Status; date:string; installed:number; notes:string; photos:string[]; responsible:string; crews?:number };
 export type Event = Progress & { id:string; spanId:string; version:number; baseVersion:number; createdAt:string; author:string; sync:'pending'|'synced'|'conflict'|'discarded' };
 export type Photo = { id:string; data:string; name:string; uploaded?:boolean };
 export const emptyProgress = ():Progress => ({status:'pendiente',date:'',installed:0,notes:'',photos:[],responsible:''});
@@ -17,7 +17,8 @@ export function validSpanId(s:unknown):s is string { return typeof s==='string' 
 export function validProgress<T>(p:T):p is T & Progress {
   if(!p||typeof p!=='object')return false; const a=p as unknown as Progress;
   const dateValid=typeof a.date==='string' && (a.date==='' || (/^\d{4}-\d{2}-\d{2}$/.test(a.date) && !isNaN(Date.parse(a.date)) && new Date(a.date+'T12:00:00Z').toISOString().slice(0,10)===a.date && a.date<=localDate() && a.date>='2020-01-01'));
-  return Object.hasOwn(statuses,a.status) && dateValid && Number.isInteger(a.installed) && a.installed>=0 && a.installed<=1000 && (a.status!=='pendiente'||a.installed===0) && typeof a.notes==='string' && a.notes.length<=4000 && typeof a.responsible==='string' && a.responsible.length<=120 && Array.isArray(a.photos) && a.photos.length<=8 && a.photos.every(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id));
+  const crewsValid=a.crews===undefined||(Number.isSafeInteger(a.crews)&&a.crews>0);
+  return crewsValid && Object.hasOwn(statuses,a.status) && dateValid && Number.isInteger(a.installed) && a.installed>=0 && a.installed<=1000 && (a.status!=='pendiente'||a.installed===0) && typeof a.notes==='string' && a.notes.length<=4000 && typeof a.responsible==='string' && a.responsible.length<=120 && Array.isArray(a.photos) && a.photos.length<=8 && a.photos.every(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id));
 }
 /** Same symmetric 10 m layout validated against the CAD-derived inventory. */
 export function plannedDiverters(span:Span){return Math.floor((.60*span.longitud_planta_m+.0001)/10)+1;}

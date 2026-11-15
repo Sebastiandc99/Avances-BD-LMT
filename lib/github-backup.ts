@@ -25,7 +25,7 @@ function checkedEvent(value:unknown):Event{
  const e=value as Event;
  if(!validProgress(e)||!validSpanId(e.spanId)||!uuid.test(e.id)||!Number.isInteger(e.version)||e.version<1||e.baseVersion!==e.version-1||typeof e.author!=='string'||e.author.length>200||typeof e.createdAt!=='string'||!Number.isFinite(Date.parse(e.createdAt))||!['pending','synced','conflict','discarded'].includes(e.sync))throw new GitHubBackupError('El respaldo contiene registros inválidos.',400);
  // Explicit allowlist: never serialize credentials, source documents or photographs.
- return {id:e.id,spanId:e.spanId,status:e.status,date:e.date,installed:e.installed,responsible:e.responsible,notes:e.notes,photos:[],version:e.version,baseVersion:e.baseVersion,createdAt:e.createdAt,author:e.author,sync:e.sync};
+ return {...(e.crews!==undefined?{crews:e.crews}:{}),id:e.id,spanId:e.spanId,status:e.status,date:e.date,installed:e.installed,responsible:e.responsible,notes:e.notes,photos:[],version:e.version,baseVersion:e.baseVersion,createdAt:e.createdAt,author:e.author,sync:e.sync};
 }
 export function githubRecords(events:Event[]){
  if(events.length>50000)throw new GitHubBackupError('El respaldo supera el límite de registros.',400);

@@ -30,3 +30,13 @@ test('corregir una fecha o reabrir retira el vano del día anterior; nunca dupli
  assert.equal(dailyCompletion(inv.vanos,latestRecords([first,discarded]),day,today).total,1);
  for(const invalid of ['','2026-02-30','2026-11-12','2019-12-31','2026-1-9'])assert.equal(dailyCompletion(inv.vanos,records,invalid,today).total,0);
 });
+
+test('la vista diaria incluye terminados y en proceso sin cambiar el rendimiento de terminados',async()=>{
+ const {dailyActivity}=await import('../lib/daily-completion.ts');
+ const events=[event('L-001-002'),event('L-002-003',{status:'ejecucion',installed:2}),event('FP-001-002',{status:'observaciones'}),event('L-003-004',{status:'pendiente'}),event('L-004-005',{date:''})];
+ const records=latestRecords(events),activity=dailyActivity(inv.vanos,records,day,today);
+ assert.equal(activity.total,3);assert.equal(activity.done,1);assert.equal(activity.inProgress,2);
+ assert.deepEqual(activity.spans.map(s=>s.id),['L-001-002','L-002-003','FP-001-002']);
+ assert.equal(dailyCompletion(inv.vanos,records,day,today).total,1);
+ for(const invalid of ['','2020-00-01','2026-02-30','2026-11-12'])assert.equal(dailyActivity(inv.vanos,records,invalid,today).total,0);
+});

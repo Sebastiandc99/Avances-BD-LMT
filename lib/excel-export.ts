@@ -40,8 +40,8 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
   daily.push([excelDate(date),f(`COUNTIFS(${range('E')},"Terminado",${range('F')},A${row})`,m.daily[date]),f(`SUMIFS(${range('H')},${range('E')},"Terminado",${range('F')},A${row})`,m.dailyBD[date])]);
  }
  if(!dates.length)daily.push(['Sin producción fechada',null,null]);
- const spans=head('Registro de vanos',['ID del vano','Línea','Vano','Longitud (m)','Estado','Fecha de ejecución','BD calculados','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones']);
- for(const s of inventory.vanos){const e=records[s.id];spans.push([s.id,s.linea==='larga'?'Larga':'Corta FP',label(s),s.longitud_planta_m,statuses[e?.status||'pendiente'],excelDate(e?.date||''),plannedDiverters(s),installedDiverters(s,e),origin(e),e?.installed||0,e?.responsible||'',e?.notes||'']);}
+ const spans=head('Registro de vanos',['ID del vano','Línea','Vano','Longitud (m)','Estado','Fecha de ejecución','BD calculados','BD colocados','Origen del conteo','BD reales informados','Responsable / cuadrilla','Observaciones','Cantidad de cuadrillas']);
+ for(const s of inventory.vanos){const e=records[s.id];spans.push([s.id,s.linea==='larga'?'Larga':'Corta FP',label(s),s.longitud_planta_m,statuses[e?.status||'pendiente'],excelDate(e?.date||''),plannedDiverters(s),installedDiverters(s,e),origin(e),e?.installed||0,e?.responsible||'',e?.notes||'',e?.crews??null]);}
  const aerial:Cell[][]=[['Vista aérea del avance'],['Traza completa de ambas líneas. Esquema orientativo del DWG.'],['Fecha de corte',excelDate(today)],['Pendiente: gris. En proceso: amarillo. Terminado: verde.']];
  return [{name:'Resumen',rows:summary},{name:'Rendimiento',rows:daily},{name:'Vanos',rows:spans},{name:'Vista aérea',rows:aerial}];
 }
