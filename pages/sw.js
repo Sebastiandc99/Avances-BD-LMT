@@ -10,7 +10,7 @@ self.addEventListener('fetch',event=>{
   const request=event.request,url=new URL(request.url);
   if(request.method!=='GET'||!belongs(url)||url.pathname.startsWith(BASE+'api/'))return;
   if(request.mode==='navigate'){
-    event.respondWith(fetch(request).then(async response=>{if(response.ok&&!response.redirected){const cache=await caches.open(CACHE);await cache.put(BASE,response.clone());}return response;}).catch(async()=>await caches.match(BASE)||new Response('Conectate una vez para preparar el modo sin conexi�n.',{status:503})));
+    event.respondWith(fetch(request).then(async response=>{if(response.ok&&!response.redirected){const cache=await caches.open(CACHE);await cache.put(BASE,response.clone());}return response;}).catch(async()=>await caches.match(BASE)||new Response('Conectate una vez para preparar el modo sin conexión.',{status:503})));
   }else if(asset(url)){
     event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(async response=>{if(response.ok){const cache=await caches.open(CACHE);await cache.put(request,response.clone());}return response;})));
   }
