@@ -5,6 +5,7 @@
 - La imagen exportada identifica los piquetes 40 a 63 de la línea larga con dos bordes rojos discontinuos, círculos y números rojos, siguiendo el tramo marcado en el mapa de la aplicación. Los colores del estado de cada vano siguen visibles.
 - La hoja Vista aérea y la imagen incluyen la leyenda «Difícil acceso por desniveles pronunciados». Resumen, Rendimiento y Vanos conservan sus datos, fórmulas, formatos y gráficos.
 - Validación local: seis pruebas de Excel y TypeScript aprobados. Se generó la imagen con el exportador real y se comprobó visualmente el tramo y su leyenda, además de verificar que el XLSX incluye exactamente esa imagen y mantiene las cuatro hojas. Compilación y verificación de GitHub Pages y Cloudflare aprobadas.
+- Publicado en GitHub Pages: commit ab8ad187d427482799ff807fdd394dab29e4571f y GitHub Actions 43774484555, con compilación y despliegue correctos. Paquete Cloudflare actualizado y comprobado.
 - Se actualiza la caché sin conexión para que los equipos reciban el nuevo exportador. La publicación directa en Cloudflare sigue dependiendo de subir el paquete actualizado; no hay sesión de publicación conectada.
 
 ## 15/11/2026 — Cantidades definitivas y comprobación de publicación
