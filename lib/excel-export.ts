@@ -28,11 +28,11 @@ export function productionSheets(inventory:Inventory,events:Event[],today=localD
   ['Vanos totales',f(`COUNTA(${range('A')})`,m.total),'Ambas líneas'],
   ['Vanos terminados',f(`COUNTIFS(${range('E')},"Terminado")`,m.done),'vanos'],
   ['Avance total',f('IF(B7>0,B8/B7,0)',m.total?m.done/m.total:0),'Terminados / total de ambas líneas'],
-  ['Terminados con fecha válida',f(`SUM(${dailyRange('B')})`,m.datedDone),'Se incluyen en el rendimiento'],
-  ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,B10/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/día'],
+  ['Rendimiento promedio',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('B')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.average:'Sin datos con fecha'),'vanos/día'],
   ['Rendimiento promedio de BD',f(`IF(COUNT(${dailyRange('A')})>0,SUM(${dailyRange('C')})/COUNT(${dailyRange('A')}),"Sin datos con fecha")`,m.days?m.averageBD:'Sin datos con fecha'),'BD/día'],
-  ['Días para finalizar',f(`IF(B7=B8,0,IF(B10>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/B10,0),"Sin estimación"))`,m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
-  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B13),B3+B13,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte'],
+  ['Días para finalizar',f(`IF(B7=B8,0,IF(SUM(${dailyRange('B')})>0,ROUNDUP((B7-B8)*COUNT(${dailyRange('A')})/SUM(${dailyRange('B')}),0),"Sin estimación"))`,m.estimatedDays??'Sin estimación'),'Una jornada de trabajo por día'],
+  ['Fecha estimada de finalización',f('IF(B7=B8,"Finalizado",IF(ISNUMBER(B12),B3+B12,"Sin estimación"))',m.remaining===0?'Finalizado':m.eta?excelDate(m.eta):'Sin estimación'),'Proyección desde la fecha de corte'],
+  ['Diverters totales',f(`SUM(${range('G')})`,m.planned),'Unidades según planilla de ambas líneas'],
   ['Diverters terminados',f(`SUM(${range('H')})`,m.installed),'Unidades instaladas según avances y cantidades informadas'],
   ['Diverters pendientes',f(`SUMPRODUCT((${range('G')}>${range('H')})*(${range('G')}-${range('H')}))`,m.remainingBD),'Por vano: cantidad de planilla menos colocados, mínimo cero']
  );
@@ -63,7 +63,7 @@ export function productionXlsx(inventory:Inventory,events:Event[],image:MapImage
  for(const [path,content] of Object.entries(template.files))files[path]=strToU8(content);
  const sheets=productionSheets(inventory,events,today);
  const slices=progressSlices(metrics(inventory.vanos,events,today));
- const summaryStyleRows:Record<number,number>={9:12,10:17,11:20,12:21,13:22,14:23};
+ const summaryStyleRows:Record<number,number>={9:12,10:20,11:21,12:22,13:23,14:13};
  const summaryStates=['Terminado','En proceso','Pendiente'];
  const chartParts=Object.entries(template.files).filter(([path])=>/\/charts\/chart\d+\.xml$/.test(path));
  if(chartParts.length!==1)throw new Error('No se encontró el gráfico del resumen de Excel.');

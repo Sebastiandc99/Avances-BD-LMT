@@ -1,5 +1,11 @@
 # Estado del proyecto Avances LMT
 
+## 15/11/2026 — Total de diverters y resumen de Excel
+
+- Quitada la fila Terminados con fecha válida del Excel. Rendimiento y proyección conservan su cálculo con las referencias ajustadas.
+- Diverters totales aparece encima de terminados y pendientes en Excel, Resumen de la app y Power BI Verde Feb2025 R4. La app y Power BI respetan los filtros seleccionados.
+- Compilación compartida para GitHub Pages y Cloudflare. La publicación en la cuenta de Cloudflare continúa pendiente de completar su acceso.
+
 ## 15/11/2026 — Cantidades reales de las planillas
 
 - Tabla de cantidades por los 235 vanos, con 1.728 unidades en la larga y 135 en la corta. Extracción contrastada entre tablas y texto de los dos PDF.

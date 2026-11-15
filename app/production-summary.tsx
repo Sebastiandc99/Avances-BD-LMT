@@ -104,9 +104,10 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
     <span><Activity size={22} /><b>Vanos de hoy</b><small>{dateLabel(today)} · Ambas líneas</small></span><strong>{currentDay.total}</strong><span>{currentDay.done} terminados <i /> {currentDay.inProgress} en proceso</span>
    </button>
    <section className="report-bd-stats" aria-label="Bird diverters">
-    <div className="report-bd-heading"><h4>Bird diverters</h4><span>{fmt(stats.planned)} según planilla en la selección</span></div>
+    <div className="report-bd-heading"><h4>Bird diverters</h4><span>Cantidades según planilla en la selección</span></div>
+    <article className="report-bd-total"><h4>Diverters totales</h4><strong>{fmt(stats.planned)}</strong></article>
     <article><h4>Diverters terminados</h4><strong>{fmt(stats.installed)}</strong></article>
-    <article><h4>Diverters pendientes</h4><strong>{fmt(stats.remainingBD)}</strong></article>
+    <article className="report-bd-pending"><h4>Diverters pendientes</h4><strong>{fmt(stats.remainingBD)}</strong></article>
     <article><h4>Rendimiento promedio</h4><strong>{stats.days ? fmt(stats.averageBD, 1) : '—'}<small> BD/día</small></strong></article>
    </section>
    {page === 'overview' && <>

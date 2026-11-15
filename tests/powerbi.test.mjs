@@ -141,7 +141,7 @@ test('las tarjetas clásicas usan Values y los botones mantienen destinos válid
   }
   if(visual.visualType==='textbox')assert.ok(Array.isArray(visual.objects.general[0].properties.paragraphs));
  }
- assert.equal(cards,17);
+ assert.equal(cards,18);
  assert.equal(buttons,20);
 });
 
@@ -176,6 +176,10 @@ test('la composición heredada conserva geometría, filtros sincronizados y orde
   assert.ok(date.position.height>=104);
  }
  const production=pageVisuals(pages.find(p=>p.name==='Produccion')).find(v=>v.name==='diario').visual;
+ const summary=pageVisuals(pages.find(p=>p.name==='Resumen'));
+ const total=summary.find(v=>v.name==='divertersTotal');
+ assert.equal(total.visual.prototypeQuery.Select[0].Measure.Property,'BD totales');
+ for(const detail of summary.filter(v=>/^diverters\d$/.test(v.name)))assert.ok(total.position.y+total.position.height<detail.position.y);
  assert.equal(production.prototypeQuery.OrderBy[0].Direction,1);
  assert.equal(production.prototypeQuery.Select[0].Column.Property,'FechaFinalizacion');
 });
