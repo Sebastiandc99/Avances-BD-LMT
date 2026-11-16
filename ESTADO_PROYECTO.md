@@ -9,6 +9,8 @@
 - Validación: TypeScript y 22 pruebas de modelo, detalle diario y torta aprobadas. Compilaciones y verificaciones de GitHub Pages y Cloudflare aprobadas. Revisión visual del encabezado completo en escritorio y a 390 px, sin desbordamiento horizontal; comprobada su ausencia en Mapa.
 - Las pruebas de interfaz utilizaron registros sintéticos de un equipo aislado. No forman parte del paquete publicado ni se enviaron a Supabase.
 - Caché actualizada a v10-indicadores-resumen-20261116.
+- Publicado en GitHub Pages con el commit 1c0f658703b49a220e5b82810b66617c5512ffce. GitHub Actions 43836304033 completó compilación y despliegue correctamente; se comprobó el encabezado de siete indicadores en la app publicada y sincronizada.
+- Avances_LMT_Cloudflare.zip actualizado a la misma revisión y verificado. La publicación en la cuenta de Cloudflare sigue mediante carga manual: no hay una sesión autorizada de Wrangler en este entorno.
 
 ## 15/11/2026 — Resumen anterior con gráfico diario
 
