@@ -7,7 +7,8 @@
 - Botón Terminar todos los pendientes en Resumen: un clic guarda los pendientes de ambas líneas como terminados, con la fecha local de hoy. No modifica vanos en proceso o terminados ni sus campos. Conserva notas, fotos, responsable y cuadrillas de los pendientes.
 - La selección se calcula sobre los últimos registros dentro de la cola de escritura local. Evita doble clic, respeta conflictos y usa la sincronización habitual. La acción sigue funcionando sin conexión.
 - Validación local aprobada: 14 pruebas de carga masiva, vista y selección; TypeScript; ambas compilaciones y sus verificaciones; privacidad de documentos. Revisión visual de escritorio y móvil a 390 px sin desbordamiento. Con datos aislados, el botón pasó 230 pendientes a terminados, conservó los dos vanos en proceso y los campos previos, y los cambios persistieron al recargar. El inicio en Resumen y el bloqueo del botón sin pendientes quedaron comprobados.
-- Publicación en curso. No se ejecutó la terminación masiva sobre avances reales.
+- Publicado en GitHub Pages con 7d3ce881ba3d251471eda8d11f643f3135990a9e. GitHub Actions 43945397702: pruebas, compilaciones, reinicios/recuperación/actualización sin conexión y despliegue correctos. Comprobado en la web publicada el inicio en Resumen, el botón nuevo y la animación sin contador ni leyenda.
+- Avances_LMT_Cloudflare.zip actualizado a la revisión 14; compilación local del 16/11/2026 a las 16:57 de Argentina. Para instalar esta revisión en Cloudflare se carga el ZIP nuevo. No se ejecutó la terminación masiva sobre avances reales.
 
 ## 16/11/2026 — Actualización visible con pestañas abiertas
 
