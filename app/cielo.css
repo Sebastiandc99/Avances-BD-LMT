@@ -183,3 +183,12 @@ input:focus,select:focus,textarea:focus{border-color:#2784d0;box-shadow:0 0 0 3p
 .cielo-shell .summary-day-heading h4{font-size:13px;color:#204a6d}
 .cielo-shell .summary-day-spans{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 @media(max-width:600px){.cielo-shell .summary-daily-card{padding:14px}}
+
+.summary-visuals{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:stretch;margin:20px 0 24px}
+.summary-visuals .progress-pie-card{margin:0;grid-template-columns:minmax(150px,.9fr) minmax(0,1fr);padding:18px;gap:18px}
+.summary-visuals .progress-pie{width:min(210px,100%);justify-self:center}
+.summary-diverters{display:flex;flex-direction:column;justify-content:center;min-width:0;margin:0;border:1px solid #d9e6f4;border-radius:13px;overflow:hidden;background:#fff}
+.summary-diverters img{display:block;width:100%;height:auto}
+.summary-diverters figcaption{padding:8px 16px 14px;text-align:center;font-size:11px;color:#6c8195}
+@media(max-width:1000px){.summary-visuals{grid-template-columns:1fr}}
+@media(max-width:600px){.summary-visuals{gap:14px}.summary-visuals .progress-pie-card{grid-template-columns:1fr}.summary-visuals .progress-pie{width:min(240px,100%)}}

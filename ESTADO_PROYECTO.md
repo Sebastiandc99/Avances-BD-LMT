@@ -1,5 +1,13 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Animación elegida y ET PUNA
+
+- Incorporada la segunda propuesta, con perspectiva y paisaje de la Puna, junto a la torta de Resumen. La misma ilustración se integra como SVG animado externo, con ocho espirales que aparecen una por una. Funciona sin conexión y queda debajo de la torta en pantallas angostas.
+- Secuencia identificada como ilustrativa. Los usuarios con movimiento reducido ven las ocho unidades completas.
+- Recuadro ET PUNA a la derecha de L-001, con tamaño constante en pantalla al hacer zoom. Se retiró el recuadro RN 51 cercano a L-001–L-007 del fondo. La otra referencia de RN 51 permanece.
+- La vista aérea del Excel incluye ET PUNA y el fondo corregido. Se comprobó visualmente la imagen generada por el exportador real.
+- TypeScript, ocho pruebas de Excel y torta, compilaciones y verificaciones de ambos destinos correctos. Revisión visual de Resumen en escritorio y a 390 px sin desbordamiento horizontal, secuencia animada y rótulo al enfocar P1 comprobados.
+
 ## 16/11/2026 — Recuperación de pantalla en blanco
 
 - La dirección de Cloudflare abrió y sincronizó los avances en un navegador nuevo. La pantalla en blanco informada por el usuario no se reprodujo en ese equipo.

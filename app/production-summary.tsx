@@ -38,8 +38,8 @@ function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoo
   {ticks.map(day => <text key={day} x={x(day)} y={height - 17} textAnchor="middle">{dateLabel(day).slice(0, 5)}</text>)}
  </svg>;
 }
-export default function ProductionSummary({ inventory, events, today, onOpenSpan }: {
- inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void;
+export default function ProductionSummary({ inventory, events, today, onOpenSpan, basePath='/' }: {
+ inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void; basePath?: string;
 }) {
  const [selectedDay, setSelectedDay] = useState('');
  const records = latestRecords(events);
@@ -49,7 +49,13 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
   <div className="panel-title"><h3><TrendingUp size={17} /> Resumen de producción</h3><span>Ambas líneas · Proyecto completo</span></div>
   <div className="analytics">
    <p className="project-total">Ambas líneas · {inventory.piquetes.length} piquetes · {stats.total} vanos</p>
-   <ProgressPie stats={stats} />
+   <div className="summary-visuals">
+    <ProgressPie stats={stats} />
+    <figure className="summary-diverters">
+     <img src={basePath+'assets/diverters-perspectiva.svg'} width="800" height="460" alt="Secuencia ilustrativa de ocho Bird diverters amarillos apareciendo de a uno entre dos piquetes, con el paisaje de la Puna."/>
+     <figcaption>Secuencia ilustrativa de montaje</figcaption>
+    </figure>
+   </div>
    <div className="performance-summary">
     <p><b>{stats.days ? fmt(stats.average, 1) : '—'} vanos/día</b></p>
     <p>{stats.datedDone} terminados con fecha · {stats.days} día(s) de ejecución registrados · {stats.undatedDone} terminados sin fecha excluidos</p>

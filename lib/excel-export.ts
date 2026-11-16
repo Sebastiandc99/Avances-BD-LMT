@@ -159,6 +159,15 @@ export async function aerialImage(inventory:Inventory,events:Event[],basePath:st
   if(Math.abs(box.x-x)>w+10||Math.abs(box.y+18-y)>30){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(box.x+w/2,box.y+12);ctx.lineWidth=1;ctx.strokeStyle='#405c51';ctx.stroke();}
   ctx.strokeStyle=difficult?'white':'#18352f';ctx.lineWidth=5;ctx.strokeText(p.rotulo,box.x,box.y+18);ctx.fillStyle=difficult?'#b23639':'white';ctx.fillText(p.rotulo,box.x,box.y+18);
  }
+ const station=poles['L-001'];
+ if(station){
+  const [x,y]=point(station.pixel),left=x+35;
+  ctx.font='bold 24px Arial';
+  const width=ctx.measureText('ET PUNA').width+24;
+  ctx.beginPath();ctx.moveTo(x+9,y);ctx.lineTo(left,y);ctx.strokeStyle='#46728b';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='white';ctx.fillRect(left,y-21,width,42);ctx.strokeRect(left,y-21,width,42);
+  ctx.fillStyle='#264d67';ctx.fillText('ET PUNA',left+12,y+8);
+ }
  ctx.restore();
  // The CAD paths overlap near the branch. Separate insets keep both states visible.
  ctx.fillStyle='#fffefa';ctx.fillRect(2960,210,1350,1450);ctx.strokeStyle='#91a297';ctx.lineWidth=2;ctx.strokeRect(2960,210,1350,1450);
