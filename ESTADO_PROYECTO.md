@@ -7,6 +7,7 @@
 - Se mantienen las cantidades corregidas de 1.871 desviadores y el detalle de totales, terminados, pendientes y rendimiento. El rendimiento continúa excluyendo terminados sin fecha.
 - Validación local: TypeScript y 22 pruebas de modelo, producción diaria y torta aprobadas. Revisión visual en escritorio y a 390 px, sin desbordamiento horizontal; comprobados el detalle de una fecha, apertura de un vano y estado sin carga, con datos sintéticos aislados.
 - Caché actualizada a v9-resumen-clasico-20261115 para recibir la revisión sin conexión. La compilación compartida actualiza GitHub Pages y el paquete de Cloudflare.
+- GitHub Pages publicado: commit e34d5094e62e5dc8e283cec51618f91ec990b677 y GitHub Actions 43777573021 correctos. El ZIP Cloudflare actualizado está disponible; su carga directa no se completó porque la extensión de Chrome requiere acceso a URL de archivos. La alternativa con el selector del equipo tampoco pudo abrirse porque la ventana permanecía minimizada.
 
 ## 15/11/2026 — Acceso difícil en la vista aérea del Excel
 
