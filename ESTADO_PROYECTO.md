@@ -7,6 +7,8 @@
 - Recuadro ET PUNA a la derecha de L-001, con tamaño constante en pantalla al hacer zoom. Se retiró el recuadro RN 51 cercano a L-001–L-007 del fondo. La otra referencia de RN 51 permanece.
 - La vista aérea del Excel incluye ET PUNA y el fondo corregido. Se comprobó visualmente la imagen generada por el exportador real.
 - TypeScript, ocho pruebas de Excel y torta, compilaciones y verificaciones de ambos destinos correctos. Revisión visual de Resumen en escritorio y a 390 px sin desbordamiento horizontal, secuencia animada y rótulo al enfocar P1 comprobados.
+- Publicado en GitHub Pages con d20a29f8427c12907a4b6e95a6d85a2c3649e449. GitHub Actions 43931388195 completó compilación, pruebas y despliegue. Se comprobó la ilustración junto a la torta en la web publicada.
+- Avances_LMT_Cloudflare.zip actualizado a la versión 12. La carga al sitio de Cloudflare sigue pendiente: Wrangler no tiene sesión autorizada en este entorno.
 
 ## 16/11/2026 — Recuperación de pantalla en blanco
 
