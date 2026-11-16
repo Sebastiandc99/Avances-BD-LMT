@@ -6,6 +6,8 @@
 - Agregada una recuperación independiente de los archivos compilados. Comprueba la publicación antes de restablecer exclusivamente la copia de la pantalla. Conserva IndexedDB, fotos, avances y la sesión local.
 - El arranque muestra un mensaje y acceso a recuperación si falla la descarga. Un error al dibujar la app también muestra ese acceso.
 - La actualización conserva una versión anterior de los archivos para completar cargas ya iniciadas.
+- Verificado en GitHub Actions 43885731625: ambas compilaciones recuperaron una pantalla inicial dañada, conservaron el avance local y reabrieron sin red. Compilación y publicación de GitHub Pages correctas, commit bc2f8f1ccf823ff8805c5f9ff373e5d2c06f26df.
+- Avances_LMT_Cloudflare.zip actualizado a la versión 11, con recuperar.html. Su publicación en Cloudflare requiere cargar ese paquete. El panel observado solicita iniciar sesión. El usuario no pudo probar todavía la entrada alternativa /reabrir.
 
 ## 16/11/2026 — Reapertura sin conexión
 
