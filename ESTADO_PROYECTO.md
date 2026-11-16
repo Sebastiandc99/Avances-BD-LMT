@@ -5,6 +5,8 @@
 - GitHub Pages y el paquete de Cloudflare instalan juntos la pantalla inicial, los archivos de la aplicación, el inventario y el fondo del mapa. La versión anterior sigue disponible mientras se descarga una actualización.
 - La app recupera la obra vinculada al dispositivo incluso si arranca con la sesión de nube pendiente. El botón de cabecera dice «Cargar avances manualmente».
 - Se comprobó la reapertura del paquete de Cloudflare en una pestaña nueva con el servidor apagado, con el inventario de 235 vanos, el mapa y el formulario de carga. La prueba de reinicio usa perfiles de Chrome temporales y bloquea la conexión con la nube.
+- En GitHub Actions 43864757516, ambas versiones pasaron dos reinicios completos de Chrome sin red. El vano de prueba guardado después del primer reinicio conservó el estado terminado en el segundo. También se verificaron el mapa y los 235 vanos.
+- GitHub Pages publicado en 9eac747f13973f78326d6c775aa75de453fbb3e1. Se comprobó el botón actualizado en la web. Avances_LMT_Cloudflare.zip actualizado a la versión 10. La carga al proyecto de Cloudflare sigue pendiente de una sesión autorizada.
 
 ## 16/11/2026 — Indicadores en Resumen
 
