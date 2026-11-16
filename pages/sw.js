@@ -29,7 +29,9 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith(prefix) && key !== cacheName).map(key => caches.delete(key)));
+    // Keep one previous shell while a document from that version finishes loading.
+    const previous = keys.filter(key => key.startsWith(prefix) && key !== cacheName).pop();
+    await Promise.all(keys.filter(key => key.startsWith(prefix) && key !== cacheName && key !== previous).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -40,11 +42,22 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   const isApp = request.mode === 'navigate' && url.origin === self.location.origin &&
     (url.pathname === new URL(scope).pathname || url.pathname === new URL('index.html', scope).pathname);
-  if (!isApp && !assetUrls.has(url.href)) return;
+  const compiledAsset = url.origin === self.location.origin && url.pathname.startsWith(new URL('assets/', scope).pathname) && /\.(?:js|css)$/.test(url.pathname);
+  // Recovery verifies the deployed files directly before replacing the local shell.
+  if (url.searchParams.has('recuperar')) return;
+  if (!isApp && !assetUrls.has(url.href) && !compiledAsset) return;
   event.respondWith((async () => {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(isApp ? scope : request, {ignoreVary: true});
-    return cached || fetch(request);
+    if (cached) return cached;
+    if (compiledAsset) {
+      const previous = (await caches.keys()).filter(key => key.startsWith(prefix) && key !== cacheName);
+      for (const key of previous) {
+        const saved = await (await caches.open(key)).match(request, {ignoreVary: true});
+        if (saved && !saved.headers.get('Content-Type')?.includes('text/html')) return saved;
+      }
+    }
+    return fetch(request);
   })());
 });
 

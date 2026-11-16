@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1476cb">
+  <title>Recuperar Avances LMT</title>
+  <style>
+    body{margin:0;background:#edf6ff;color:#17436a;font:16px/1.6 Arial,sans-serif}
+    main{max-width:480px;margin:10vh auto;padding:28px;background:white;border-radius:16px}
+    h1{font-size:25px}button,a{display:inline-block;padding:12px 18px;border-radius:8px;font:inherit}
+    button{border:0;background:#0879d4;color:white;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
+    a{color:#0867b1}p[role=status]{min-height:52px}small{display:block;margin-top:18px;color:#506d86}
+    @media(max-width:540px){main{margin:5vh 14px;padding:22px}}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Recuperar Avances LMT</h1>
+    <p>Repara los archivos de la pantalla cuando la app queda en blanco o no termina de abrir.</p>
+    <p>Los avances, fotos y la sesión guardados en este equipo se conservan.</p>
+    <button id="repair" type="button">Recuperar aplicación</button>
+    <p id="status" role="status" aria-live="polite">Necesitás conexión a internet para descargar la aplicación.</p>
+    <a id="open" href="./">Volver a la app</a>
+    <small>Si tenés otras pestañas de esta app abiertas, cerralas antes de volver a entrar.</small>
+  </main>
+  <script>
+    const button = document.getElementById('repair');
+    const status = document.getElementById('status');
+    const base = new URL('./', location.href);
+    document.getElementById('open').href = base.href;
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      status.textContent = 'Descargando y comprobando la aplicación…';
+      try {
+        const response = await fetch(new URL('index.html?recuperar=' + Date.now(), base), {cache:'no-store'});
+        if (!response.ok) throw new Error('La página no está disponible.');
+        const html = await response.text();
+        const page = new DOMParser().parseFromString(html, 'text/html');
+        const resources = Array.from(page.querySelectorAll('script[src],link[rel="stylesheet"]'))
+          .map(element => new URL(element.getAttribute('src') || element.getAttribute('href'), base));
+        if (!resources.some(url => url.pathname.endsWith('.js'))) throw new Error('La publicación está incompleta.');
+        for (const url of resources) {
+          if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname)) throw new Error('Recurso de otra aplicación.');
+          url.searchParams.set('recuperar', Date.now());
+          const asset = await fetch(url, {cache:'no-store'});
+          if (!asset.ok || asset.headers.get('Content-Type')?.includes('text/html')) throw new Error('Faltan archivos de la aplicación.');
+          await asset.arrayBuffer();
+        }
+        const inventory = await fetch(new URL('assets/inventory.json?recuperar=' + Date.now(), base), {cache:'no-store'});
+        if (!inventory.ok || !Array.isArray((await inventory.json()).vanos)) throw new Error('El plano no está disponible.');
+        status.textContent = 'Restableciendo los archivos de la pantalla…';
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.filter(registration => registration.scope === base.href).map(registration => registration.unregister()));
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          const prefix = 'lmt-pages:' + base.pathname + ':';
+          await Promise.all(keys.filter(key => key.startsWith(prefix)).map(key => caches.delete(key)));
+        }
+        status.textContent = 'Aplicación recuperada. Volviendo a tus avances…';
+        location.replace(base.href + '?recuperada=' + Date.now());
+      } catch (error) {
+        status.textContent = 'No se completó la recuperación. ' + error.message + ' Comprobá la conexión y volvé a intentar.';
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

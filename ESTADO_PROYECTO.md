@@ -1,5 +1,12 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Recuperación de pantalla en blanco
+
+- La dirección de Cloudflare abrió y sincronizó los avances en un navegador nuevo. La pantalla en blanco informada por el usuario no se reprodujo en ese equipo.
+- Agregada una recuperación independiente de los archivos compilados. Comprueba la publicación antes de restablecer exclusivamente la copia de la pantalla. Conserva IndexedDB, fotos, avances y la sesión local.
+- El arranque muestra un mensaje y acceso a recuperación si falla la descarga. Un error al dibujar la app también muestra ese acceso.
+- La actualización conserva una versión anterior de los archivos para completar cargas ya iniciadas.
+
 ## 16/11/2026 — Reapertura sin conexión
 
 - GitHub Pages y el paquete de Cloudflare instalan juntos la pantalla inicial, los archivos de la aplicación, el inventario y el fondo del mapa. La versión anterior sigue disponible mientras se descarga una actualización.
