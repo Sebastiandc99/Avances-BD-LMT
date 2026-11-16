@@ -23,9 +23,9 @@ export function completedEvents(ids:string[],records:Record<string,Event>,option
   return {...(old?.crews!==undefined?{crews:old.crews}:{}),status:'terminado',date:options.date,installed:old?.installed||0,notes:old?.notes||'',photos:old?.photos||[],responsible:options.mode==='dates'?(old?.responsible||''):options.responsible||old?.responsible||'',id:makeId(),spanId,version:(old?.version||0)+1,baseVersion:old?.version||0,createdAt,author:options.author,sync:'pending'};
  });
 }
-export function pendingCompletedEvents(spans:Span[],events:Event[],options:{date:string;author:string},makeId:()=>string,createdAt:string):Event[]{
+export function inProgressCompletedEvents(spans:Span[],events:Event[],options:{date:string;author:string},makeId:()=>string,createdAt:string):Event[]{
  const records=latestRecords(events);
- const ids=spans.filter(span=>(records[span.id]?.status||'pendiente')==='pendiente').map(span=>span.id);
+ const ids=spans.filter(span=>['ejecucion','observaciones'].includes(records[span.id]?.status)).map(span=>span.id);
  if(!ids.length)return [];
  const versions=Object.fromEntries(ids.map(id=>[id,records[id]?.version||0]));
  return selectionEvents(spans,ids,events,versions,{status:'terminado',date:options.date,withoutDate:false},options.author,makeId,createdAt);

@@ -1,5 +1,12 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Recuperación de carga y botón solo para En proceso
+
+- Recuperado el estado anterior al clic de las 17:12:33: 191 vanos terminados, 3 en proceso y 41 pendientes. Se incorporaron 41 revisiones que recuperan exactamente los campos previos; no se borraron eventos ni se modificaron los otros 194 vanos. Se guardó un respaldo privado del historial antes de intervenir.
+- Corregido el botón a Terminar los vanos en proceso. Solo incluye estados ejecucion y observaciones de ambas líneas; conserva todos los pendientes y los terminados. Mantiene cantidades reales, notas, responsable, fotos y cuadrillas; usa la fecha de hoy.
+- Verificados los 41 vanos recuperados campo por campo contra su estado previo: 41 coincidencias exactas. Cloudflare mostró 191 terminados, 3 en proceso y 41 pendientes después de sincronizar.
+- Pruebas locales aprobadas: 14 pruebas de lote/selección/vista, TypeScript, ambas compilaciones, rutas e inventario, y privacidad de archivos. En la interfaz aislada, el botón pasó de 3 terminados / 2 en proceso / 230 pendientes a 5 / 0 / 230. Publicación en curso.
+
 ## 16/11/2026 — Inicio en Resumen y terminación directa de pendientes
 
 - Cada apertura o recarga inicia en Resumen. Se conservan filtros, fecha, búsqueda y cámara de la sesión para volver a Vanos o Mapa.

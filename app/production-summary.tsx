@@ -38,8 +38,8 @@ function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoo
   {ticks.map(day => <text key={day} x={x(day)} y={height - 17} textAnchor="middle">{dateLabel(day).slice(0, 5)}</text>)}
  </svg>;
 }
-export default function ProductionSummary({ inventory, events, today, onOpenSpan, onCompletePending, completingPending, pendingCompletionBlocked, basePath='/' }: {
- inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void; onCompletePending: () => void; completingPending: boolean; pendingCompletionBlocked: boolean; basePath?: string;
+export default function ProductionSummary({ inventory, events, today, onOpenSpan, onCompleteInProgress, completingInProgress, inProgressCompletionBlocked, basePath='/' }: {
+ inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void; onCompleteInProgress: () => void; completingInProgress: boolean; inProgressCompletionBlocked: boolean; basePath?: string;
 }) {
  const [selectedDay, setSelectedDay] = useState('');
  const records = latestRecords(events);
@@ -50,8 +50,8 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
   <div className="analytics">
    <p className="project-total">Ambas líneas · {inventory.piquetes.length} piquetes · {stats.total} vanos</p>
    <div className="summary-bulk-action">
-    <button className="outline" type="button" onClick={onCompletePending} disabled={!stats.pending||completingPending||pendingCompletionBlocked}>{completingPending?<LoaderCircle className="spin" size={17}/>:<CheckCircle2 size={17}/>} {completingPending?'Guardando…':'Terminar todos los pendientes'}</button>
-    <span>{pendingCompletionBlocked?'Guardá o cerrá la carga abierta para usar esta opción.':stats.pending?`${stats.pending} vanos de ambas líneas · Se guardan con la fecha de hoy (${dateLabel(today)}).`:'No quedan vanos pendientes.'}</span>
+    <button className="outline" type="button" onClick={onCompleteInProgress} disabled={!stats.inProgress||completingInProgress||inProgressCompletionBlocked}>{completingInProgress?<LoaderCircle className="spin" size={17}/>:<CheckCircle2 size={17}/>} {completingInProgress?'Guardando…':'Terminar los vanos en proceso'}</button>
+    <span>{inProgressCompletionBlocked?'Guardá o cerrá la carga abierta para usar esta opción.':stats.inProgress?`${stats.inProgress} vanos en proceso de ambas líneas · Se guardan con la fecha de hoy (${dateLabel(today)}).`:'No hay vanos en proceso.'}</span>
    </div>
    <div className="summary-visuals">
     <ProgressPie stats={stats} />

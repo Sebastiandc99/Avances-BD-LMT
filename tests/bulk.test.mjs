@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { completionPlan, completedEvents, pendingCompletedEvents } from '../lib/bulk-progress.ts';
+import { completionPlan, completedEvents, inProgressCompletedEvents } from '../lib/bulk-progress.ts';
 import { latestRecords, metrics, validProgress } from '../lib/model.ts';
 const {vanos}=JSON.parse(fs.readFileSync('public/assets/inventory.json','utf8'));
 const options={date:'2026-11-08',responsible:'',author:'Prueba'};
@@ -38,25 +38,27 @@ test('dates mode revises already completed spans without counting them twice or 
  assert.equal(revisions[0].version,2);assert.equal(revisions[0].baseVersion,1);assert.equal(revisions[0].installed,8);assert.equal(revisions[0].notes,'Conservar');assert.equal(revisions[0].responsible,'A');assert.deepEqual(revisions[0].photos,old[0].photos);
 });
 
-test('one action finishes only pending spans in both lines, preserving other states and field data',()=>{
+test('one action completes only in-progress spans in both lines and preserves pending and completed records',()=>{
  const old=completedEvents(['L-001-002','L-002-003','L-003-004','FP-001-002'],{},options,makeId,'2026-11-08T10:00:00Z');
- old[0]={...old[0],status:'pendiente',notes:'Conservar nota',responsible:'Cuadrilla A',crews:2,photos:[makeId()]};
- old[1]={...old[1],status:'ejecucion',installed:3};old[3]={...old[3],status:'observaciones',installed:2};
- const additions=pendingCompletedEvents(vanos,old,options,makeId,'2026-11-10T10:00:00Z');
- assert.equal(additions.length,232);assert.ok(additions.some(e=>e.spanId==='FP-017-018'));
- const revised=additions.find(e=>e.spanId==='L-001-002');
- assert.equal(revised.baseVersion,1);assert.equal(revised.version,2);assert.equal(revised.notes,old[0].notes);assert.equal(revised.responsible,old[0].responsible);assert.equal(revised.crews,2);assert.deepEqual(revised.photos,old[0].photos);
+ old[0]={...old[0],status:'pendiente',installed:0,notes:'Pendiente real',date:'2026-11-07'};
+ old[1]={...old[1],status:'ejecucion',installed:3,notes:'Conservar nota',responsible:'Cuadrilla A',crews:2,photos:[makeId()]};
+ old[3]={...old[3],status:'observaciones',installed:2};
+ const additions=inProgressCompletedEvents(vanos,old,options,makeId,'2026-11-10T10:00:00Z');
+ assert.deepEqual(additions.map(e=>e.spanId),['L-002-003','FP-001-002']);
+ const revised=additions[0];
+ assert.equal(revised.baseVersion,1);assert.equal(revised.version,2);assert.equal(revised.notes,old[1].notes);assert.equal(revised.responsible,old[1].responsible);assert.equal(revised.crews,2);assert.equal(revised.installed,3);assert.deepEqual(revised.photos,old[1].photos);
  assert.ok(additions.every(e=>validProgress(e)&&e.status==='terminado'&&e.date===options.date&&e.sync==='pending'));
  const next=latestRecords([...old,...additions]);
- for(const spanId of ['L-002-003','L-003-004','FP-001-002'])assert.deepEqual(next[spanId],latestRecords(old)[spanId]);
- const stats=metrics(vanos,[...old,...additions],'2026-11-10');assert.equal(stats.pending,0);assert.equal(stats.done,233);assert.equal(stats.inProgress,2);
- assert.deepEqual(pendingCompletedEvents(vanos,[...old,...additions],options,()=>{throw Error('No debe generar otro evento');},'2026-11-10T10:01:00Z'),[]);
+ for(const spanId of ['L-001-002','L-003-004'])assert.deepEqual(next[spanId],latestRecords(old)[spanId]);
+ assert.equal(next['L-004-005'],undefined);
+ const stats=metrics(vanos,[...old,...additions],'2026-11-10');assert.equal(stats.pending,232);assert.equal(stats.done,3);assert.equal(stats.inProgress,0);
+ assert.deepEqual(inProgressCompletedEvents(vanos,[...old,...additions],options,()=>{throw Error('No debe generar otro evento');},'2026-11-10T10:01:00Z'),[]);
 });
 
-test('pending completion uses the latest queued state and blocks conflicted pending spans before generating events',()=>{
- const old=completedEvents(['L-001-002'],{},options,makeId,'2026-11-08T10:00:00Z');old[0].status='pendiente';
- const changed={...old[0],id:makeId(),status:'ejecucion',version:2,baseVersion:1};
- assert.deepEqual(pendingCompletedEvents(vanos.slice(0,1),[...old,changed],options,makeId,'2026-11-10T10:00:00Z'),[]);
+test('in-progress completion uses the latest state and blocks a conflicted in-progress span atomically',()=>{
+ const old=completedEvents(['L-001-002'],{},options,makeId,'2026-11-08T10:00:00Z');old[0].status='ejecucion';
+ const changed={...old[0],id:makeId(),status:'pendiente',version:2,baseVersion:1};
+ assert.deepEqual(inProgressCompletedEvents(vanos,[...old,changed],options,makeId,'2026-11-10T10:00:00Z'),[]);
  old[0].sync='conflict';
- assert.throws(()=>pendingCompletedEvents(vanos,old,options,()=>{throw Error('No debe generar eventos parciales');},'2026-11-10T10:00:00Z'),/conflicto/);
+ assert.throws(()=>inProgressCompletedEvents(vanos,old,options,()=>{throw Error('No debe generar eventos parciales');},'2026-11-10T10:00:00Z'),/conflicto/);
 });
