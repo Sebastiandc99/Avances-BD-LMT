@@ -56,6 +56,8 @@ input:focus,select:focus,textarea:focus{border-color:#2784d0;box-shadow:0 0 0 3p
 .span-stat.done .stat-icon{background:#e8f7e9;color:#29954e}
 .span-stat.progress .stat-icon{background:#fff4d9;color:#cd9218}
 .span-stat.pending .stat-icon{background:#edf1f5;color:#788594}
+.span-stat.bird-installed .stat-icon{background:#e8f7e9;color:#29954e}
+.summary-stats .span-stat.today{grid-column:span 2}
 .span-stat h3{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:3px}
 .span-stat strong{font-size:38px;font-weight:720;line-height:1.1;letter-spacing:-1px;color:#123857;font-variant-numeric:tabular-nums}
 .cielo-shell .content-grid{display:block}

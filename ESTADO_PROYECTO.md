@@ -1,5 +1,15 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Indicadores en Resumen
+
+- Movido el encabezado de tarjetas a Resumen. Las secciones de carga, incluido Mapa, dejan de mostrarlo.
+- Siete indicadores del proyecto completo: Total de vanos, Vanos terminados, Vanos en proceso, Vanos pendientes, Vanos de hoy, Bird diverters totales y Bird diverters instalados.
+- Vanos de hoy conserva el criterio vigente: terminados y en proceso con fecha de actividad de hoy. Los Bird diverters instalados incluyen los conteos informados en campo y las cantidades de planilla que corresponden a los vanos terminados sin conteo informado.
+- Se conserva el diseño de las tarjetas, la torta, la proyección y el gráfico de rendimiento diario. La tarjeta de hoy ocupa una fila completa en celular; los dos indicadores de Bird Diverters quedan juntos.
+- Validación: TypeScript y 22 pruebas de modelo, detalle diario y torta aprobadas. Compilaciones y verificaciones de GitHub Pages y Cloudflare aprobadas. Revisión visual del encabezado completo en escritorio y a 390 px, sin desbordamiento horizontal; comprobada su ausencia en Mapa.
+- Las pruebas de interfaz utilizaron registros sintéticos de un equipo aislado. No forman parte del paquete publicado ni se enviaron a Supabase.
+- Caché actualizada a v10-indicadores-resumen-20261116.
+
 ## 15/11/2026 — Resumen anterior con gráfico diario
 
 - Restaurada la presentación de Resumen anterior al informe con aspecto de Power BI: torta de avance, promedio diario, días restantes y fecha estimada, en una vista única con el estilo azul de la aplicación.
