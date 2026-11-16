@@ -22,7 +22,7 @@ self.addEventListener('install', event => {
       }
     }
     await cache.put(scope, shell);
-    // An open tab can keep using its own complete version until it closes.
+    await self.skipWaiting();
   })());
 });
 
@@ -41,7 +41,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   const isApp = request.mode === 'navigate' && url.origin === self.location.origin &&
-    (url.pathname === new URL(scope).pathname || url.pathname === new URL('index.html', scope).pathname);
+    [new URL(scope).pathname, new URL('index.html', scope).pathname, new URL('reabrir', scope).pathname].includes(url.pathname);
   const compiledAsset = url.origin === self.location.origin && url.pathname.startsWith(new URL('assets/', scope).pathname) && /\.(?:js|css)$/.test(url.pathname);
   // Recovery verifies the deployed files directly before replacing the local shell.
   if (url.searchParams.has('recuperar')) return;
@@ -65,5 +65,8 @@ self.addEventListener('message', event => {
   if (event.data?.type === 'CACHE_URLS') {
     // Only an installed, active worker receives this request from the dashboard.
     event.source?.postMessage({type: 'LMT_OFFLINE_READY'});
+    if (typeof event.data.entry === 'string' && !BUILD.entryAssets.some(file => new URL(file, scope).href === event.data.entry)) {
+      event.source?.postMessage({type: 'LMT_UPDATE_READY'});
+    }
   }
 });

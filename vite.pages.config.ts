@@ -33,6 +33,7 @@ export default defineConfig({
   root:path.join(root,'pages'),
   base,
   publicDir:path.join(root,'public'),
+  define:{'import.meta.env.VITE_APP_BUILD':JSON.stringify(new Date().toISOString())},
   css:{postcss:root},
   plugins:[react(),{
     name:'lmt-pages-offline',

@@ -116,5 +116,5 @@ export default function App(){
  return <Dashboard key={(session&&!session.user.is_anonymous?session.user.id:'device-app')+':'+revision}
   storageOwner={workspace||localOwner||undefined} autoCloud cloudConnecting={connecting} cloudError={cloudError}
   user={connected&&session?{id:workspace,name:session.user.email||'Este dispositivo',deviceOnly:!!session.user.is_anonymous}:null}
-  cloud={adapter} accountPanel={accountPanel} basePath={import.meta.env.BASE_URL}/>;
+  cloud={adapter} accountPanel={accountPanel} basePath={import.meta.env.BASE_URL} buildDate={import.meta.env.VITE_APP_BUILD}/>;
 }

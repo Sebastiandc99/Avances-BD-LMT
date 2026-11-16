@@ -1,5 +1,11 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Actualización visible con pestañas abiertas
+
+- La nueva copia se activa después de descargar y comprobar todos sus archivos, aun si hay otras pestañas de la aplicación abiertas. Se conserva la copia anterior para completar sus cargas.
+- La app detecta cuando sus archivos pertenecen a una versión anterior y ofrece Actualizar versión en un aviso visible sobre el contenido. Se vuelve a comprobar al recuperar conexión y al volver a la aplicación.
+- La actualización espera las escrituras locales y pide terminar la carga abierta antes de recargar. El pie muestra la fecha y hora de la compilación para identificar la copia recibida.
+
 ## 16/11/2026 — Cloudflare actualizado y copia anterior del navegador
 
 - Verificado que Cloudflare ya sirve la animación aprobada y ET PUNA. La indicación anterior de publicación pendiente quedó superada por esta comprobación del sitio.
