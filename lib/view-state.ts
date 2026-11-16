@@ -14,7 +14,7 @@ export type ViewState = {
 };
 const key = 'lmt-view-session-v2';
 const defaults: ViewState = {
- tab: 'list', mapLine: 'all', listLine: 'all', listDate: '', listFilter: 'all',
+ tab: 'metrics', mapLine: 'all', listLine: 'all', listDate: '', listFilter: 'all',
  listSearch: '', mapQuery: '', mapMemory: null, multiMode: false, multiIds: [],
 };
 export function readViewState(): ViewState {
@@ -28,7 +28,7 @@ export function readViewState(): ViewState {
    && Number.isFinite(memory.size?.w) && Number.isFinite(memory.size?.h)
    && memory.size.w > 0 && memory.size.h > 0;
   return {
-   tab: ['list', 'map', 'metrics', 'history'].includes(saved.tab) ? saved.tab : defaults.tab,
+   tab: defaults.tab,
    mapLine: ['all', 'larga', 'corta'].includes(saved.mapLine) ? saved.mapLine : 'all',
    listLine: ['all', 'larga', 'corta'].includes(saved.listLine) ? saved.listLine : 'all',
    listDate: typeof saved.listDate === 'string' ? saved.listDate : '',

@@ -189,7 +189,9 @@ input:focus,select:focus,textarea:focus{border-color:#2784d0;box-shadow:0 0 0 3p
 .summary-visuals .progress-pie{width:min(210px,100%);justify-self:center}
 .summary-diverters{display:flex;flex-direction:column;justify-content:center;min-width:0;margin:0;border:1px solid #d9e6f4;border-radius:13px;overflow:hidden;background:#fff}
 .summary-diverters img{display:block;width:100%;height:auto}
-.summary-diverters figcaption{padding:8px 16px 14px;text-align:center;font-size:11px;color:#6c8195}
+.summary-bulk-action{display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;padding:14px 16px;margin-top:16px;border:1px solid #d9e6f4;border-radius:10px;background:#f5f9fd}
+.summary-bulk-action button{max-width:100%}
+.summary-bulk-action span{font-size:12px;line-height:1.5;color:#56748d}
 @media(max-width:1000px){.summary-visuals{grid-template-columns:1fr}}
 @media(max-width:600px){.summary-visuals{gap:14px}.summary-visuals .progress-pie-card{grid-template-columns:1fr}.summary-visuals .progress-pie{width:min(240px,100%)}}
 

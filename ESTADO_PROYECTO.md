@@ -1,5 +1,14 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Inicio en Resumen y terminación directa de pendientes
+
+- Cada apertura o recarga inicia en Resumen. Se conservan filtros, fecha, búsqueda y cámara de la sesión para volver a Vanos o Mapa.
+- Retirados el contador numérico de la animación y la leyenda Secuencia ilustrativa de montaje. Se conservan las ocho espirales y su aparición progresiva.
+- Botón Terminar todos los pendientes en Resumen: un clic guarda los pendientes de ambas líneas como terminados, con la fecha local de hoy. No modifica vanos en proceso o terminados ni sus campos. Conserva notas, fotos, responsable y cuadrillas de los pendientes.
+- La selección se calcula sobre los últimos registros dentro de la cola de escritura local. Evita doble clic, respeta conflictos y usa la sincronización habitual. La acción sigue funcionando sin conexión.
+- Validación local aprobada: 14 pruebas de carga masiva, vista y selección; TypeScript; ambas compilaciones y sus verificaciones; privacidad de documentos. Revisión visual de escritorio y móvil a 390 px sin desbordamiento. Con datos aislados, el botón pasó 230 pendientes a terminados, conservó los dos vanos en proceso y los campos previos, y los cambios persistieron al recargar. El inicio en Resumen y el bloqueo del botón sin pendientes quedaron comprobados.
+- Publicación en curso. No se ejecutó la terminación masiva sobre avances reales.
+
 ## 16/11/2026 — Actualización visible con pestañas abiertas
 
 - La nueva copia se activa después de descargar y comprobar todos sus archivos, aun si hay otras pestañas de la aplicación abiertas. Se conserva la copia anterior para completar sus cargas.

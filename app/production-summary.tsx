@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, TrendingUp, X } from 'lucide-react';
+import { CheckCircle2, ChevronDown, LoaderCircle, TrendingUp, X } from 'lucide-react';
 import { dailyCompletion } from '../lib/daily-completion';
 import { dateLabel, latestRecords, metrics, type Event, type Inventory, type Span } from '../lib/model';
 import ProgressPie from './progress-pie';
@@ -38,8 +38,8 @@ function DailyChart({ daily, onChoose }: { daily: Record<string, number>; onChoo
   {ticks.map(day => <text key={day} x={x(day)} y={height - 17} textAnchor="middle">{dateLabel(day).slice(0, 5)}</text>)}
  </svg>;
 }
-export default function ProductionSummary({ inventory, events, today, onOpenSpan, basePath='/' }: {
- inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void; basePath?: string;
+export default function ProductionSummary({ inventory, events, today, onOpenSpan, onCompletePending, completingPending, pendingCompletionBlocked, basePath='/' }: {
+ inventory: Inventory; events: Event[]; today: string; onOpenSpan: (id: string) => void; onCompletePending: () => void; completingPending: boolean; pendingCompletionBlocked: boolean; basePath?: string;
 }) {
  const [selectedDay, setSelectedDay] = useState('');
  const records = latestRecords(events);
@@ -49,11 +49,14 @@ export default function ProductionSummary({ inventory, events, today, onOpenSpan
   <div className="panel-title"><h3><TrendingUp size={17} /> Resumen de producción</h3><span>Ambas líneas · Proyecto completo</span></div>
   <div className="analytics">
    <p className="project-total">Ambas líneas · {inventory.piquetes.length} piquetes · {stats.total} vanos</p>
+   <div className="summary-bulk-action">
+    <button className="outline" type="button" onClick={onCompletePending} disabled={!stats.pending||completingPending||pendingCompletionBlocked}>{completingPending?<LoaderCircle className="spin" size={17}/>:<CheckCircle2 size={17}/>} {completingPending?'Guardando…':'Terminar todos los pendientes'}</button>
+    <span>{pendingCompletionBlocked?'Guardá o cerrá la carga abierta para usar esta opción.':stats.pending?`${stats.pending} vanos de ambas líneas · Se guardan con la fecha de hoy (${dateLabel(today)}).`:'No quedan vanos pendientes.'}</span>
+   </div>
    <div className="summary-visuals">
     <ProgressPie stats={stats} />
     <figure className="summary-diverters">
      <img src={basePath+'assets/diverters-perspectiva.svg'} width="800" height="460" alt="Secuencia ilustrativa de ocho Bird diverters amarillos apareciendo de a uno entre dos piquetes, con el paisaje de la Puna."/>
-     <figcaption>Secuencia ilustrativa de montaje</figcaption>
     </figure>
    </div>
    <div className="performance-summary">

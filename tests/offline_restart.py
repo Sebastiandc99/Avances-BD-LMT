@@ -37,6 +37,12 @@ def chrome(profile, offline=False):
         yield browser, WebDriverWait(browser, 20)
 
 
+def open_vanos(browser, wait):
+    # A fresh load always starts in Resumen, even when the saved tab was Vanos or Mapa.
+    wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '.cielo-nav button[aria-current="page"]').text == 'Resumen')
+    browser.find_element(By.XPATH, '//button[normalize-space()="Vanos"]').click()
+
+
 def check_restart(build, base):
     with TemporaryDirectory() as temporary:
         root = Path(temporary) / 'www'
@@ -56,6 +62,7 @@ def check_restart(build, base):
         edit = 'button[aria-label="Editar vano 1 — 2"]'
         with chrome(profile, offline=True) as (browser, wait):
             browser.get(url)
+            open_vanos(browser, wait)
             wait.until(lambda d: d.find_element(By.CSS_SELECTOR, edit)).click()
             assert browser.find_element(By.CSS_SELECTOR, '.hero-load').text == 'Cargar avances manualmente'
             browser.find_element(By.XPATH, '//button[normalize-space()="Terminado"]').click()
@@ -64,6 +71,7 @@ def check_restart(build, base):
 
         with chrome(profile, offline=True) as (browser, wait):
             browser.get(url)
+            open_vanos(browser, wait)
             wait.until(lambda d: 'Terminado' in d.find_element(By.CSS_SELECTOR, 'tbody tr').text)
             browser.find_element(By.XPATH, '//button[normalize-space()="Mapa"]').click()
             wait.until(lambda d: '235 vanos' in d.find_element(By.CSS_SELECTOR, '.panel-title').text)
@@ -82,6 +90,7 @@ def check_recovery(build, base):
                 with chrome(profile) as (browser, wait):
                     browser.get(url)
                     wait.until(lambda d: 'Listo para trabajar sin conexión' in d.find_element(By.TAG_NAME, 'footer').text)
+                    open_vanos(browser, wait)
                     browser.find_element(By.CSS_SELECTOR, 'button[aria-label="Editar vano 1 — 2"]').click()
                     browser.find_element(By.XPATH, '//button[normalize-space()="Terminado"]').click()
                     browser.find_element(By.CSS_SELECTOR, '.form-footer button[type=submit]').click()
@@ -103,12 +112,14 @@ def check_recovery(build, base):
                     wait.until(lambda d: d.execute_script('return document.getElementById("root")?.childElementCount===0'))
                     browser.get(url + 'recuperar.html')
                     browser.find_element(By.ID, 'repair').click()
+                    open_vanos(browser, wait)
                     wait.until(lambda d: 'Terminado' in d.find_element(By.CSS_SELECTOR, 'tbody tr').text)
                     wait.until(lambda d: 'Listo para trabajar sin conexión' in d.find_element(By.TAG_NAME, 'footer').text)
             finally:
                 server.shutdown()
         with chrome(profile, offline=True) as (browser, wait):
             browser.get(url)
+            open_vanos(browser, wait)
             wait.until(lambda d: 'Terminado' in d.find_element(By.CSS_SELECTOR, 'tbody tr').text)
         print(f'{build}: pantalla blanca recuperada, avance local conservado y nuevo reinicio sin red verificados.', flush=True)
 
@@ -138,6 +149,7 @@ def check_open_tab_update(build, base):
                 with chrome(profile) as (browser, wait):
                     browser.get(url)
                     wait.until(lambda d: 'Listo para trabajar sin conexión' in d.find_element(By.TAG_NAME, 'footer').text)
+                    open_vanos(browser, wait)
                     browser.find_element(By.CSS_SELECTOR, 'button[aria-label="Editar vano 1 — 2"]').click()
                     browser.find_element(By.XPATH, '//button[normalize-space()="Terminado"]').click()
                     browser.find_element(By.CSS_SELECTOR, '.form-footer button[type=submit]').click()
@@ -160,6 +172,7 @@ def check_open_tab_update(build, base):
                     wait.until(lambda d: not d.find_elements(By.CSS_SELECTOR, '.form-footer button[type=submit]'))
                     browser.find_element(By.XPATH, '//button[normalize-space()="Actualizar versión"]').click()
                     wait.until(lambda d: d.title == 'Avances LMT')
+                    open_vanos(browser, wait)
                     wait.until(lambda d: 'Terminado' in d.find_element(By.CSS_SELECTOR, 'tbody tr').text)
                     browser.find_element(By.CSS_SELECTOR, 'button[aria-label="Editar vano 2 — 3"]').click()
                     assert browser.find_element(By.CSS_SELECTOR, 'textarea').get_attribute('value') == 'Borrador conservado durante la actualización'
@@ -169,6 +182,7 @@ def check_open_tab_update(build, base):
                 server.shutdown()
         with chrome(profile, offline=True) as (browser, wait):
             browser.get(url)
+            open_vanos(browser, wait)
             wait.until(lambda d: 'Terminado' in d.find_element(By.CSS_SELECTOR, 'tbody tr').text)
         print(f'{build}: actualización con pestaña abierta, aviso, borrador protegido y reapertura offline verificados.', flush=True)
 
