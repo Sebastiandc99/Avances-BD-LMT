@@ -5,7 +5,9 @@
 - Recuperado el estado anterior al clic de las 17:12:33: 191 vanos terminados, 3 en proceso y 41 pendientes. Se incorporaron 41 revisiones que recuperan exactamente los campos previos; no se borraron eventos ni se modificaron los otros 194 vanos. Se guardó un respaldo privado del historial antes de intervenir.
 - Corregido el botón a Terminar los vanos en proceso. Solo incluye estados ejecucion y observaciones de ambas líneas; conserva todos los pendientes y los terminados. Mantiene cantidades reales, notas, responsable, fotos y cuadrillas; usa la fecha de hoy.
 - Verificados los 41 vanos recuperados campo por campo contra su estado previo: 41 coincidencias exactas. Cloudflare mostró 191 terminados, 3 en proceso y 41 pendientes después de sincronizar.
-- Pruebas locales aprobadas: 14 pruebas de lote/selección/vista, TypeScript, ambas compilaciones, rutas e inventario, y privacidad de archivos. En la interfaz aislada, el botón pasó de 3 terminados / 2 en proceso / 230 pendientes a 5 / 0 / 230. Publicación en curso.
+- Pruebas locales aprobadas: 14 pruebas de lote/selección/vista, TypeScript, ambas compilaciones, rutas e inventario, y privacidad de archivos. En la interfaz aislada, el botón pasó de 3 terminados / 2 en proceso / 230 pendientes a 5 / 0 / 230; el pendiente con notas y cuadrillas conservó su estado y sus datos al recargar. Revisión móvil de 390 px sin desbordamiento.
+- Publicado en GitHub Pages con df1787aa4ac5370ab6288bc58dea418546c537f1. GitHub Actions 43948979769 aprobó pruebas, compilaciones, comprobaciones sin conexión y despliegue. La app publicada mostró los 191 terminados, 3 en proceso y 41 pendientes recuperados junto al botón corregido.
+- Avances_LMT_Cloudflare.zip actualizado a la revisión 15; compilación local a las 17:19 de Argentina. Para instalar el botón corregido en Cloudflare hay que cargar este paquete. La recuperación de los datos ya está guardada en Supabase y comprobada en Cloudflare.
 
 ## 16/11/2026 — Inicio en Resumen y terminación directa de pendientes
 
