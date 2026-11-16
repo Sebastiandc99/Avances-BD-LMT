@@ -5,6 +5,8 @@
 - La nueva copia se activa después de descargar y comprobar todos sus archivos, aun si hay otras pestañas de la aplicación abiertas. Se conserva la copia anterior para completar sus cargas.
 - La app detecta cuando sus archivos pertenecen a una versión anterior y ofrece Actualizar versión en un aviso visible sobre el contenido. Se vuelve a comprobar al recuperar conexión y al volver a la aplicación.
 - La actualización espera las escrituras locales y pide terminar la carga abierta antes de recargar. El pie muestra la fecha y hora de la compilación para identificar la copia recibida.
+- Pruebas de reinicio, recuperación y actualización con pestaña abierta aprobadas en ambos destinos. La prueba de actualización conserva un borrador, muestra el aviso y comprueba la nueva pantalla después de guardar y recargar. La nueva copia también reabre sin red.
+- GitHub Actions 43937714417 y despliegue de Pages correctos para 5072bb1694dc600ae1403d0609f9bf6d79b8fa66. Paquete Cloudflare actualizado a la revisión 13, con compilación local del 16/11/2026 a las 16:16 de Argentina. Esta revisión se instala mediante la carga del ZIP en Cloudflare.
 
 ## 16/11/2026 — Cloudflare actualizado y copia anterior del navegador
 
