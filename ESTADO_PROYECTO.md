@@ -1,5 +1,13 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Cloudflare actualizado y copia anterior del navegador
+
+- Verificado que Cloudflare ya sirve la animación aprobada y ET PUNA. La indicación anterior de publicación pendiente quedó superada por esta comprobación del sitio.
+- En el navegador de prueba, la entrada principal conservaba un HTML anterior. La entrada /reabrir mostró la versión actual con la animación junto a la torta.
+- Se usó /recuperar para restablecer la copia de la pantalla. La dirección principal volvió a mostrar la animación y ET PUNA, conservando la sesión y los registros. Se confirmó visualmente en el sitio de Cloudflare.
+- El usuario debe abrir /recuperar en el mismo Chrome donde ve la versión anterior y pulsar Recuperar aplicación con conexión disponible.
+- Esta comprobación requirió recuperar la copia del navegador. El paquete vigente sigue siendo la versión 12.
+
 ## 16/11/2026 — Animación elegida y ET PUNA
 
 - Incorporada la segunda propuesta, con perspectiva y paisaje de la Puna, junto a la torta de Resumen. La misma ilustración se integra como SVG animado externo, con ocho espirales que aparecen una por una. Funciona sin conexión y queda debajo de la torta en pantallas angostas.
