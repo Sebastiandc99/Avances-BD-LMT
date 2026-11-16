@@ -1,25 +1,56 @@
-const BASE=new URL('./',self.location.href).pathname;
-const PREFIX='lmt-pages:'+BASE+':';
-const CACHE=PREFIX+'v10-indicadores-resumen-20261116';
-const CORE=[BASE,BASE+'assets/inventory.json?revision=planillas-2026-11-15-fp18',BASE+'assets/fondo-esquematico.svg',BASE+'manifest.webmanifest',BASE+'assets/obra-lmt.jpg'];
-const belongs=u=>u.origin===self.location.origin&&u.pathname.startsWith(BASE);
-const asset=u=>belongs(u)&&(/\.(?:js|css|woff2|svg|png)$/.test(u.pathname)||u.pathname.startsWith(BASE+'assets/'));
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',event=>{
-  const request=event.request,url=new URL(request.url);
-  if(request.method!=='GET'||!belongs(url)||url.pathname.startsWith(BASE+'api/'))return;
-  if(request.mode==='navigate'){
-    event.respondWith(fetch(request).then(async response=>{if(response.ok&&!response.redirected){const cache=await caches.open(CACHE);await cache.put(BASE,response.clone());}return response;}).catch(async()=>await caches.match(BASE)||new Response('Conectate una vez para preparar el modo sin conexión.',{status:503})));
-  }else if(asset(url)){
-    event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(async response=>{if(response.ok){const cache=await caches.open(CACHE);await cache.put(request,response.clone());}return response;})));
-  }
+/* BUILD_CONFIG */
+const scope = self.registration.scope;
+const prefix = 'lmt-pages:' + new URL(scope).pathname + ':';
+const cacheName = prefix + BUILD.version;
+const files = BUILD.files.map(url => new Request(new URL(url, scope), {cache: 'reload'}));
+const assetUrls = new Set(files.map(request => request.url));
+
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const shell = await fetch(scope, {cache: 'reload', headers: {Accept: 'text/html'}});
+    const html = await shell.clone().text();
+    if (!shell.ok || shell.redirected || !BUILD.entryAssets.every(file => html.includes(new URL(file, scope).pathname))) {
+      throw new Error('La página y los recursos corresponden a versiones diferentes.');
+    }
+    const cache = await caches.open(cacheName);
+    await cache.addAll(files);
+    // Pages can return the HTML shell with status 200 for a missing static file.
+    for (const file of files) {
+      const saved = await cache.match(file, {ignoreVary: true});
+      if (!saved || saved.headers.get('Content-Type')?.includes('text/html')) {
+        throw new Error('No se pudo guardar el recurso ' + file.url);
+      }
+    }
+    await cache.put(scope, shell);
+    // An open tab can keep using its own complete version until it closes.
+  })());
 });
-self.addEventListener('message',event=>{
-  if(event.data?.type!=='CACHE_URLS'||!Array.isArray(event.data.urls))return;
-  event.waitUntil((async()=>{try{
-    const urls=event.data.urls.filter(value=>{try{return asset(new URL(value))}catch{return false}});
-    const cache=await caches.open(CACHE);await cache.addAll([...new Set(urls)]);
-    event.source?.postMessage({type:'LMT_OFFLINE_READY'});
-  }catch{event.source?.postMessage({type:'LMT_OFFLINE_FAILED'});}})());
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(prefix) && key !== cacheName).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  const isApp = request.mode === 'navigate' && url.origin === self.location.origin &&
+    (url.pathname === new URL(scope).pathname || url.pathname === new URL('index.html', scope).pathname);
+  if (!isApp && !assetUrls.has(url.href)) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(cacheName);
+    const cached = await cache.match(isApp ? scope : request, {ignoreVary: true});
+    return cached || fetch(request);
+  })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'CACHE_URLS') {
+    // Only an installed, active worker receives this request from the dashboard.
+    event.source?.postMessage({type: 'LMT_OFFLINE_READY'});
+  }
 });

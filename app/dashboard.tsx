@@ -78,7 +78,30 @@ export default function Dashboard({user,basePath='/',localOnly=false,cloud,accou
   writes.current=task.catch(()=>{});return task;
  }
  const github=useGitHubBackup({owner,events,ready,online,onRestore:async incoming=>{await persist(es=>mergeGitHubRecords(es,incoming));void sync();}});
- useEffect(()=>{readyOwner.current='';setLoadedOwner('');let active=true;async function init(){try{await writes.current;if(cloud&&user)await claimLocalRecords(owner);const [data,es,ps]=await Promise.all([fetch(basePath+'assets/inventory.json?revision='+inventoryRevision).then(r=>{if(!r.ok)throw Error('No se pudo cargar el plano.');return r.json() as Promise<Inventory>}),readStore<Event>('events',owner),readStore<Photo>('photos',owner)]);if(!active)return;setInventory(data);eventsRef.current=es;setEvents(es);photosRef.current=Object.fromEntries(ps.map(p=>[p.id,p]));setPhotos(photosRef.current);readyOwner.current=owner;setLoadedOwner(owner);setReady(true);}catch(e){setError(String(e));}}init();setOnline(navigator.onLine);function status(){setOnline(navigator.onLine)}window.addEventListener('online',status);window.addEventListener('offline',status);if('serviceWorker' in navigator){navigator.serviceWorker.addEventListener('message',e=>{if(e.data?.type==='LMT_OFFLINE_READY')setOfflineReady(true)});navigator.serviceWorker.register(basePath+'sw.js',{scope:basePath}).then(()=>navigator.serviceWorker.ready).then(reg=>{const urls=performance.getEntriesByType('resource').map(r=>r.name);reg.active?.postMessage({type:'CACHE_URLS',urls});}).catch(()=>{});}navigator.storage?.persist?.().catch(()=>{});return()=>{active=false;window.removeEventListener('online',status);window.removeEventListener('offline',status)};},[owner,!!cloud]);
+ useEffect(()=>{readyOwner.current='';setLoadedOwner('');let active=true;async function init(){try{await writes.current;if(cloud&&user)await claimLocalRecords(owner);const [data,es,ps]=await Promise.all([fetch(basePath+'assets/inventory.json?revision='+inventoryRevision).then(r=>{if(!r.ok)throw Error('No se pudo cargar el plano.');return r.json() as Promise<Inventory>}),readStore<Event>('events',owner),readStore<Photo>('photos',owner)]);if(!active)return;setInventory(data);eventsRef.current=es;setEvents(es);photosRef.current=Object.fromEntries(ps.map(p=>[p.id,p]));setPhotos(photosRef.current);readyOwner.current=owner;setLoadedOwner(owner);setReady(true);}catch(e){setError(String(e));}}init();setOnline(navigator.onLine);function status(){setOnline(navigator.onLine)}window.addEventListener('online',status);window.addEventListener('offline',status);navigator.storage?.persist?.().catch(()=>{});return()=>{active=false;window.removeEventListener('online',status);window.removeEventListener('offline',status)};},[owner,!!cloud]);
+ useEffect(()=>{
+  if(!('serviceWorker' in navigator))return;
+  const workers=navigator.serviceWorker;
+  let active=true;
+  function askReady(worker:ServiceWorker|null){
+   if(!active||!worker)return;
+   // The server-rendered edition still discovers its resources in the page.
+   worker.postMessage({type:'CACHE_URLS',urls:performance.getEntriesByType('resource').map(entry=>entry.name)});
+  }
+  function report(event:MessageEvent){
+   if(event.data?.type==='LMT_OFFLINE_READY')setOfflineReady(true);
+  }
+  function controllerChanged(){askReady(workers.controller);}
+  function register(){
+   void workers.register(basePath+'sw.js',{scope:basePath,updateViaCache:'none'})
+    .then(()=>workers.ready).then(registration=>askReady(registration.active)).catch(()=>{});
+  }
+  workers.addEventListener('message',report);
+  workers.addEventListener('controllerchange',controllerChanged);
+  window.addEventListener('online',register);
+  controllerChanged();register();
+  return()=>{active=false;workers.removeEventListener('message',report);workers.removeEventListener('controllerchange',controllerChanged);window.removeEventListener('online',register);};
+ },[basePath]);
  useEffect(()=>{function before(e:BeforeUnloadEvent){if(dirty){e.preventDefault();e.returnValue='';}}window.addEventListener('beforeunload',before);return()=>window.removeEventListener('beforeunload',before)},[dirty]);
  useEffect(()=>{if(!ready||loadedOwner!==owner||!online||!user)return;void sync();const resume=()=>{if(document.visibilityState==='visible')void sync();};const timer=setInterval(()=>void sync(),45000);document.addEventListener('visibilitychange',resume);window.addEventListener('focus',resume);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',resume);window.removeEventListener('focus',resume)}},[ready,online,user?.id,loadedOwner]);
  useEffect(()=>{if(!ready||loadedOwner!==owner||!online||!user||!pending||syncing||syncMessage)return;const timer=setTimeout(()=>void sync(),1500);return()=>clearTimeout(timer);},[ready,loadedOwner,online,user?.id,pending,syncing,syncMessage]);
@@ -163,7 +186,7 @@ export default function Dashboard({user,basePath='/',localOnly=false,cloud,accou
  <section className="site-hero" aria-label="Línea de media tensión en el Salar del Rincón">
   <img className="hero-photo" src={basePath+'assets/obra-lmt.jpg'} alt="Piquetes de la línea de media tensión junto al camino de obra y los cerros del Salar del Rincón" fetchPriority="high"/>
   <div className="hero-shade"/>
-  <div className="hero-inner"><div className="hero-copy"><div className="hero-eyebrow">REGISTRO EN CAMPO</div><h2>{sectionTitle}</h2><p>LMT larga y LMT corta <span>·</span> Salar del Rincón</p><span className="hero-date">{dateLabel(localDate())}</span></div><button className="primary hero-load" onClick={openBulk}><Plus size={23}/> Cargar avances</button></div>
+  <div className="hero-inner"><div className="hero-copy"><div className="hero-eyebrow">REGISTRO EN CAMPO</div><h2>{sectionTitle}</h2><p>LMT larga y LMT corta <span>·</span> Salar del Rincón</p><span className="hero-date">{dateLabel(localDate())}</span></div><button className="primary hero-load" onClick={openBulk}><Plus size={23}/> Cargar avances manualmente</button></div>
  </section>
  <main className="workspace">
   <section className="cielo-progress" aria-label="Avance total del proyecto"><div className="progress-label"><span>Avance total</span><strong>{fmt(projectStats.pct,1)}<small>%</small></strong></div><div className="cielo-progress-track" role="progressbar" aria-label="Vanos terminados del proyecto" aria-valuenow={Number(projectStats.pct.toFixed(1))} aria-valuemin={0} aria-valuemax={100}><i style={{width:projectStats.pct+'%'}}/></div><span className="progress-count">{projectStats.done} de {projectStats.total} vanos</span>

@@ -44,7 +44,7 @@ function cachedWorkspace(id:string){
 export default function App(){
  const [session,setSession]=useState<Session|null>(()=>{try{const cached=JSON.parse(localStorage.getItem('avances-bd-lmt-auth-v1')||'null');return typeof cached?.user?.id==='string'?cached:null;}catch{return null;}});
  const [localOwner,setLocalOwner]=useState(storedOwner);
- const [workspace,setWorkspace]=useState(()=>session?cachedWorkspace(session.user.id):storedOwner());
+ const [workspace,setWorkspace]=useState(()=>cachedWorkspace(session?.user.id||storedOwner()));
  const [resolvedAuth,setResolvedAuth]=useState(''),[connecting,setConnecting]=useState(false),[cloudError,setCloudError]=useState(''),[revision,setRevision]=useState(0);
  const active=useRef(true),busy=useRef(false),sessionRef=useRef(session),workspaceJob=useRef<Promise<void>|null>(null);
  sessionRef.current=session;

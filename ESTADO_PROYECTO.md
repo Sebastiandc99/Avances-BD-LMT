@@ -1,5 +1,11 @@
 # Estado del proyecto Avances LMT
 
+## 16/11/2026 — Reapertura sin conexión
+
+- GitHub Pages y el paquete de Cloudflare instalan juntos la pantalla inicial, los archivos de la aplicación, el inventario y el fondo del mapa. La versión anterior sigue disponible mientras se descarga una actualización.
+- La app recupera la obra vinculada al dispositivo incluso si arranca con la sesión de nube pendiente. El botón de cabecera dice «Cargar avances manualmente».
+- Se comprobó la reapertura del paquete de Cloudflare en una pestaña nueva con el servidor apagado, con el inventario de 235 vanos, el mapa y el formulario de carga. La prueba de reinicio usa perfiles de Chrome temporales y bloquea la conexión con la nube.
+
 ## 16/11/2026 — Indicadores en Resumen
 
 - Movido el encabezado de tarjetas a Resumen. Las secciones de carga, incluido Mapa, dejan de mostrarlo.

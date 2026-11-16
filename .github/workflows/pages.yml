@@ -54,6 +54,11 @@ jobs:
         run: |
           npm run build:cloudflare
           npm run verify:cloudflare
+      - name: Probar reinicio de Chrome sin conexión en ambas versiones
+        run: |
+          python3 -m venv "$RUNNER_TEMP/lmt-browser-test"
+          "$RUNNER_TEMP/lmt-browser-test/bin/pip" install --quiet selenium==4.32.0
+          "$RUNNER_TEMP/lmt-browser-test/bin/python" tests/offline_restart.py
       - uses: actions/upload-pages-artifact@v3
         with:
           path: pages-dist
